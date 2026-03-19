@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
-| Tool Version : Vivado v.2025.1 (lin64) Build 6140274 Wed May 21 22:58:25 MDT 2025
-| Date         : Thu Mar 19 15:05:34 2026
-| Host         : ThinkpadT14s running 64-bit Ubuntu 24.04.4 LTS
+| Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
+| Date         : Thu Mar 19 18:49:45 2026
+| Host         : DESKTOP-QGTME97 running 64-bit major release  (build 9200)
 | Command      : report_clock_utilization -file system_bd_wrapper_clock_utilization_routed.rpt
 | Design       : system_bd_wrapper
 | Device       : 7z015-clg485

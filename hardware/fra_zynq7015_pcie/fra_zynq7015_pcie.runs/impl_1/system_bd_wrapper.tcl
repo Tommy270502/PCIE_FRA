@@ -1,5 +1,5 @@
 namespace eval ::optrace {
-  variable script "/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/impl_1/system_bd_wrapper.tcl"
+  variable script "C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/impl_1/system_bd_wrapper.tcl"
   variable category "vivado_impl"
 }
 
@@ -107,9 +107,11 @@ set rc [catch {
   create_msg_db write_bitstream.pb
   set_param chipscope.maxJobs 4
   set_param general.usePosixSpawnForFork 1
+  set_param bd.open.in_stealth_mode 1
+  set_param xicom.use_bs_reader 1
   set_param runs.launchOptions { -jobs 8  }
   open_checkpoint system_bd_wrapper_routed.dcp
-  set_property webtalk.parent_dir /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.cache/wt [current_project]
+  set_property webtalk.parent_dir C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.cache/wt [current_project]
 set_property TOP system_bd_wrapper [current_fileset]
 OPTRACE "read constraints: write_bitstream" START { }
 OPTRACE "read constraints: write_bitstream" END { }
