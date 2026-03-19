@@ -7,10 +7,14 @@
 # Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 # 
 
+echo "This script was generated under a different operating system."
+echo "Please update the PATH and LD_LIBRARY_PATH variables below, before executing this script"
+exit
+
 if [ -z "$PATH" ]; then
-  PATH=/home/thomas/tools/Xilinx/2025.1/Vitis/bin:/home/thomas/tools/Xilinx/2025.1/Vivado/ids_lite/ISE/bin/lin64:/home/thomas/tools/Xilinx/2025.1/Vivado/bin
+  PATH=C:/Xilinx/2025.1/Vitis/bin;C:/Xilinx/2025.1/Vivado/ids_lite/ISE/bin/nt64;C:/Xilinx/2025.1/Vivado/ids_lite/ISE/lib/nt64:C:/Xilinx/2025.1/Vivado/bin
 else
-  PATH=/home/thomas/tools/Xilinx/2025.1/Vitis/bin:/home/thomas/tools/Xilinx/2025.1/Vivado/ids_lite/ISE/bin/lin64:/home/thomas/tools/Xilinx/2025.1/Vivado/bin:$PATH
+  PATH=C:/Xilinx/2025.1/Vitis/bin;C:/Xilinx/2025.1/Vivado/ids_lite/ISE/bin/nt64;C:/Xilinx/2025.1/Vivado/ids_lite/ISE/lib/nt64:C:/Xilinx/2025.1/Vivado/bin:$PATH
 fi
 export PATH
 
@@ -21,7 +25,7 @@ else
 fi
 export LD_LIBRARY_PATH
 
-HD_PWD='/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/impl_1'
+HD_PWD='C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/impl_1'
 cd "$HD_PWD"
 
 HD_LOG=runme.log

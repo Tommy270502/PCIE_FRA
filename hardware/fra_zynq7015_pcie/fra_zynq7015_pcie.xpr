@@ -4,7 +4,7 @@
 <!-- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.                   -->
 <!-- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.   -->
 
-<Project Product="Vivado" Version="7" Minor="70" Path="/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.xpr">
+<Project Product="Vivado" Version="7" Minor="70" Path="C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="1ab2953c224643e898ce6291ce883b2f"/>
@@ -235,15 +235,15 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="system_bd_fra_top_0_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_bd_fra_top_0_0" RelGenDir="$PGENDIR/system_bd_fra_top_0_0">
-      <Config>
-        <Option Name="TopModule" Val="system_bd_fra_top_0_0"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
     <FileSet Name="system_bd_axi_gpio_1_1" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_bd_axi_gpio_1_1" RelGenDir="$PGENDIR/system_bd_axi_gpio_1_1">
       <Config>
         <Option Name="TopModule" Val="system_bd_axi_gpio_1_1"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="system_bd_fra_top_0_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_bd_fra_top_0_0" RelGenDir="$PGENDIR/system_bd_fra_top_0_0">
+      <Config>
+        <Option Name="TopModule" Val="system_bd_fra_top_0_0"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
@@ -259,14 +259,11 @@
     <Simulator Name="Questa">
       <Option Name="Description" Val="Questa Advanced Simulator"/>
     </Simulator>
-    <Simulator Name="Xcelium">
-      <Option Name="Description" Val="Xcelium Parallel Simulator"/>
-    </Simulator>
-    <Simulator Name="VCS">
-      <Option Name="Description" Val="Verilog Compiler Simulator (VCS)"/>
-    </Simulator>
     <Simulator Name="Riviera">
       <Option Name="Description" Val="Riviera-PRO Simulator"/>
+    </Simulator>
+    <Simulator Name="ActiveHDL">
+      <Option Name="Description" Val="Active-HDL Simulator"/>
     </Simulator>
   </Simulators>
   <Runs Version="1" Minor="22">
@@ -320,11 +317,9 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="system_bd_fra_top_0_0_synth_1" Type="Ft3:Synth" SrcSet="system_bd_fra_top_0_0" Part="xc7z015clg485-2" ConstrsSet="system_bd_fra_top_0_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_bd_fra_top_0_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_synth_1" ParallelReportGen="true">
+    <Run Id="system_bd_axi_gpio_1_1_synth_1" Type="Ft3:Synth" SrcSet="system_bd_axi_gpio_1_1" Part="xc7z015clg485-2" ConstrsSet="system_bd_axi_gpio_1_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_bd_axi_gpio_1_1_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_synth_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -332,7 +327,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="system_bd_axi_gpio_1_1_synth_1" Type="Ft3:Synth" SrcSet="system_bd_axi_gpio_1_1" Part="xc7z015clg485-2" ConstrsSet="system_bd_axi_gpio_1_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_bd_axi_gpio_1_1_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_synth_1" ParallelReportGen="true">
+    <Run Id="system_bd_fra_top_0_0_synth_1" Type="Ft3:Synth" SrcSet="system_bd_fra_top_0_0" Part="xc7z015clg485-2" ConstrsSet="system_bd_fra_top_0_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_bd_fra_top_0_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_synth_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025">
           <Desc>Vivado Synthesis Defaults</Desc>
@@ -430,11 +425,9 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="system_bd_fra_top_0_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="system_bd_fra_top_0_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="system_bd_fra_top_0_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_impl_1" ParallelReportGen="true">
+    <Run Id="system_bd_axi_gpio_1_1_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="system_bd_axi_gpio_1_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="system_bd_axi_gpio_1_1_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_impl_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -449,7 +442,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="system_bd_axi_gpio_1_1_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="system_bd_axi_gpio_1_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="system_bd_axi_gpio_1_1_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_axi_gpio_1_1_impl_1" ParallelReportGen="true">
+    <Run Id="system_bd_fra_top_0_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="system_bd_fra_top_0_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="system_bd_fra_top_0_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/system_bd_fra_top_0_0_impl_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025">
           <Desc>Default settings for Implementation.</Desc>

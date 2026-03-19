@@ -212,7 +212,7 @@
         "vlnv": "xilinx.com:ip:processing_system7:5.5",
         "ip_revision": "7",
         "xci_name": "system_bd_processing_system7_0_0",
-        "xci_path": "ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0.xci",
+        "xci_path": "ip\\system_bd_processing_system7_0_0\\system_bd_processing_system7_0_0.xci",
         "inst_hier_path": "processing_system7_0",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -565,7 +565,7 @@
         "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
         "ip_revision": "17",
         "xci_name": "system_bd_proc_sys_reset_0_0",
-        "xci_path": "ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0.xci",
+        "xci_path": "ip\\system_bd_proc_sys_reset_0_0\\system_bd_proc_sys_reset_0_0.xci",
         "inst_hier_path": "proc_sys_reset_0",
         "has_run_ip_tcl": "true"
       },
@@ -573,7 +573,7 @@
         "vlnv": "xilinx.com:module_ref:fra_top:1.0",
         "ip_revision": "1",
         "xci_name": "system_bd_fra_top_0_0",
-        "xci_path": "ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0.xci",
+        "xci_path": "ip\\system_bd_fra_top_0_0\\system_bd_fra_top_0_0.xci",
         "inst_hier_path": "fra_top_0",
         "has_run_ip_tcl": "true",
         "reference_info": {
@@ -651,7 +651,7 @@
         "vlnv": "xilinx.com:ip:axi_gpio:2.0",
         "ip_revision": "37",
         "xci_name": "system_bd_axi_gpio_0_0",
-        "xci_path": "ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0.xci",
+        "xci_path": "ip\\system_bd_axi_gpio_0_0\\system_bd_axi_gpio_0_0.xci",
         "inst_hier_path": "phase_reg",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -670,7 +670,7 @@
         "vlnv": "xilinx.com:ip:axi_gpio:2.0",
         "ip_revision": "37",
         "xci_name": "system_bd_axi_gpio_1_0",
-        "xci_path": "ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0.xci",
+        "xci_path": "ip\\system_bd_axi_gpio_1_0\\system_bd_axi_gpio_1_0.xci",
         "inst_hier_path": "amp_enable_reg",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -695,7 +695,7 @@
         "vlnv": "xilinx.com:ip:smartconnect:1.0",
         "ip_revision": "27",
         "xci_name": "system_bd_axi_smc_0",
-        "xci_path": "ip/system_bd_axi_smc_0/system_bd_axi_smc_0.xci",
+        "xci_path": "ip\\system_bd_axi_smc_0\\system_bd_axi_smc_0.xci",
         "inst_hier_path": "axi_smc",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -834,7 +834,7 @@
         "vlnv": "xilinx.com:ip:axi_gpio:2.0",
         "ip_revision": "37",
         "xci_name": "system_bd_axi_gpio_1_1",
-        "xci_path": "ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1.xci",
+        "xci_path": "ip\\system_bd_axi_gpio_1_1\\system_bd_axi_gpio_1_1.xci",
         "inst_hier_path": "adc_reg",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -949,8 +949,8 @@
           "phase_reg/s_axi_aresetn",
           "axi_smc/aresetn",
           "amp_enable_reg/s_axi_aresetn",
-          "fra_top_0/reset_n",
-          "adc_reg/s_axi_aresetn"
+          "adc_reg/s_axi_aresetn",
+          "fra_top_0/reset_n"
         ]
       },
       "processing_system7_0_FCLK_CLK0": {
@@ -961,8 +961,8 @@
           "axi_smc/aclk",
           "phase_reg/s_axi_aclk",
           "amp_enable_reg/s_axi_aclk",
-          "fra_top_0/clk",
-          "adc_reg/s_axi_aclk"
+          "adc_reg/s_axi_aclk",
+          "fra_top_0/clk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {

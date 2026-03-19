@@ -3,20 +3,16 @@
 #include "xil_printf.h"
 #include "xstatus.h"
 #include "sleep.h"
-#include <limits.h>
 
-/*
- * Your xparameters.h does not expose XPAR_<name>_DEVICE_ID macros,
- * so we keep the config-table indices explicit here.
- *
- * From your design:
- *   0 -> ADC_REG
- *   1 -> AMP_ENABLE_REG
- *   2 -> PHASE_REG
- */
-#define ADC_GPIO_DEV_ID         0
-#define AMP_GPIO_DEV_ID         1
-#define PHASE_GPIO_DEV_ID       2
+#include <limits.h>
+#include <stdint.h>
+#include <math.h>
+
+/* ---------------- DDS / hardware configuration ---------------- */
+
+#define DDS_CLK_HZ              25000000.0
+#define DDS_PHASE_SCALE         4294967296.0   /* 2^32 */
+#define ADC_MASK                0xFFu
 
 /* GPIO channels */
 #define ADC_CH                  1
@@ -25,53 +21,153 @@
 #define PHASE_IN_CH             1
 #define PHASE_OFFSET_CH         2
 
-/* Masks / widths */
-#define ADC_MASK                0xFFu
+/* ---------------- Startup settings ---------------- */
 
-/* Test settings */
-#define TEST_PHASE_IN           1000u
-#define TEST_PHASE_OFFSET       200u
-#define TEST_AMPLITUDE          50u
+#define TEST_FREQ_HZ            1000.0
+#define TEST_PHASE_OFFSET       0u
+#define TEST_AMPLITUDE          128u
 #define TEST_ENABLE             1u
 
-/*
- * Sampling/report settings:
- *  - POLL_INTERVAL_US controls how fast you poll sample_out.
- *  - REPORT_EVERY_SAMPLES controls how often you print stats.
- *
- * Example below:
- *   1 kHz polling, print every 1000 samples => about once/second.
- */
+/* ---------------- Runtime options ---------------- */
+
+/* 0 = monitor ADC continuously, 1 = run log sweep continuously */
+#define RUN_SWEEP               1
+
+/* ADC monitor settings */
 #define POLL_INTERVAL_US        1000u
 #define REPORT_EVERY_SAMPLES    1000u
-
-/*
- * Set to 1 if you want to print only when the ADC/sample value changes.
- * Set to 0 to print min/max/avg summaries instead.
- */
 #define PRINT_ON_CHANGE         0
 
-static int InitGpio(XGpio *InstancePtr, u16 DevId, UINTPTR BaseAddr)
+/* Sweep settings */
+#define SWEEP_FSTART_HZ         10.0
+#define SWEEP_FSTOP_HZ          20000.0
+#define SWEEP_POINTS            20u
+#define SWEEP_DWELL_US          100000u
+
+/* ---------------- Utility functions ---------------- */
+
+static int InitGpio(XGpio *InstancePtr, UINTPTR BaseAddr)
 {
-    XGpio_Config *Cfg;
-
-    Cfg = XGpio_LookupConfig(DevId);
-    if (Cfg == NULL) {
-        return XST_FAILURE;
-    }
-
-    return XGpio_CfgInitialize(InstancePtr, Cfg, BaseAddr);
+    return XGpio_Initialize(InstancePtr, BaseAddr);
 }
 
-static void ProgramFra(XGpio *PhaseGpio, XGpio *AmpGpio,
-                       u32 phase_in, u32 phase_offset,
-                       u32 amplitude, u32 enable)
+static u32 DdsPhaseIncFromFreq(double freq_hz)
+{
+    if (freq_hz <= 0.0) {
+        return 0u;
+    }
+
+    if (freq_hz > (DDS_CLK_HZ / 2.0)) {
+        freq_hz = DDS_CLK_HZ / 2.0;
+    }
+
+    return (u32)((freq_hz * DDS_PHASE_SCALE) / DDS_CLK_HZ + 0.5);
+}
+
+static double DdsFreqFromPhaseInc(u32 phase_inc)
+{
+    return ((double)phase_inc * DDS_CLK_HZ) / DDS_PHASE_SCALE;
+}
+
+static void SetFrequencyHz(XGpio *PhaseGpio, double freq_hz)
+{
+    XGpio_DiscreteWrite(PhaseGpio, PHASE_IN_CH, DdsPhaseIncFromFreq(freq_hz));
+}
+
+static void ProgramFra(XGpio *PhaseGpio,
+                       XGpio *AmpGpio,
+                       u32 phase_in,
+                       u32 phase_offset,
+                       u32 amplitude,
+                       u32 enable)
 {
     XGpio_DiscreteWrite(PhaseGpio, PHASE_IN_CH, phase_in);
     XGpio_DiscreteWrite(PhaseGpio, PHASE_OFFSET_CH, phase_offset);
     XGpio_DiscreteWrite(AmpGpio, AMP_CH, amplitude);
     XGpio_DiscreteWrite(AmpGpio, ENABLE_CH, enable);
 }
+
+static void SweepLog(XGpio *PhaseGpio,
+                     double fstart_hz,
+                     double fstop_hz,
+                     u32 points,
+                     u32 dwell_us)
+{
+    u32 i;
+    double ratio;
+    double f;
+
+    if ((points < 2u) || (fstart_hz <= 0.0) || (fstop_hz <= 0.0)) {
+        xil_printf("SweepLog: invalid arguments\r\n");
+        return;
+    }
+
+    ratio = pow(fstop_hz / fstart_hz, 1.0 / (double)(points - 1u));
+    f = fstart_hz;
+
+    for (i = 0; i < points; i++) {
+        u32 phase_inc = DdsPhaseIncFromFreq(f);
+
+        XGpio_DiscreteWrite(PhaseGpio, PHASE_IN_CH, phase_inc);
+
+        xil_printf("sweep[%lu/%lu]: f=%lu Hz, phase_inc=%lu\r\n",
+                   (unsigned long)(i + 1u),
+                   (unsigned long)points,
+                   (unsigned long)(f + 0.5),
+                   (unsigned long)phase_inc);
+
+        usleep(dwell_us);
+        f *= ratio;
+    }
+}
+
+static int InitFraGpio(XGpio *GpioAdc, XGpio *GpioAmpEnable, XGpio *GpioPhase)
+{
+    int Status;
+
+    Status = InitGpio(GpioAdc, XPAR_ADC_REG_BASEADDR);
+    if (Status != XST_SUCCESS) {
+        xil_printf("ERROR: ADC_REG init failed (status=%d)\r\n", Status);
+        return XST_FAILURE;
+    }
+
+    Status = InitGpio(GpioAmpEnable, XPAR_AMP_ENABLE_REG_BASEADDR);
+    if (Status != XST_SUCCESS) {
+        xil_printf("ERROR: AMP_ENABLE_REG init failed (status=%d)\r\n", Status);
+        return XST_FAILURE;
+    }
+
+    Status = InitGpio(GpioPhase, XPAR_PHASE_REG_BASEADDR);
+    if (Status != XST_SUCCESS) {
+        xil_printf("ERROR: PHASE_REG init failed (status=%d)\r\n", Status);
+        return XST_FAILURE;
+    }
+
+    XGpio_SetDataDirection(GpioAdc, ADC_CH, ADC_MASK);             /* input */
+    XGpio_SetDataDirection(GpioAmpEnable, AMP_CH, 0x00000000u);    /* output */
+    XGpio_SetDataDirection(GpioAmpEnable, ENABLE_CH, 0x00000000u); /* output */
+    XGpio_SetDataDirection(GpioPhase, PHASE_IN_CH, 0x00000000u);   /* output */
+    XGpio_SetDataDirection(GpioPhase, PHASE_OFFSET_CH, 0x00000000u); /* output */
+
+    return XST_SUCCESS;
+}
+
+static void PrintConfig(XGpio *GpioPhase, XGpio *GpioAmpEnable)
+{
+    u32 phase_in = XGpio_DiscreteRead(GpioPhase, PHASE_IN_CH);
+    u32 phase_offset = XGpio_DiscreteRead(GpioPhase, PHASE_OFFSET_CH);
+    u32 amplitude = XGpio_DiscreteRead(GpioAmpEnable, AMP_CH);
+    u32 enable = XGpio_DiscreteRead(GpioAmpEnable, ENABLE_CH);
+
+    xil_printf("Configured:\r\n");
+    xil_printf("  phase_in     = %lu\r\n", (unsigned long)phase_in);
+    xil_printf("  phase_freq   = %lu Hz\r\n", (unsigned long)(DdsFreqFromPhaseInc(phase_in) + 0.5));
+    xil_printf("  phase_offset = %lu\r\n", (unsigned long)phase_offset);
+    xil_printf("  amplitude    = %lu\r\n", (unsigned long)amplitude);
+    xil_printf("  enable       = %lu\r\n", (unsigned long)enable);
+}
+
+/* ---------------- Main ---------------- */
 
 int main(void)
 {
@@ -80,79 +176,72 @@ int main(void)
     XGpio GpioAmpEnable;
     XGpio GpioPhase;
 
-    u32 sample = 0;
-    u32 last_sample = UINT_MAX;
-
-    /* Stats for test reporting */
+#if !PRINT_ON_CHANGE
     u32 min_sample = ADC_MASK;
-    u32 max_sample = 0;
-    u32 sum_sample = 0;
-    u32 count = 0;
+    u32 max_sample = 0u;
+    u32 sum_sample = 0u;
+    u32 count = 0u;
+#else
+    u32 last_sample = UINT_MAX;
+#endif
 
     xil_printf("\r\n=== FRA GPIO test start ===\r\n");
 
-    /* Initialize AXI GPIO instances */
-    Status = InitGpio(&GpioAdc, ADC_GPIO_DEV_ID, XPAR_ADC_REG_BASEADDR);
+    xil_printf("Base addresses:\r\n");
+    xil_printf("  ADC_REG        = 0x%08lx\r\n", (unsigned long)XPAR_ADC_REG_BASEADDR);
+    xil_printf("  AMP_ENABLE_REG = 0x%08lx\r\n", (unsigned long)XPAR_AMP_ENABLE_REG_BASEADDR);
+    xil_printf("  PHASE_REG      = 0x%08lx\r\n", (unsigned long)XPAR_PHASE_REG_BASEADDR);
+
+    Status = InitFraGpio(&GpioAdc, &GpioAmpEnable, &GpioPhase);
     if (Status != XST_SUCCESS) {
-        xil_printf("ERROR: ADC_REG init failed\r\n");
         return XST_FAILURE;
     }
 
-    Status = InitGpio(&GpioAmpEnable, AMP_GPIO_DEV_ID, XPAR_AMP_ENABLE_REG_BASEADDR);
-    if (Status != XST_SUCCESS) {
-        xil_printf("ERROR: AMP_ENABLE_REG init failed\r\n");
-        return XST_FAILURE;
-    }
-
-    Status = InitGpio(&GpioPhase, PHASE_GPIO_DEV_ID, XPAR_PHASE_REG_BASEADDR);
-    if (Status != XST_SUCCESS) {
-        xil_printf("ERROR: PHASE_REG init failed\r\n");
-        return XST_FAILURE;
-    }
-
-    /* Configure GPIO directions */
-    XGpio_SetDataDirection(&GpioAdc, ADC_CH, ADC_MASK);     /* 8-bit input */
-
-    XGpio_SetDataDirection(&GpioAmpEnable, AMP_CH, 0x00u);      /* output */
-    XGpio_SetDataDirection(&GpioAmpEnable, ENABLE_CH, 0x00u);   /* output */
-
-    XGpio_SetDataDirection(&GpioPhase, PHASE_IN_CH, 0x00000000u);      /* output */
-    XGpio_SetDataDirection(&GpioPhase, PHASE_OFFSET_CH, 0x00000000u);  /* output */
-
-    /* Program test values */
-    ProgramFra(&GpioPhase, &GpioAmpEnable,
-               TEST_PHASE_IN,
+    ProgramFra(&GpioPhase,
+               &GpioAmpEnable,
+               DdsPhaseIncFromFreq(TEST_FREQ_HZ),
                TEST_PHASE_OFFSET,
                TEST_AMPLITUDE,
                TEST_ENABLE);
 
-    /* Read back programmed registers for sanity check */
-    xil_printf("Configured:\r\n");
-    xil_printf("  phase_in     = %lu\r\n", XGpio_DiscreteRead(&GpioPhase, PHASE_IN_CH));
-    xil_printf("  phase_offset = %lu\r\n", XGpio_DiscreteRead(&GpioPhase, PHASE_OFFSET_CH));
-    xil_printf("  amplitude    = %lu\r\n", XGpio_DiscreteRead(&GpioAmpEnable, AMP_CH));
-    xil_printf("  enable       = %lu\r\n", XGpio_DiscreteRead(&GpioAmpEnable, ENABLE_CH));
+    PrintConfig(&GpioPhase, &GpioAmpEnable);
 
+#if RUN_SWEEP
+    xil_printf("Mode: log sweep from %lu Hz to %lu Hz, %lu points, dwell %lu us\r\n",
+               (unsigned long)(SWEEP_FSTART_HZ + 0.5),
+               (unsigned long)(SWEEP_FSTOP_HZ + 0.5),
+               (unsigned long)SWEEP_POINTS,
+               (unsigned long)SWEEP_DWELL_US);
+
+    while (1) {
+        SweepLog(&GpioPhase,
+                 SWEEP_FSTART_HZ,
+                 SWEEP_FSTOP_HZ,
+                 SWEEP_POINTS,
+                 SWEEP_DWELL_US);
+    }
+#else
 #if PRINT_ON_CHANGE
-    xil_printf("Mode: print on change\r\n");
+    xil_printf("Mode: print ADC on change\r\n");
 #else
     xil_printf("Mode: %u us polling, report every %u samples\r\n",
-               (unsigned)POLL_INTERVAL_US, (unsigned)REPORT_EVERY_SAMPLES);
+               (unsigned)POLL_INTERVAL_US,
+               (unsigned)REPORT_EVERY_SAMPLES);
 #endif
 
     while (1) {
-        /* sample_out[7:0] from fra_top_0 via ADC_REG */
-        sample = XGpio_DiscreteRead(&GpioAdc, ADC_CH) & ADC_MASK;
+        u32 sample = XGpio_DiscreteRead(&GpioAdc, ADC_CH) & ADC_MASK;
 
 #if PRINT_ON_CHANGE
         if (sample != last_sample) {
-            xil_printf("sample_out = %lu\r\n", sample);
+            xil_printf("sample_out = %lu\r\n", (unsigned long)sample);
             last_sample = sample;
         }
 #else
         if (sample < min_sample) {
             min_sample = sample;
         }
+
         if (sample > max_sample) {
             max_sample = sample;
         }
@@ -162,21 +251,19 @@ int main(void)
 
         if (count >= REPORT_EVERY_SAMPLES) {
             xil_printf("sample_out: last=%lu min=%lu max=%lu avg=%lu\r\n",
-                       sample,
-                       min_sample,
-                       max_sample,
-                       sum_sample / REPORT_EVERY_SAMPLES);
+                       (unsigned long)sample,
+                       (unsigned long)min_sample,
+                       (unsigned long)max_sample,
+                       (unsigned long)(sum_sample / REPORT_EVERY_SAMPLES));
 
             min_sample = ADC_MASK;
-            max_sample = 0;
-            sum_sample = 0;
-            count = 0;
+            max_sample = 0u;
+            sum_sample = 0u;
+            count = 0u;
         }
 #endif
 
         usleep(POLL_INTERVAL_US);
     }
-
-    /* not reached */
-    /* return XST_SUCCESS; */
+#endif
 }

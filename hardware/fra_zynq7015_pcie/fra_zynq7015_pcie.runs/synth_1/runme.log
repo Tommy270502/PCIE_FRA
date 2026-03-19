@@ -3,20 +3,21 @@
     with args -log system_bd_wrapper.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source system_bd_wrapper.tcl
 
 
+
 ****** Vivado v2025.1 (64-bit)
-  **** SW Build 6140274 on Wed May 21 22:58:25 MDT 2025
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
   **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
   **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-  **** Start of session at: Thu Mar 19 15:04:10 2026
+  **** Start of session at: Thu Mar 19 18:43:54 2026
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 
 source system_bd_wrapper.tcl -notrace
 INFO: [IP_Flow 19-234] Refreshing IP repositories
 INFO: [IP_Flow 19-1704] No user IP repositories specified
-INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/thomas/tools/Xilinx/2025.1/Vivado/data/ip'.
-Command: read_checkpoint -auto_incremental -incremental /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/utils_1/imports/synth_1/fra_top.dcp
-INFO: [Vivado 12-5825] Read reference checkpoint from /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/utils_1/imports/synth_1/fra_top.dcp for incremental synthesis
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/2025.1/Vivado/data/ip'.
+Command: read_checkpoint -auto_incremental -incremental C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/utils_1/imports/synth_1/fra_top.dcp
+INFO: [Vivado 12-5825] Read reference checkpoint from C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/utils_1/imports/synth_1/fra_top.dcp for incremental synthesis
 INFO: [Vivado 12-7989] Please ensure there are no constraint changes
 Command: synth_design -top system_bd_wrapper -part xc7z015clg485-2
 Starting synth_design
@@ -25,106 +26,106 @@ INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z015
 INFO: [Device 21-403] Loading part xc7z015clg485-2
 INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
 INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
-INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 189337
+INFO: [Synth 8-7075] Helper process launched with PID 6308
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2154.133 ; gain = 442.680 ; free physical = 1153 ; free virtual = 9758
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 1254.297 ; gain = 494.703
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-6157] synthesizing module 'system_bd_wrapper' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/hdl/system_bd_wrapper.v:13]
-INFO: [Synth 8-6157] synthesizing module 'system_bd' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:13]
-INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_gpio_1_1' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_gpio_1_1_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_gpio_1_1' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_gpio_1_1_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_gpio_1_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_gpio_1_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_gpio_1_0' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_gpio_1_0_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_smc_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_smc_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_smc_0' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_smc_0_stub.v:6]
-WARNING: [Synth 8-7071] port 'M00_AXI_awprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
-WARNING: [Synth 8-7071] port 'M00_AXI_arprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
-WARNING: [Synth 8-7071] port 'M01_AXI_awprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
-WARNING: [Synth 8-7071] port 'M01_AXI_arprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
-WARNING: [Synth 8-7071] port 'M02_AXI_awprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
-WARNING: [Synth 8-7071] port 'M02_AXI_arprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
-WARNING: [Synth 8-7023] instance 'axi_smc' of module 'system_bd_axi_smc_0' has 97 connections declared, but only 91 given [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
-INFO: [Synth 8-6157] synthesizing module 'system_bd_fra_top_0_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_fra_top_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_fra_top_0_0' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_fra_top_0_0_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_gpio_0_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_gpio_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_gpio_0_0' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_axi_gpio_0_0_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'system_bd_proc_sys_reset_0_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_proc_sys_reset_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_proc_sys_reset_0_0' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_proc_sys_reset_0_0_stub.v:6]
-WARNING: [Synth 8-7071] port 'mb_reset' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
-WARNING: [Synth 8-7071] port 'bus_struct_reset' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
-WARNING: [Synth 8-7071] port 'peripheral_reset' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
-WARNING: [Synth 8-7071] port 'interconnect_aresetn' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
-WARNING: [Synth 8-7023] instance 'proc_sys_reset_0' of module 'system_bd_proc_sys_reset_0_0' has 10 connections declared, but only 6 given [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
-INFO: [Synth 8-6157] synthesizing module 'system_bd_processing_system7_0_0' [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_processing_system7_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_processing_system7_0_0' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-189221-ThinkpadT14s/realtime/system_bd_processing_system7_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:13]
-INFO: [Synth 8-6155] done synthesizing module 'system_bd_wrapper' (0#1) [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/hdl/system_bd_wrapper.v:13]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_wrapper' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/hdl/system_bd_wrapper.v:13]
+INFO: [Synth 8-6157] synthesizing module 'system_bd' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:13]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_gpio_1_1' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_gpio_1_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_gpio_1_1' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_gpio_1_1_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_gpio_1_0' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_gpio_1_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_gpio_1_0' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_gpio_1_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_smc_0' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_smc_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_smc_0' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_smc_0_stub.v:6]
+WARNING: [Synth 8-7071] port 'M00_AXI_awprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
+WARNING: [Synth 8-7071] port 'M00_AXI_arprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
+WARNING: [Synth 8-7071] port 'M01_AXI_awprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
+WARNING: [Synth 8-7071] port 'M01_AXI_arprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
+WARNING: [Synth 8-7071] port 'M02_AXI_awprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
+WARNING: [Synth 8-7071] port 'M02_AXI_arprot' of module 'system_bd_axi_smc_0' is unconnected for instance 'axi_smc' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
+WARNING: [Synth 8-7023] instance 'axi_smc' of module 'system_bd_axi_smc_0' has 97 connections declared, but only 91 given [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:232]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_fra_top_0_0' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_fra_top_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_fra_top_0_0' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_fra_top_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_axi_gpio_0_0' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_gpio_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_axi_gpio_0_0' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_axi_gpio_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_proc_sys_reset_0_0' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_proc_sys_reset_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_proc_sys_reset_0_0' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_proc_sys_reset_0_0_stub.v:6]
+WARNING: [Synth 8-7071] port 'mb_reset' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
+WARNING: [Synth 8-7071] port 'bus_struct_reset' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
+WARNING: [Synth 8-7071] port 'peripheral_reset' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
+WARNING: [Synth 8-7071] port 'interconnect_aresetn' of module 'system_bd_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
+WARNING: [Synth 8-7023] instance 'proc_sys_reset_0' of module 'system_bd_proc_sys_reset_0_0' has 10 connections declared, but only 6 given [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:358]
+INFO: [Synth 8-6157] synthesizing module 'system_bd_processing_system7_0_0' [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_processing_system7_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_processing_system7_0_0' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/.Xil/Vivado-24772-DESKTOP-QGTME97/realtime/system_bd_processing_system7_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd' (0#1) [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/synth/system_bd.v:13]
+INFO: [Synth 8-6155] done synthesizing module 'system_bd_wrapper' (0#1) [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/hdl/system_bd_wrapper.v:13]
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2235.070 ; gain = 523.617 ; free physical = 1053 ; free virtual = 9659
+Finished RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1367.410 ; gain = 607.816
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2252.883 ; gain = 541.430 ; free physical = 1053 ; free virtual = 9659
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1367.410 ; gain = 607.816
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2252.883 ; gain = 541.430 ; free physical = 1053 ; free virtual = 9659
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1367.410 ; gain = 607.816
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2252.883 ; gain = 0.000 ; free physical = 1061 ; free virtual = 9667
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.003 . Memory (MB): peak = 1367.410 ; gain = 0.000
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
 Initializing timing engine
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0_in_context.xdc] for cell 'system_bd_i/processing_system7_0'
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0_in_context.xdc] for cell 'system_bd_i/processing_system7_0'
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0_in_context.xdc] for cell 'system_bd_i/proc_sys_reset_0'
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0_in_context.xdc] for cell 'system_bd_i/proc_sys_reset_0'
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0/system_bd_fra_top_0_0_in_context.xdc] for cell 'system_bd_i/fra_top_0'
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0/system_bd_fra_top_0_0_in_context.xdc] for cell 'system_bd_i/fra_top_0'
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0_in_context.xdc] for cell 'system_bd_i/phase_reg'
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0_in_context.xdc] for cell 'system_bd_i/phase_reg'
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0_in_context.xdc] for cell 'system_bd_i/amp_enable_reg'
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0_in_context.xdc] for cell 'system_bd_i/amp_enable_reg'
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/system_bd_axi_smc_0/system_bd_axi_smc_0_in_context.xdc] for cell 'system_bd_i/axi_smc'
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/system_bd_axi_smc_0/system_bd_axi_smc_0_in_context.xdc] for cell 'system_bd_i/axi_smc'
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_in_context.xdc] for cell 'system_bd_i/adc_reg'
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_in_context.xdc] for cell 'system_bd_i/adc_reg'
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc]
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc]
-INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/system_bd_wrapper_propImpl.xdc].
+Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0_in_context.xdc] for cell 'system_bd_i/processing_system7_0'
+Finished Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0_in_context.xdc] for cell 'system_bd_i/processing_system7_0'
+Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0_in_context.xdc] for cell 'system_bd_i/proc_sys_reset_0'
+Finished Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0_in_context.xdc] for cell 'system_bd_i/proc_sys_reset_0'
+Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0/system_bd_fra_top_0_0_in_context.xdc] for cell 'system_bd_i/fra_top_0'
+Finished Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0/system_bd_fra_top_0_0_in_context.xdc] for cell 'system_bd_i/fra_top_0'
+Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0_in_context.xdc] for cell 'system_bd_i/phase_reg'
+Finished Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0_in_context.xdc] for cell 'system_bd_i/phase_reg'
+Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0_in_context.xdc] for cell 'system_bd_i/amp_enable_reg'
+Finished Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0_in_context.xdc] for cell 'system_bd_i/amp_enable_reg'
+Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/system_bd_axi_smc_0/system_bd_axi_smc_0_in_context.xdc] for cell 'system_bd_i/axi_smc'
+Finished Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/system_bd_axi_smc_0/system_bd_axi_smc_0_in_context.xdc] for cell 'system_bd_i/axi_smc'
+Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_in_context.xdc] for cell 'system_bd_i/adc_reg'
+Finished Parsing XDC File [c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_in_context.xdc] for cell 'system_bd_i/adc_reg'
+Parsing XDC File [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc]
+Finished Parsing XDC File [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/system_bd_wrapper_propImpl.xdc].
 Resolution: To avoid this warning, move constraints listed in [.Xil/system_bd_wrapper_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
-Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/dont_touch.xdc]
-Finished Parsing XDC File [/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/dont_touch.xdc]
+Parsing XDC File [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/dont_touch.xdc]
+Finished Parsing XDC File [C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/dont_touch.xdc]
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2301.809 ; gain = 0.000 ; free physical = 1055 ; free virtual = 9661
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1367.410 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2301.844 ; gain = 0.000 ; free physical = 1055 ; free virtual = 9661
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 1367.410 ; gain = 0.000
 INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
 INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 2301.844 ; gain = 590.391 ; free physical = 1076 ; free virtual = 9683
+Finished Constraint Validation : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1367.410 ; gain = 607.816
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z015clg485-2
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 2309.812 ; gain = 598.359 ; free physical = 1076 ; free virtual = 9683
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1367.410 ; gain = 607.816
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 2309.812 ; gain = 598.359 ; free physical = 1076 ; free virtual = 9683
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1367.410 ; gain = 607.816
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 2309.812 ; gain = 598.359 ; free physical = 1076 ; free virtual = 9683
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1367.410 ; gain = 607.816
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -147,25 +148,25 @@ Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2309.812 ; gain = 598.359 ; free physical = 1078 ; free virtual = 9689
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:10 ; elapsed = 00:00:10 . Memory (MB): peak = 1377.516 ; gain = 617.922
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 2397.812 ; gain = 686.359 ; free physical = 1013 ; free virtual = 9624
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1551.504 ; gain = 791.910
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 2397.812 ; gain = 686.359 ; free physical = 1013 ; free virtual = 9624
+Finished Timing Optimization : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1552.055 ; gain = 792.461
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 2407.828 ; gain = 696.375 ; free physical = 1005 ; free virtual = 9616
+Finished Technology Mapping : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1562.426 ; gain = 802.832
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -183,37 +184,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.641 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Finished IO Insertion : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.641 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.641 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.641 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.641 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.641 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -246,16 +247,16 @@ Report Cell Usage:
 |9     |OBUF                           |    10|
 +------+-------------------------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.641 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:12 ; elapsed = 00:00:12 . Memory (MB): peak = 2583.641 ; gain = 823.227 ; free physical = 849 ; free virtual = 9461
-Synthesis Optimization Complete : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2583.648 ; gain = 872.188 ; free physical = 849 ; free virtual = 9461
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:10 ; elapsed = 00:00:14 . Memory (MB): peak = 1796.816 ; gain = 1037.223
+Synthesis Optimization Complete : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 1796.816 ; gain = 1037.223
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2583.648 ; gain = 0.000 ; free physical = 849 ; free virtual = 9461
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.003 . Memory (MB): peak = 1805.938 ; gain = 0.000
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2583.648 ; gain = 0.000 ; free physical = 1020 ; free virtual = 9632
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1809.613 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
@@ -263,10 +264,8 @@ Synth Design complete | Checksum: aea46dc0
 INFO: [Common 17-83] Releasing license: Synthesis
 40 Infos, 13 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:19 ; elapsed = 00:00:18 . Memory (MB): peak = 2583.676 ; gain = 1057.926 ; free physical = 1020 ; free virtual = 9631
-INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 1749.762; main = 1749.762; forked = 273.268
-INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3276.703; main = 2583.645; forked = 963.887
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2607.652 ; gain = 0.000 ; free physical = 1019 ; free virtual = 9631
-INFO: [Common 17-1381] The checkpoint '/home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/system_bd_wrapper.dcp' has been generated.
+synth_design: Time (s): cpu = 00:00:17 ; elapsed = 00:00:21 . Memory (MB): peak = 1809.613 ; gain = 1277.043
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1809.613 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/system_bd_wrapper.dcp' has been generated.
 INFO: [Vivado 12-24828] Executing command : report_utilization -file system_bd_wrapper_utilization_synth.rpt -pb system_bd_wrapper_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Thu Mar 19 15:04:31 2026...
+INFO: [Common 17-206] Exiting Vivado at Thu Mar 19 18:44:21 2026...
