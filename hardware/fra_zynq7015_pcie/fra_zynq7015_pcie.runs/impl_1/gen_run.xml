@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="impl_1" LaunchPart="xc7z015clg485-2" LaunchTime="1773923105">
+<GenRun Id="impl_1" LaunchPart="xc7z015clg485-2" LaunchTime="1773929100">
   <File Type="POSTROUTE-PHYSOPT-RQS-RPT" Name="postroute_physopt_report_qor_suggestions_0.rpt"/>
   <File Type="ROUTE-RQS-RPT" Name="route_report_qor_suggestions_0.rpt"/>
   <File Type="POSTROUTE-PHYSOPT-RQS" Name="system_bd_wrapper_postroute_physopted.rqs"/>
@@ -49,12 +49,12 @@
   <File Type="BITSTR-MSK" Name="system_bd_wrapper.msk"/>
   <File Type="BG-BIN" Name="system_bd_wrapper.bin"/>
   <File Type="BG-BIT" Name="system_bd_wrapper.bit"/>
-  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="fra_top_bus_skew_postroute_physopted.rpx"/>
-  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="fra_top_bus_skew_postroute_physopted.pb"/>
-  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="fra_top_bus_skew_postroute_physopted.rpt"/>
-  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="fra_top_timing_summary_postroute_physopted.rpx"/>
-  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="fra_top_timing_summary_postroute_physopted.pb"/>
-  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="fra_top_timing_summary_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="system_bd_wrapper_bus_skew_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="system_bd_wrapper_bus_skew_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="system_bd_wrapper_bus_skew_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="system_bd_wrapper_timing_summary_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="system_bd_wrapper_timing_summary_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="system_bd_wrapper_timing_summary_postroute_physopted.rpt"/>
   <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="system_bd_wrapper_postroute_physopt_bb.dcp"/>
   <File Type="POSTROUTE-PHYSOPT-DCP" Name="system_bd_wrapper_postroute_physopt.dcp"/>
   <File Type="ROUTE-RQS-PB" Name="system_bd_wrapper_rqs_routed.pb"/>
@@ -206,9 +206,9 @@
     <Step Id="post_route_phys_opt_design"/>
     <Step Id="write_bitstream"/>
   </Strategy>
-  <BlockFileSet Type="BlockSrcs" Name="system_bd_axi_gpio_0_0"/>
   <BlockFileSet Type="BlockSrcs" Name="system_bd_fra_top_0_0"/>
-  <BlockFileSet Type="BlockSrcs" Name="system_bd_axi_smc_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="system_bd_axi_gpio_1_1"/>
+  <BlockFileSet Type="BlockSrcs" Name="system_bd_axi_gpio_0_0"/>
   <BlockFileSet Type="BlockSrcs" Name="system_bd_axi_gpio_1_0"/>
   <BlockFileSet Type="BlockSrcs" Name="system_bd_proc_sys_reset_0_0"/>
   <BlockFileSet Type="BlockSrcs" Name="system_bd_processing_system7_0_0"/>

@@ -58,6 +58,7 @@ module system_bd_fra_top_0_0 (
   reset_n,
   clk,
   adc_in,
+  sample_out,
   adc_clk_out,
   dac_out,
   dac_clk_out,
@@ -76,6 +77,7 @@ input wire reset_n;
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME clk, FREQ_HZ 50000000, FREQ_TOLERANCE_HZ 0, PHASE 0.0, CLK_DOMAIN system_bd_processing_system7_0_0_FCLK_CLK0, INSERT_VIP 0" *)
 input wire clk;
 input wire [7 : 0] adc_in;
+output wire [7 : 0] sample_out;
 output wire adc_clk_out;
 output wire [7 : 0] dac_out;
 output wire dac_clk_out;
@@ -88,6 +90,7 @@ input wire enable;
     .reset_n(reset_n),
     .clk(clk),
     .adc_in(adc_in),
+    .sample_out(sample_out),
     .adc_clk_out(adc_clk_out),
     .dac_out(dac_out),
     .dac_clk_out(dac_clk_out),

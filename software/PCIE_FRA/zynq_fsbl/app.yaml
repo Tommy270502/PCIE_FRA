@@ -1,0 +1,4 @@
+domain_path: /home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/zynq_fsbl/zynq_fsbl_bsp
+app_src_dir: /home/thomas/tools/Xilinx/2025.1/Vitis/data/embeddedsw/lib/sw_apps/zynq_fsbl
+template: zynq_fsbl
+lang: c

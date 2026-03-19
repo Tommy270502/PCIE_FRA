@@ -2,7 +2,7 @@
   "schema": "xilinx.com:schema:json_instance:1.0",
   "ip_inst": {
     "xci_name": "system_bd_axi_gpio_1_0",
-    "cell_name": "axi_gpio_1",
+    "cell_name": "amp_enable_reg",
     "component_reference": "xilinx.com:ip:axi_gpio:2.0",
     "ip_revision": "37",
     "gen_directory": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_0",

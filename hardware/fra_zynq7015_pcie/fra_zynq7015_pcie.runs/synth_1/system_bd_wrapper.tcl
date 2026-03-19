@@ -56,12 +56,8 @@ if {$::dispatch::connected} {
 }
 
 OPTRACE "synth_1" START { ROLLUP_AUTO }
-set_param checkpoint.writeSynthRtdsInDcp 1
 set_param chipscope.maxJobs 4
 set_param general.usePosixSpawnForFork 1
-set_param synth.incrementalSynthesisCache ./.Xil/Vivado-12848-ThinkpadT14s/incrSyn
-set_msg_config -id {Synth 8-256} -limit 10000
-set_msg_config -id {Synth 8-638} -limit 10000
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7z015clg485-2
 
@@ -121,8 +117,16 @@ set_property used_in_implementation false [get_files -all /home/thomas/Documents
 set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_36/bd_3c1f_m01awn_0_ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_37/bd_3c1f_m01wn_0_ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_38/bd_3c1f_m01bn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_40/bd_3c1f_m02s2a_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_41/bd_3c1f_m02arn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_42/bd_3c1f_m02rn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_43/bd_3c1f_m02awn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_44/bd_3c1f_m02wn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_45/bd_3c1f_m02bn_0_ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/smartconnect.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_board.xdc]
+set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/system_bd_ooc.xdc]
 
 OPTRACE "Adding files" END { }

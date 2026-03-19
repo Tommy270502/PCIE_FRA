@@ -172,6 +172,13 @@ vlog -work xil_defaultlib  -incr "+incdir+../../../../fra_zynq7015_pcie.gen/sour
 "../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_37/sim/bd_3c1f_m01wn_0.sv" \
 "../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_38/sim/bd_3c1f_m01bn_0.sv" \
 "../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_39/sim/bd_3c1f_m01e_0.sv" \
+"../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_40/sim/bd_3c1f_m02s2a_0.sv" \
+"../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_41/sim/bd_3c1f_m02arn_0.sv" \
+"../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_42/sim/bd_3c1f_m02rn_0.sv" \
+"../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_43/sim/bd_3c1f_m02awn_0.sv" \
+"../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_44/sim/bd_3c1f_m02wn_0.sv" \
+"../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_45/sim/bd_3c1f_m02bn_0.sv" \
+"../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_46/sim/bd_3c1f_m02e_0.sv" \
 
 vlog -work xil_defaultlib  -incr -v2k5 "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/ec67/hdl" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/6cfa/hdl" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/f0b6/hdl/verilog" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/a8e4/hdl/verilog" "+incdir+../../../../../../../../../tools/Xilinx/2025.1/data/rsb/busdef" "+incdir+/home/thomas/tools/Xilinx/2025.1/Vivado/data/xilinx_vip/include" -l xilinx_vip -l xpm -l axi_infrastructure_v1_1_0 -l axi_vip_v1_1_21 -l processing_system7_vip_v1_0_23 -l xil_defaultlib -l proc_sys_reset_v5_0_17 -l axi_lite_ipif_v3_0_4 -l interrupt_control_v3_1_5 -l axi_gpio_v2_0_37 -l xlconstant_v1_1_10 -l smartconnect_v1_0 -l axi_register_slice_v2_1_35 \
 "../../../bd/system_bd/ip/system_bd_axi_smc_0/bd_0/sim/bd_3c1f.v" \
@@ -181,6 +188,9 @@ vlog -work axi_register_slice_v2_1_35  -incr -v2k5 "+incdir+../../../../fra_zynq
 
 vlog -work xil_defaultlib  -incr "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/ec67/hdl" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/6cfa/hdl" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/f0b6/hdl/verilog" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/a8e4/hdl/verilog" "+incdir+../../../../../../../../../tools/Xilinx/2025.1/data/rsb/busdef" "+incdir+/home/thomas/tools/Xilinx/2025.1/Vivado/data/xilinx_vip/include" -l xilinx_vip -l xpm -l axi_infrastructure_v1_1_0 -l axi_vip_v1_1_21 -l processing_system7_vip_v1_0_23 -l xil_defaultlib -l proc_sys_reset_v5_0_17 -l axi_lite_ipif_v3_0_4 -l interrupt_control_v3_1_5 -l axi_gpio_v2_0_37 -l xlconstant_v1_1_10 -l smartconnect_v1_0 -l axi_register_slice_v2_1_35 \
 "../../../bd/system_bd/ip/system_bd_axi_smc_0/sim/system_bd_axi_smc_0.sv" \
+
+vcom -work xil_defaultlib -93  -incr \
+"../../../bd/system_bd/ip/system_bd_axi_gpio_1_1/sim/system_bd_axi_gpio_1_1.vhd" \
 
 vlog -work xil_defaultlib  -incr -v2k5 "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/ec67/hdl" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/6cfa/hdl" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/f0b6/hdl/verilog" "+incdir+../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ipshared/a8e4/hdl/verilog" "+incdir+../../../../../../../../../tools/Xilinx/2025.1/data/rsb/busdef" "+incdir+/home/thomas/tools/Xilinx/2025.1/Vivado/data/xilinx_vip/include" -l xilinx_vip -l xpm -l axi_infrastructure_v1_1_0 -l axi_vip_v1_1_21 -l processing_system7_vip_v1_0_23 -l xil_defaultlib -l proc_sys_reset_v5_0_17 -l axi_lite_ipif_v3_0_4 -l interrupt_control_v3_1_5 -l axi_gpio_v2_0_37 -l xlconstant_v1_1_10 -l smartconnect_v1_0 -l axi_register_slice_v2_1_35 \
 "../../../bd/system_bd/sim/system_bd.v" \
