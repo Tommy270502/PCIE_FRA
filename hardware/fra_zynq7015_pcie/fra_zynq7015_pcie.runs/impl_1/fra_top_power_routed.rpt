@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date             : Wed Mar 18 23:30:07 2026
+| Date             : Thu Mar 19 08:06:35 2026
 | Host             : DESKTOP-QGTME97 running 64-bit major release  (build 9200)
 | Command          : report_power -file fra_top_power_routed.rpt -pb fra_top_power_summary_routed.pb -rpx fra_top_power_routed.rpx
 | Design           : fra_top
@@ -53,12 +53,13 @@ Table of Contents
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
 | Clocks         |    <0.001 |        3 |       --- |             --- |
-| Slice Logic    |    <0.001 |       46 |       --- |             --- |
-|   LUT as Logic |    <0.001 |       11 |     46200 |            0.02 |
+| Slice Logic    |    <0.001 |       41 |       --- |             --- |
+|   LUT as Logic |    <0.001 |       13 |     46200 |            0.03 |
+|   Register     |    <0.001 |       16 |     92400 |            0.02 |
 |   CARRY4       |    <0.001 |        2 |     11550 |            0.02 |
-|   Register     |    <0.001 |       24 |     92400 |            0.03 |
-|   Others       |     0.000 |        5 |       --- |             --- |
+|   Others       |     0.000 |        8 |       --- |             --- |
 | Signals        |    <0.001 |       31 |       --- |             --- |
+| Block RAM      |    <0.001 |      0.5 |        95 |            0.53 |
 | I/O            |     0.006 |       12 |       150 |            8.00 |
 | Static Power   |     0.104 |          |           |                 |
 | Total          |     0.110 |          |           |                 |

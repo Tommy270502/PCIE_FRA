@@ -24,7 +24,7 @@ architecture Behavioral of sawtooth_gen is
     --  23 = 4096Hz
     --  11 = 8192Hz
     --  5 = 16384Hz
-    constant DIVIDER_MAX : unsigned(15 downto 0) := to_unsigned(96, 16);
+    constant DIVIDER_MAX : unsigned(15 downto 0) := to_unsigned(23, 16);
 
     signal divider_counter : unsigned(15 downto 0);
     signal ramp_counter    : unsigned(7 downto 0);
