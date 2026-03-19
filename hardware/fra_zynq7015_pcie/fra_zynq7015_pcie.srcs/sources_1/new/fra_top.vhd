@@ -8,6 +8,7 @@ entity fra_top is
         clk         : in  std_logic;
 
         adc_in      : in  std_logic_vector(7 downto 0);
+        sample_out  : out std_logic_vector(7 downto 0);
         adc_clk_out : out std_logic;
 
         dac_out     : out std_logic_vector(7 downto 0);
@@ -51,7 +52,7 @@ begin
             reset_n     => reset_n,
             clk         => clk_25,
             adc_data    => adc_in,
-            sample_data => adc_sample_s
+            sample_data => sample_out
         );
 
     --------------------------------------------------------------------

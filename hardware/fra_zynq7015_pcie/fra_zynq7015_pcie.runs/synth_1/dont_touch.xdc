@@ -24,4 +24,7 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_a
 # IP: bd/system_bd/ip/system_bd_axi_smc_0/system_bd_axi_smc_0.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_smc_0 || ORIG_REF_NAME==system_bd_axi_smc_0} -quiet] -quiet
 
+# IP: bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_gpio_1_1 || ORIG_REF_NAME==system_bd_axi_gpio_1_1} -quiet] -quiet
+
 # XDC: /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/system_bd_ooc.xdc

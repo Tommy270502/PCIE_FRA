@@ -2,7 +2,7 @@
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2025.1 (lin64) Build 6140274 Wed May 21 22:58:25 MDT 2025
--- Date        : Thu Mar 19 13:14:26 2026
+-- Date        : Thu Mar 19 14:47:35 2026
 -- Host        : ThinkpadT14s running 64-bit Ubuntu 24.04.4 LTS
 -- Command     : write_vhdl -force -mode funcsim
 --               /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0_sim_netlist.vhdl
@@ -11,6 +11,88 @@
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
 -- Device      : xc7z015clg485-2
 -- --------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity system_bd_fra_top_0_0_adc_if is
+  port (
+    sample_out : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    SR : in STD_LOGIC_VECTOR ( 0 to 0 );
+    adc_in : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    dac_clk_out : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of system_bd_fra_top_0_0_adc_if : entity is "adc_if";
+end system_bd_fra_top_0_0_adc_if;
+
+architecture STRUCTURE of system_bd_fra_top_0_0_adc_if is
+begin
+\sample_data_reg[0]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(0),
+      Q => sample_out(0),
+      R => SR(0)
+    );
+\sample_data_reg[1]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(1),
+      Q => sample_out(1),
+      R => SR(0)
+    );
+\sample_data_reg[2]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(2),
+      Q => sample_out(2),
+      R => SR(0)
+    );
+\sample_data_reg[3]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(3),
+      Q => sample_out(3),
+      R => SR(0)
+    );
+\sample_data_reg[4]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(4),
+      Q => sample_out(4),
+      R => SR(0)
+    );
+\sample_data_reg[5]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(5),
+      Q => sample_out(5),
+      R => SR(0)
+    );
+\sample_data_reg[6]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(6),
+      Q => sample_out(6),
+      R => SR(0)
+    );
+\sample_data_reg[7]\: unisim.vcomponents.FDRE
+     port map (
+      C => dac_clk_out,
+      CE => '1',
+      D => adc_in(7),
+      Q => sample_out(7),
+      R => SR(0)
+    );
+end STRUCTURE;
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
@@ -390,7 +472,7 @@ architecture STRUCTURE of system_bd_fra_top_0_0_sine_lut is
   attribute SOFT_HLUTNM of \dac_data6__30_carry__0_i_9\ : label is "soft_lutpair8";
   attribute SOFT_HLUTNM of \dac_data6__30_carry_i_8\ : label is "soft_lutpair9";
   attribute SOFT_HLUTNM of \dac_data[6]_i_1\ : label is "soft_lutpair3";
-  attribute SOFT_HLUTNM of \dac_data[7]_i_1__0\ : label is "soft_lutpair3";
+  attribute SOFT_HLUTNM of \dac_data[7]_i_1\ : label is "soft_lutpair3";
   attribute \MEM.PORTA.DATA_BIT_LAYOUT\ : string;
   attribute \MEM.PORTA.DATA_BIT_LAYOUT\ of data_reg : label is "p0_d8";
   attribute METHODOLOGY_DRC_VIOS : string;
@@ -3623,7 +3705,7 @@ dac_data2_carry_i_5: unisim.vcomponents.LUT5
       I2 => enable,
       O => D(6)
     );
-\dac_data[7]_i_1__0\: unisim.vcomponents.LUT4
+\dac_data[7]_i_1\: unisim.vcomponents.LUT4
     generic map(
       INIT => X"5F5D"
     )
@@ -7514,14 +7596,6 @@ dac_data2_carry: unisim.vcomponents.CARRY4
       I1 => \dac_data6__30_carry_n_7\,
       O => \dac_data6__90_carry_i_7_n_0\
     );
-\dac_data[7]_i_1\: unisim.vcomponents.LUT1
-    generic map(
-      INIT => X"1"
-    )
-        port map (
-      I0 => reset_n,
-      O => \^ss\(0)
-    );
 \dac_data_reg[0]\: unisim.vcomponents.FDRE
      port map (
       C => dac_clk_out,
@@ -9053,6 +9127,14 @@ phase_sum_carry_i_4: unisim.vcomponents.LUT2
       I1 => phase_ofst(0),
       O => phase_sum_carry_i_4_n_0
     );
+\sample_data[7]_i_1\: unisim.vcomponents.LUT1
+    generic map(
+      INIT => X"1"
+    )
+        port map (
+      I0 => reset_n,
+      O => \^ss\(0)
+    );
 sine_rom_inst: entity work.system_bd_fra_top_0_0_sine_lut
      port map (
       ADDRARDADDR(7 downto 0) => sel(7 downto 0),
@@ -9452,9 +9534,11 @@ use UNISIM.VCOMPONENTS.ALL;
 entity system_bd_fra_top_0_0_fra_top is
   port (
     dac_clk_out : out STD_LOGIC;
+    sample_out : out STD_LOGIC_VECTOR ( 7 downto 0 );
     dac_out : out STD_LOGIC_VECTOR ( 7 downto 0 );
     amplitude : in STD_LOGIC_VECTOR ( 7 downto 0 );
     clk : in STD_LOGIC;
+    adc_in : in STD_LOGIC_VECTOR ( 7 downto 0 );
     enable : in STD_LOGIC;
     reset_n : in STD_LOGIC;
     phase_inc : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -9470,6 +9554,13 @@ architecture STRUCTURE of system_bd_fra_top_0_0_fra_top is
   signal u_dds_n_0 : STD_LOGIC;
 begin
   dac_clk_out <= \^dac_clk_out\;
+u_adc_if: entity work.system_bd_fra_top_0_0_adc_if
+     port map (
+      SR(0) => u_dds_n_0,
+      adc_in(7 downto 0) => adc_in(7 downto 0),
+      dac_clk_out => \^dac_clk_out\,
+      sample_out(7 downto 0) => sample_out(7 downto 0)
+    );
 u_clk_div_2: entity work.system_bd_fra_top_0_0_clk_div_2
      port map (
       clk => clk,
@@ -9503,6 +9594,7 @@ entity system_bd_fra_top_0_0 is
     reset_n : in STD_LOGIC;
     clk : in STD_LOGIC;
     adc_in : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    sample_out : out STD_LOGIC_VECTOR ( 7 downto 0 );
     adc_clk_out : out STD_LOGIC;
     dac_out : out STD_LOGIC_VECTOR ( 7 downto 0 );
     dac_clk_out : out STD_LOGIC;
@@ -9524,7 +9616,7 @@ entity system_bd_fra_top_0_0 is
 end system_bd_fra_top_0_0;
 
 architecture STRUCTURE of system_bd_fra_top_0_0 is
-  signal \^dac_clk_out\ : STD_LOGIC;
+  signal \^adc_clk_out\ : STD_LOGIC;
   attribute X_INTERFACE_INFO : string;
   attribute X_INTERFACE_INFO of clk : signal is "xilinx.com:signal:clock:1.0 clk CLK";
   attribute X_INTERFACE_MODE : string;
@@ -9535,17 +9627,19 @@ architecture STRUCTURE of system_bd_fra_top_0_0 is
   attribute X_INTERFACE_MODE of reset_n : signal is "slave";
   attribute X_INTERFACE_PARAMETER of reset_n : signal is "XIL_INTERFACENAME reset_n, POLARITY ACTIVE_LOW, INSERT_VIP 0";
 begin
-  adc_clk_out <= \^dac_clk_out\;
-  dac_clk_out <= \^dac_clk_out\;
+  adc_clk_out <= \^adc_clk_out\;
+  dac_clk_out <= \^adc_clk_out\;
 inst: entity work.system_bd_fra_top_0_0_fra_top
      port map (
+      adc_in(7 downto 0) => adc_in(7 downto 0),
       amplitude(7 downto 0) => amplitude(7 downto 0),
       clk => clk,
-      dac_clk_out => \^dac_clk_out\,
+      dac_clk_out => \^adc_clk_out\,
       dac_out(7 downto 0) => dac_out(7 downto 0),
       enable => enable,
       phase_inc(31 downto 0) => phase_inc(31 downto 0),
       phase_ofst(31 downto 0) => phase_ofst(31 downto 0),
-      reset_n => reset_n
+      reset_n => reset_n,
+      sample_out(7 downto 0) => sample_out(7 downto 0)
     );
 end STRUCTURE;

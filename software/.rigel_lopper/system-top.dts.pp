@@ -1,10 +1,10 @@
-# 0 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/system-top.dts"
+# 0 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/system-top.dts"
 # 0 "<built-in>"
 # 0 "<command-line>"
-# 1 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/system-top.dts"
+# 1 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/system-top.dts"
 /dts-v1/;
-# 1 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/zynq-7000.dtsi" 1
-# 10 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/zynq-7000.dtsi"
+# 1 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/zynq-7000.dtsi" 1
+# 10 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/zynq-7000.dtsi"
 / {
  #address-cells = <1>;
  #size-cells = <1>;
@@ -585,15 +585,15 @@
   };
  };
 };
-# 3 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/system-top.dts" 2
-# 1 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/pl.dtsi" 1
+# 3 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/system-top.dts" 2
+# 1 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/pl.dtsi" 1
 / {
  amba_pl: amba_pl {
   ranges;
   compatible = "simple-bus";
   #address-cells = <1>;
   #size-cells = <1>;
-  firmware-name = "fra_zynq7015.bit.bin";
+  firmware-name = "pcie_fra.bit.bin";
   clocking0: clocking0 {
    compatible = "xlnx,fclk";
    assigned-clocks = <&clkc 15>;
@@ -602,17 +602,17 @@
    clock-output-names = "fabric_clk";
    clocks = <&clkc 15>;
   };
-  axi_gpio_0: gpio@41200000 {
+  adc_reg: gpio@41220000 {
    xlnx,gpio-board-interface = "Custom";
    compatible = "xlnx,axi-gpio-2.0" , "xlnx,xps-gpio-1.00.a";
-   xlnx,all-outputs = <1>;
+   xlnx,all-outputs = <0>;
    #gpio-cells = <2>;
-   xlnx,gpio-width = <32>;
+   xlnx,gpio-width = <8>;
    xlnx,dout-default = <0x0>;
-   xlnx,is-dual = <1>;
+   xlnx,is-dual = <0>;
    xlnx,ip-name = "axi_gpio";
    xlnx,tri-default-2 = <0xffffffff>;
-   reg = <0x41200000 0x10000>;
+   reg = <0x41220000 0x10000>;
    xlnx,all-inputs-2 = <0>;
    clocks = <&clkc 15>;
    xlnx,all-outputs-2 = <1>;
@@ -622,13 +622,13 @@
    xlnx,edk-iptype = "PERIPHERAL";
    xlnx,dout-default-2 = <0x0>;
    status = "okay";
-   xlnx,gpio2-width = <32>;
+   xlnx,gpio2-width = <1>;
    clock-names = "s_axi_aclk";
    xlnx,tri-default = <0xffffffff>;
-   xlnx,name = "axi_gpio_0";
-   xlnx,all-inputs = <0>;
+   xlnx,name = "adc_reg";
+   xlnx,all-inputs = <1>;
   };
-  axi_gpio_1: gpio@41210000 {
+  amp_enable_reg: gpio@41210000 {
    xlnx,gpio-board-interface = "Custom";
    compatible = "xlnx,axi-gpio-2.0" , "xlnx,xps-gpio-1.00.a";
    xlnx,all-outputs = <1>;
@@ -651,13 +651,39 @@
    xlnx,gpio2-width = <1>;
    clock-names = "s_axi_aclk";
    xlnx,tri-default = <0xffffffff>;
-   xlnx,name = "axi_gpio_1";
+   xlnx,name = "amp_enable_reg";
+   xlnx,all-inputs = <0>;
+  };
+  phase_reg: gpio@41200000 {
+   xlnx,gpio-board-interface = "Custom";
+   compatible = "xlnx,axi-gpio-2.0" , "xlnx,xps-gpio-1.00.a";
+   xlnx,all-outputs = <1>;
+   #gpio-cells = <2>;
+   xlnx,gpio-width = <32>;
+   xlnx,dout-default = <0x0>;
+   xlnx,is-dual = <1>;
+   xlnx,ip-name = "axi_gpio";
+   xlnx,tri-default-2 = <0xffffffff>;
+   reg = <0x41200000 0x10000>;
+   xlnx,all-inputs-2 = <0>;
+   clocks = <&clkc 15>;
+   xlnx,all-outputs-2 = <1>;
+   gpio-controller;
+   xlnx,interrupt-present = <0>;
+   xlnx,gpio2-board-interface = "Custom";
+   xlnx,edk-iptype = "PERIPHERAL";
+   xlnx,dout-default-2 = <0x0>;
+   status = "okay";
+   xlnx,gpio2-width = <32>;
+   clock-names = "s_axi_aclk";
+   xlnx,tri-default = <0xffffffff>;
+   xlnx,name = "phase_reg";
    xlnx,all-inputs = <0>;
   };
  };
 };
-# 4 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/system-top.dts" 2
-# 1 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/pcw.dtsi" 1
+# 4 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/system-top.dts" 2
+# 1 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/pcw.dtsi" 1
  &ps7_cortexa9_0 {
   xlnx,i-cache-size = <0x8000>;
   xlnx,d-cache-line-size = <20>;
@@ -874,7 +900,7 @@
   fclk-enable = <0x1>;
   ps-clk-frequency = <33333333>;
  };
-# 5 "/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/hw/sdt/system-top.dts" 2
+# 5 "/home/thomas/Documents/git/PCIE_FRA/software/PCIE_FRA/hw/sdt/system-top.dts" 2
 / {
  device_id = "7z015";
  slrcount = <1>;
@@ -922,8 +948,9 @@
          <0x00100000 &ps7_ddr_0_memory 0x00100000 0x3FF00000>,
          <0x0 &ps7_ram_0_memory 0x0 0x30000>,
          <0xffff0000 &ps7_ram_1_memory 0xffff0000 0xfe00>,
-         <0x41200000 &axi_gpio_0 0x41200000 0x10000>,
-         <0x41210000 &axi_gpio_1 0x41210000 0x10000>,
+         <0x41200000 &phase_reg 0x41200000 0x10000>,
+         <0x41210000 &amp_enable_reg 0x41210000 0x10000>,
+         <0x41220000 &adc_reg 0x41220000 0x10000>,
          <0xf8008000 &ps7_afi_0 0xf8008000 0x1000>,
          <0xf8009000 &ps7_afi_1 0xf8009000 0x1000>,
          <0xf800a000 &ps7_afi_2 0xf800a000 0x1000>,

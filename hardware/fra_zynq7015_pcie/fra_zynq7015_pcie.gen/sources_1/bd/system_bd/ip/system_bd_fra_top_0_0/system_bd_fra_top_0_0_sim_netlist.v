@@ -2,7 +2,7 @@
 // Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2025.1 (lin64) Build 6140274 Wed May 21 22:58:25 MDT 2025
-// Date        : Thu Mar 19 13:14:26 2026
+// Date        : Thu Mar 19 14:47:35 2026
 // Host        : ThinkpadT14s running 64-bit Ubuntu 24.04.4 LTS
 // Command     : write_verilog -force -mode funcsim
 //               /home/thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0_sim_netlist.v
@@ -20,6 +20,7 @@ module system_bd_fra_top_0_0
    (reset_n,
     clk,
     adc_in,
+    sample_out,
     adc_clk_out,
     dac_out,
     dac_clk_out,
@@ -30,6 +31,7 @@ module system_bd_fra_top_0_0
   (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 reset_n RST" *) (* X_INTERFACE_MODE = "slave" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME reset_n, POLARITY ACTIVE_LOW, INSERT_VIP 0" *) input reset_n;
   (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 clk CLK" *) (* X_INTERFACE_MODE = "slave" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME clk, FREQ_HZ 50000000, FREQ_TOLERANCE_HZ 0, PHASE 0.0, CLK_DOMAIN system_bd_processing_system7_0_0_FCLK_CLK0, INSERT_VIP 0" *) input clk;
   input [7:0]adc_in;
+  output [7:0]sample_out;
   output adc_clk_out;
   output [7:0]dac_out;
   output dac_clk_out;
@@ -38,25 +40,95 @@ module system_bd_fra_top_0_0
   input [7:0]amplitude;
   input enable;
 
+  wire adc_clk_out;
+  wire [7:0]adc_in;
   wire [7:0]amplitude;
   wire clk;
-  wire dac_clk_out;
   wire [7:0]dac_out;
   wire enable;
   wire [31:0]phase_inc;
   wire [31:0]phase_ofst;
   wire reset_n;
+  wire [7:0]sample_out;
 
-  assign adc_clk_out = dac_clk_out;
+  assign dac_clk_out = adc_clk_out;
   system_bd_fra_top_0_0_fra_top inst
-       (.amplitude(amplitude),
+       (.adc_in(adc_in),
+        .amplitude(amplitude),
         .clk(clk),
-        .dac_clk_out(dac_clk_out),
+        .dac_clk_out(adc_clk_out),
         .dac_out(dac_out),
         .enable(enable),
         .phase_inc(phase_inc),
         .phase_ofst(phase_ofst),
-        .reset_n(reset_n));
+        .reset_n(reset_n),
+        .sample_out(sample_out));
+endmodule
+
+(* ORIG_REF_NAME = "adc_if" *) 
+module system_bd_fra_top_0_0_adc_if
+   (sample_out,
+    SR,
+    adc_in,
+    dac_clk_out);
+  output [7:0]sample_out;
+  input [0:0]SR;
+  input [7:0]adc_in;
+  input dac_clk_out;
+
+  wire [0:0]SR;
+  wire [7:0]adc_in;
+  wire dac_clk_out;
+  wire [7:0]sample_out;
+
+  FDRE \sample_data_reg[0] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[0]),
+        .Q(sample_out[0]),
+        .R(SR));
+  FDRE \sample_data_reg[1] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[1]),
+        .Q(sample_out[1]),
+        .R(SR));
+  FDRE \sample_data_reg[2] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[2]),
+        .Q(sample_out[2]),
+        .R(SR));
+  FDRE \sample_data_reg[3] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[3]),
+        .Q(sample_out[3]),
+        .R(SR));
+  FDRE \sample_data_reg[4] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[4]),
+        .Q(sample_out[4]),
+        .R(SR));
+  FDRE \sample_data_reg[5] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[5]),
+        .Q(sample_out[5]),
+        .R(SR));
+  FDRE \sample_data_reg[6] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[6]),
+        .Q(sample_out[6]),
+        .R(SR));
+  FDRE \sample_data_reg[7] 
+       (.C(dac_clk_out),
+        .CE(1'b1),
+        .D(adc_in[7]),
+        .Q(sample_out[7]),
+        .R(SR));
 endmodule
 
 (* ORIG_REF_NAME = "clk_div_2" *) 
@@ -2498,11 +2570,6 @@ module system_bd_fra_top_0_0_dds
        (.I0(dac_data6__0_carry_n_4),
         .I1(dac_data6__30_carry_n_7),
         .O(dac_data6__90_carry_i_7_n_0));
-  LUT1 #(
-    .INIT(2'h1)) 
-    \dac_data[7]_i_1 
-       (.I0(reset_n),
-        .O(SS));
   FDRE \dac_data_reg[0] 
        (.C(dac_clk_out),
         .CE(1'b1),
@@ -3496,6 +3563,11 @@ module system_bd_fra_top_0_0_dds
        (.I0(phase_acc_reg[0]),
         .I1(phase_ofst[0]),
         .O(phase_sum_carry_i_4_n_0));
+  LUT1 #(
+    .INIT(2'h1)) 
+    \sample_data[7]_i_1 
+       (.I0(reset_n),
+        .O(SS));
   system_bd_fra_top_0_0_sine_lut sine_rom_inst
        (.ADDRARDADDR(sel),
         .CO(sine_rom_inst_n_4),
@@ -3644,22 +3716,27 @@ endmodule
 (* ORIG_REF_NAME = "fra_top" *) 
 module system_bd_fra_top_0_0_fra_top
    (dac_clk_out,
+    sample_out,
     dac_out,
     amplitude,
     clk,
+    adc_in,
     enable,
     reset_n,
     phase_inc,
     phase_ofst);
   output dac_clk_out;
+  output [7:0]sample_out;
   output [7:0]dac_out;
   input [7:0]amplitude;
   input clk;
+  input [7:0]adc_in;
   input enable;
   input reset_n;
   input [31:0]phase_inc;
   input [31:0]phase_ofst;
 
+  wire [7:0]adc_in;
   wire [7:0]amplitude;
   wire clk;
   wire dac_clk_out;
@@ -3669,8 +3746,14 @@ module system_bd_fra_top_0_0_fra_top
   wire [31:0]phase_inc;
   wire [31:0]phase_ofst;
   wire reset_n;
+  wire [7:0]sample_out;
   wire u_dds_n_0;
 
+  system_bd_fra_top_0_0_adc_if u_adc_if
+       (.SR(u_dds_n_0),
+        .adc_in(adc_in),
+        .dac_clk_out(dac_clk_out),
+        .sample_out(sample_out));
   system_bd_fra_top_0_0_clk_div_2 u_clk_div_2
        (.clk(clk),
         .dac_clk_out(dac_clk_out));
@@ -6511,7 +6594,7 @@ module system_bd_fra_top_0_0_sine_lut
   (* SOFT_HLUTNM = "soft_lutpair3" *) 
   LUT4 #(
     .INIT(16'h5F5D)) 
-    \dac_data[7]_i_1__0 
+    \dac_data[7]_i_1 
        (.I0(enable),
         .I1(\dac_data_reg[7]_0 [1]),
         .I2(\dac_data_reg[7] [1]),

@@ -1,3 +1,0 @@
-/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/zynq_fsbl/build/CMakeFiles/fsbl.elf.dir
-/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/zynq_fsbl/build/CMakeFiles/edit_cache.dir
-/home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/zynq_fsbl/build/CMakeFiles/rebuild_cache.dir

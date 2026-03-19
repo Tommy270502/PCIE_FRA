@@ -1,4 +1,0 @@
-domain_path: /home/thomas/Documents/git/PCIE_FRA/software/fra_zynq7015_pcie/export/fra_zynq7015_pcie/sw/standalone_ps7_cortexa9_0
-app_src_dir: /home/thomas/tools/Xilinx/2025.1/Vitis/data/embeddedsw/lib/sw_apps/empty_application
-template: empty_application
-lang: c
