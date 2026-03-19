@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Thu Mar 19 08:05:42 2026
+| Date         : Thu Mar 19 08:25:48 2026
 | Host         : DESKTOP-QGTME97 running 64-bit major release  (build 9200)
 | Command      : report_utilization -file fra_top_utilization_synth.rpt -pb fra_top_utilization_synth.pb
 | Design       : fra_top
@@ -34,8 +34,8 @@ Table of Contents
 | Slice LUTs*             |   12 |     0 |          0 |     46200 |  0.03 |
 |   LUT as Logic          |   12 |     0 |          0 |     46200 |  0.03 |
 |   LUT as Memory         |    0 |     0 |          0 |     14400 |  0.00 |
-| Slice Registers         |   14 |     0 |          0 |     92400 |  0.02 |
-|   Register as Flip Flop |   14 |     0 |          0 |     92400 |  0.02 |
+| Slice Registers         |   41 |     0 |          0 |     92400 |  0.04 |
+|   Register as Flip Flop |   41 |     0 |          0 |     92400 |  0.04 |
 |   Register as Latch     |    0 |     0 |          0 |     92400 |  0.00 |
 | F7 Muxes                |    0 |     0 |          0 |     23100 |  0.00 |
 | F8 Muxes                |    0 |     0 |          0 |     11550 |  0.00 |
@@ -60,7 +60,7 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 | 0     |          Yes |           - |          Set |
 | 0     |          Yes |           - |        Reset |
 | 7     |          Yes |         Set |            - |
-| 7     |          Yes |       Reset |            - |
+| 34    |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -120,7 +120,7 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +------------+------+-------+------------+-----------+-------+
 |  Site Type | Used | Fixed | Prohibited | Available | Util% |
 +------------+------+-------+------------+-----------+-------+
-| BUFGCTRL   |    1 |     0 |          0 |        32 |  3.13 |
+| BUFGCTRL   |    2 |     0 |          0 |        32 |  6.25 |
 | BUFIO      |    0 |     0 |          0 |        12 |  0.00 |
 | MMCME2_ADV |    0 |     0 |          0 |         3 |  0.00 |
 | PLLE2_ADV  |    0 |     0 |          0 |         3 |  0.00 |
@@ -154,19 +154,14 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+------+---------------------+
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
+| FDRE     |   34 |        Flop & Latch |
+| LUT1     |   12 |                 LUT |
 | OBUF     |   10 |                  IO |
+| CARRY4   |    8 |          CarryLogic |
 | FDSE     |    7 |        Flop & Latch |
-| FDRE     |    7 |        Flop & Latch |
-| LUT1     |    4 |                 LUT |
-| LUT6     |    3 |                 LUT |
-| LUT5     |    2 |                 LUT |
-| LUT3     |    2 |                 LUT |
-| LUT2     |    2 |                 LUT |
 | IBUF     |    2 |                  IO |
-| CARRY4   |    2 |          CarryLogic |
+| BUFG     |    2 |               Clock |
 | RAMB18E1 |    1 |        Block Memory |
-| LUT4     |    1 |                 LUT |
-| BUFG     |    1 |               Clock |
 +----------+------+---------------------+
 
 

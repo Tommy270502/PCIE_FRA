@@ -16,19 +16,16 @@ end fra_top;
 architecture Behavioral of fra_top is
 
     signal clk_25       : std_logic;
-
     signal adc_sample_s : std_logic_vector(7 downto 0);
+    signal dds_data_s   : std_logic_vector(7 downto 0);
 
-    signal ramp_s       : std_logic_vector(7 downto 0);
-    signal lut_addr     : unsigned(7 downto 0);
-    signal lut_data     : std_logic_vector(7 downto 0);
+    constant PHASE_INC_C    : unsigned(31 downto 0) := to_unsigned(68719, 32);
+    constant PHASE_OFFSET_C : unsigned(31 downto 0) := (others => '0');
 
 begin
 
     adc_clk_out <= clk_25;
     dac_clk_out <= clk_25;
-
-    lut_addr <= unsigned(ramp_s);
 
     u_clk_div_2 : entity work.clk_div_2
         port map (
@@ -44,25 +41,20 @@ begin
             sample_data => adc_sample_s
         );
 
-    u_sawtooth_gen : entity work.sawtooth_gen
+    u_dds : entity work.dds
         port map (
-            reset_n => reset_n,
-            clk     => clk_25,
-            ramp    => ramp_s
-        );
-
-    u_lut : entity work.sine_lut
-        port map (
-            clk  => clk_25,
-            addr => lut_addr,
-            data => lut_data
+            clk          => clk_25,
+            reset_n      => reset_n,
+            phase_inc    => PHASE_INC_C,
+            phase_offset => PHASE_OFFSET_C,
+            dac_data     => dds_data_s
         );
 
     u_dac_if : entity work.dac_if
         port map (
             reset_n      => reset_n,
             clk          => clk_25,
-            dac_data_reg => lut_data,
+            dac_data_reg => dds_data_s,
             dac_data     => dac_out
         );
 
