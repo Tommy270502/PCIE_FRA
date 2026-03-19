@@ -16,13 +16,19 @@ end fra_top;
 architecture Behavioral of fra_top is
 
     signal clk_25       : std_logic;
+
     signal adc_sample_s : std_logic_vector(7 downto 0);
-    signal dac_word_s   : std_logic_vector(7 downto 0);
+
+    signal ramp_s       : std_logic_vector(7 downto 0);
+    signal lut_addr     : unsigned(7 downto 0);
+    signal lut_data     : std_logic_vector(7 downto 0);
 
 begin
 
     adc_clk_out <= clk_25;
     dac_clk_out <= clk_25;
+
+    lut_addr <= unsigned(ramp_s);
 
     u_clk_div_2 : entity work.clk_div_2
         port map (
@@ -42,14 +48,21 @@ begin
         port map (
             reset_n => reset_n,
             clk     => clk_25,
-            ramp    => dac_word_s
+            ramp    => ramp_s
+        );
+
+    u_lut : entity work.sine_lut
+        port map (
+            clk  => clk_25,
+            addr => lut_addr,
+            data => lut_data
         );
 
     u_dac_if : entity work.dac_if
         port map (
             reset_n      => reset_n,
             clk          => clk_25,
-            dac_data_reg => dac_word_s,
+            dac_data_reg => lut_data,
             dac_data     => dac_out
         );
 
