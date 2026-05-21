@@ -1,0 +1,46 @@
+# Vivado generated output and local state
+.Xil/
+*.jou
+*.log
+*.str
+*.pb
+*.rpt
+*.rpx
+*.wdb
+*.wcfg
+*.dcp
+*.bit
+*.bin
+*.mcs
+*.xsa
+
+hardware/**/.Xil/
+hardware/**/*.cache/
+hardware/**/*.gen/
+hardware/**/*.hw/
+hardware/**/*.ip_user_files/
+hardware/**/*.runs/
+hardware/**/*.sim/
+
+# Vitis generated output and local state
+software/**/build/
+software/**/export/
+software/**/logs/
+software/**/_ide/logs/
+software/**/_ide/.wsdata/
+software/**/*.elf
+software/**/*.map
+software/**/*.o
+software/**/*.d
+software/**/*.a
+software/**/*.pdi
+software/**/*.vitisWorkspace.json
+software/**/.cache/
+
+# Editor and OS noise
+.vscode/
+.idea/
+*~
+*.swp
+Thumbs.db
+.DS_Store

@@ -1,54 +1,106 @@
 #include "xparameters.h"
-#include "xgpio.h"
+#include "xil_types.h"
+#include "xil_io.h"
 #include "xil_printf.h"
-#include "xstatus.h"
 #include "sleep.h"
 
-#include <limits.h>
-#include <stdint.h>
+#include <ctype.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
-/* ---------------- DDS / hardware configuration ---------------- */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+#if defined(XPAR_FRA_CORE_0_BASEADDR)
+#define FRA_BASEADDR ((UINTPTR)XPAR_FRA_CORE_0_BASEADDR)
+#elif defined(XPAR_FRA_CORE_BASEADDR)
+#define FRA_BASEADDR ((UINTPTR)XPAR_FRA_CORE_BASEADDR)
+#else
+#define FRA_BASEADDR ((UINTPTR)0x43C00000u)
+#endif
 
 #define DDS_CLK_HZ              25000000.0
-#define DDS_PHASE_SCALE         4294967296.0   /* 2^32 */
-#define ADC_MASK                0xFFu
+#define DDS_PHASE_SCALE         4294967296.0
+#define MAX_SWEEP_POINTS        64u
+#define LINE_BUF_SIZE           96u
 
-/* GPIO channels */
-#define ADC_CH                  1
-#define AMP_CH                  1
-#define ENABLE_CH               2
-#define PHASE_IN_CH             1
-#define PHASE_OFFSET_CH         2
+#define REG_VERSION             0x00u
+#define REG_CONTROL             0x04u
+#define REG_STATUS              0x08u
+#define REG_PHASE_INC           0x0Cu
+#define REG_PHASE_OFFSET        0x10u
+#define REG_AMPLITUDE           0x14u
+#define REG_SETTLE_CYCLES       0x18u
+#define REG_MEASURE_CYCLES      0x1Cu
+#define REG_SAMPLE_COUNT        0x20u
+#define REG_I_ACC_LO            0x24u
+#define REG_I_ACC_HI            0x28u
+#define REG_Q_ACC_LO            0x2Cu
+#define REG_Q_ACC_HI            0x30u
+#define REG_ADC_MIN_MAX         0x34u
+#define REG_LAST_SAMPLE         0x38u
 
-/* ---------------- Startup settings ---------------- */
+#define CTRL_DDS_ENABLE         0x00000001u
+#define CTRL_START              0x00000002u
+#define CTRL_CLEAR_DONE         0x00000004u
+#define CTRL_RESET_PHASE        0x00000008u
 
-#define TEST_FREQ_HZ            1000.0
-#define TEST_PHASE_OFFSET       0u
-#define TEST_AMPLITUDE          128u
-#define TEST_ENABLE             1u
+#define STATUS_BUSY             0x00000001u
+#define STATUS_DONE             0x00000002u
+#define STATUS_OVERFLOW         0x00000004u
+#define STATUS_ADC_CLIP         0x00000008u
+#define STATUS_LOW_SIGNAL       0x00000010u
+#define STATUS_CONFIG_ERR       0x00000020u
 
-/* ---------------- Runtime options ---------------- */
+typedef struct {
+    double start_hz;
+    double stop_hz;
+    u32 points;
+    u32 amplitude;
+    u32 settle_cycles;
+    u32 measure_cycles;
+} FraConfig;
 
-/* 0 = monitor ADC continuously, 1 = run log sweep continuously */
-#define RUN_SWEEP               1
+typedef struct {
+    double freq_hz;
+    double mag_counts;
+    double phase_deg;
+    int64_t i_acc;
+    int64_t q_acc;
+    u32 sample_count;
+    u32 adc_min;
+    u32 adc_max;
+    u32 status;
+} FraResult;
 
-/* ADC monitor settings */
-#define POLL_INTERVAL_US        1000u
-#define REPORT_EVERY_SAMPLES    1000u
-#define PRINT_ON_CHANGE         0
+typedef struct {
+    double mag_counts[MAX_SWEEP_POINTS];
+    double phase_deg[MAX_SWEEP_POINTS];
+    u32 valid[MAX_SWEEP_POINTS];
+} FraCalibration;
 
-/* Sweep settings */
-#define SWEEP_FSTART_HZ         10.0
-#define SWEEP_FSTOP_HZ          20000.0
-#define SWEEP_POINTS            20u
-#define SWEEP_DWELL_US          100000u
+static FraConfig Config = {
+    10.0,
+    20000.0,
+    20u,
+    128u,
+    2u,
+    4u
+};
 
-/* ---------------- Utility functions ---------------- */
+static FraCalibration Calibration;
 
-static int InitGpio(XGpio *InstancePtr, UINTPTR BaseAddr)
+static u32 RegRead(u32 offset)
 {
-    return XGpio_Initialize(InstancePtr, BaseAddr);
+    return Xil_In32(FRA_BASEADDR + offset);
+}
+
+static void RegWrite(u32 offset, u32 value)
+{
+    Xil_Out32(FRA_BASEADDR + offset, value);
 }
 
 static u32 DdsPhaseIncFromFreq(double freq_hz)
@@ -64,206 +116,577 @@ static u32 DdsPhaseIncFromFreq(double freq_hz)
     return (u32)((freq_hz * DDS_PHASE_SCALE) / DDS_CLK_HZ + 0.5);
 }
 
-static double DdsFreqFromPhaseInc(u32 phase_inc)
+static int StrEq(const char *a, const char *b)
 {
-    return ((double)phase_inc * DDS_CLK_HZ) / DDS_PHASE_SCALE;
+    while ((*a != '\0') && (*b != '\0')) {
+        if (tolower((unsigned char)*a) != tolower((unsigned char)*b)) {
+            return 0;
+        }
+        a++;
+        b++;
+    }
+
+    return (*a == '\0') && (*b == '\0');
 }
 
-static void SetFrequencyHz(XGpio *PhaseGpio, double freq_hz)
+static int ParseDouble(const char *text, double *value)
 {
-    XGpio_DiscreteWrite(PhaseGpio, PHASE_IN_CH, DdsPhaseIncFromFreq(freq_hz));
+    char *end = NULL;
+    double parsed;
+
+    if (text == NULL) {
+        return 0;
+    }
+
+    parsed = strtod(text, &end);
+    if ((end == text) || (*end != '\0')) {
+        return 0;
+    }
+
+    *value = parsed;
+    return 1;
 }
 
-static void ProgramFra(XGpio *PhaseGpio,
-                       XGpio *AmpGpio,
-                       u32 phase_in,
-                       u32 phase_offset,
-                       u32 amplitude,
-                       u32 enable)
+static int ParseU32(const char *text, u32 *value)
 {
-    XGpio_DiscreteWrite(PhaseGpio, PHASE_IN_CH, phase_in);
-    XGpio_DiscreteWrite(PhaseGpio, PHASE_OFFSET_CH, phase_offset);
-    XGpio_DiscreteWrite(AmpGpio, AMP_CH, amplitude);
-    XGpio_DiscreteWrite(AmpGpio, ENABLE_CH, enable);
+    char *end = NULL;
+    unsigned long parsed;
+
+    if (text == NULL) {
+        return 0;
+    }
+
+    parsed = strtoul(text, &end, 0);
+    if ((end == text) || (*end != '\0')) {
+        return 0;
+    }
+
+    *value = (u32)parsed;
+    return 1;
 }
 
-static void SweepLog(XGpio *PhaseGpio,
-                     double fstart_hz,
-                     double fstop_hz,
-                     u32 points,
-                     u32 dwell_us)
+static void PrintU64(uint64_t value)
 {
-    u32 i;
-    double ratio;
-    double f;
+    char buf[21];
+    int i = 0;
 
-    if ((points < 2u) || (fstart_hz <= 0.0) || (fstop_hz <= 0.0)) {
-        xil_printf("SweepLog: invalid arguments\r\n");
+    if (value == 0u) {
+        xil_printf("0");
         return;
     }
 
-    ratio = pow(fstop_hz / fstart_hz, 1.0 / (double)(points - 1u));
-    f = fstart_hz;
+    while (value > 0u) {
+        buf[i++] = (char)('0' + (value % 10u));
+        value /= 10u;
+    }
 
-    for (i = 0; i < points; i++) {
-        u32 phase_inc = DdsPhaseIncFromFreq(f);
-
-        XGpio_DiscreteWrite(PhaseGpio, PHASE_IN_CH, phase_inc);
-
-        xil_printf("sweep[%lu/%lu]: f=%lu Hz, phase_inc=%lu\r\n",
-                   (unsigned long)(i + 1u),
-                   (unsigned long)points,
-                   (unsigned long)(f + 0.5),
-                   (unsigned long)phase_inc);
-
-        usleep(dwell_us);
-        f *= ratio;
+    while (i > 0) {
+        xil_printf("%c", buf[--i]);
     }
 }
 
-static int InitFraGpio(XGpio *GpioAdc, XGpio *GpioAmpEnable, XGpio *GpioPhase)
+static void PrintI64(int64_t value)
 {
-    int Status;
+    uint64_t magnitude;
 
-    Status = InitGpio(GpioAdc, XPAR_ADC_REG_BASEADDR);
-    if (Status != XST_SUCCESS) {
-        xil_printf("ERROR: ADC_REG init failed (status=%d)\r\n", Status);
-        return XST_FAILURE;
+    if (value < 0) {
+        xil_printf("-");
+        magnitude = (uint64_t)(-(value + 1)) + 1u;
+    } else {
+        magnitude = (uint64_t)value;
     }
 
-    Status = InitGpio(GpioAmpEnable, XPAR_AMP_ENABLE_REG_BASEADDR);
-    if (Status != XST_SUCCESS) {
-        xil_printf("ERROR: AMP_ENABLE_REG init failed (status=%d)\r\n", Status);
-        return XST_FAILURE;
-    }
-
-    Status = InitGpio(GpioPhase, XPAR_PHASE_REG_BASEADDR);
-    if (Status != XST_SUCCESS) {
-        xil_printf("ERROR: PHASE_REG init failed (status=%d)\r\n", Status);
-        return XST_FAILURE;
-    }
-
-    XGpio_SetDataDirection(GpioAdc, ADC_CH, ADC_MASK);             /* input */
-    XGpio_SetDataDirection(GpioAmpEnable, AMP_CH, 0x00000000u);    /* output */
-    XGpio_SetDataDirection(GpioAmpEnable, ENABLE_CH, 0x00000000u); /* output */
-    XGpio_SetDataDirection(GpioPhase, PHASE_IN_CH, 0x00000000u);   /* output */
-    XGpio_SetDataDirection(GpioPhase, PHASE_OFFSET_CH, 0x00000000u); /* output */
-
-    return XST_SUCCESS;
+    PrintU64(magnitude);
 }
 
-static void PrintConfig(XGpio *GpioPhase, XGpio *GpioAmpEnable)
+static int32_t RoundMilli(double value)
 {
-    u32 phase_in = XGpio_DiscreteRead(GpioPhase, PHASE_IN_CH);
-    u32 phase_offset = XGpio_DiscreteRead(GpioPhase, PHASE_OFFSET_CH);
-    u32 amplitude = XGpio_DiscreteRead(GpioAmpEnable, AMP_CH);
-    u32 enable = XGpio_DiscreteRead(GpioAmpEnable, ENABLE_CH);
+    if (value >= 0.0) {
+        return (int32_t)(value * 1000.0 + 0.5);
+    }
 
-    xil_printf("Configured:\r\n");
-    xil_printf("  phase_in     = %lu\r\n", (unsigned long)phase_in);
-    xil_printf("  phase_freq   = %lu Hz\r\n", (unsigned long)(DdsFreqFromPhaseInc(phase_in) + 0.5));
-    xil_printf("  phase_offset = %lu\r\n", (unsigned long)phase_offset);
-    xil_printf("  amplitude    = %lu\r\n", (unsigned long)amplitude);
-    xil_printf("  enable       = %lu\r\n", (unsigned long)enable);
+    return (int32_t)(value * 1000.0 - 0.5);
 }
 
-/* ---------------- Main ---------------- */
+static void PrintFixedMilli(int32_t milli)
+{
+    int32_t whole;
+    int32_t frac;
+
+    if (milli < 0) {
+        xil_printf("-");
+        milli = -milli;
+    }
+
+    whole = milli / 1000;
+    frac = milli % 1000;
+
+    xil_printf("%ld.%03ld", (long)whole, (long)frac);
+}
+
+static void PrintDouble3(double value)
+{
+    PrintFixedMilli(RoundMilli(value));
+}
+
+static void ClearCalibration(void)
+{
+    u32 i;
+
+    for (i = 0u; i < MAX_SWEEP_POINTS; i++) {
+        Calibration.mag_counts[i] = 0.0;
+        Calibration.phase_deg[i] = 0.0;
+        Calibration.valid[i] = 0u;
+    }
+}
+
+static double SweepFreq(u32 index)
+{
+    double ratio;
+
+    if (Config.points <= 1u) {
+        return Config.start_hz;
+    }
+
+    ratio = (double)index / (double)(Config.points - 1u);
+    return Config.start_hz * pow(Config.stop_hz / Config.start_hz, ratio);
+}
+
+static double WrapPhaseDeg(double phase_deg)
+{
+    while (phase_deg > 180.0) {
+        phase_deg -= 360.0;
+    }
+
+    while (phase_deg <= -180.0) {
+        phase_deg += 360.0;
+    }
+
+    return phase_deg;
+}
+
+static void PrintStatusFlags(u32 status)
+{
+    if (status & STATUS_BUSY) {
+        xil_printf(" BUSY");
+    }
+    if (status & STATUS_DONE) {
+        xil_printf(" DONE");
+    }
+    if (status & STATUS_OVERFLOW) {
+        xil_printf(" OVERFLOW");
+    }
+    if (status & STATUS_ADC_CLIP) {
+        xil_printf(" ADC_CLIP");
+    }
+    if (status & STATUS_LOW_SIGNAL) {
+        xil_printf(" LOW_SIGNAL");
+    }
+    if (status & STATUS_CONFIG_ERR) {
+        xil_printf(" CONFIG_ERR");
+    }
+}
+
+static void PrintConfig(void)
+{
+    xil_printf("config: start=");
+    PrintDouble3(Config.start_hz);
+    xil_printf("Hz stop=");
+    PrintDouble3(Config.stop_hz);
+    xil_printf("Hz points=%lu amp=%lu settle=%lu measure=%lu\r\n",
+               (unsigned long)Config.points,
+               (unsigned long)Config.amplitude,
+               (unsigned long)Config.settle_cycles,
+               (unsigned long)Config.measure_cycles);
+}
+
+static void PrintCoreStatus(void)
+{
+    u32 status = RegRead(REG_STATUS);
+    u32 adc_min_max = RegRead(REG_ADC_MIN_MAX);
+
+    xil_printf("base=0x%08lx version=0x%08lx status=0x%08lx",
+               (unsigned long)FRA_BASEADDR,
+               (unsigned long)RegRead(REG_VERSION),
+               (unsigned long)status);
+    PrintStatusFlags(status);
+    xil_printf("\r\n");
+
+    xil_printf("phase_inc=%lu amplitude=%lu samples=%lu adc_min=%lu adc_max=%lu last=%lu\r\n",
+               (unsigned long)RegRead(REG_PHASE_INC),
+               (unsigned long)(RegRead(REG_AMPLITUDE) & 0xFFu),
+               (unsigned long)RegRead(REG_SAMPLE_COUNT),
+               (unsigned long)(adc_min_max & 0xFFu),
+               (unsigned long)((adc_min_max >> 8) & 0xFFu),
+               (unsigned long)(RegRead(REG_LAST_SAMPLE) & 0xFFu));
+    PrintConfig();
+}
+
+static int WaitForDone(double freq_hz)
+{
+    double timeout_us_d;
+    u32 timeout_us;
+    u32 waited_us = 0u;
+    u32 status;
+
+    timeout_us_d = (((double)Config.settle_cycles + (double)Config.measure_cycles + 2.0) * 1000000.0) / freq_hz;
+    timeout_us_d += 500000.0;
+
+    if (timeout_us_d < 1000000.0) {
+        timeout_us_d = 1000000.0;
+    }
+    if (timeout_us_d > 60000000.0) {
+        timeout_us_d = 60000000.0;
+    }
+
+    timeout_us = (u32)timeout_us_d;
+
+    while (waited_us < timeout_us) {
+        status = RegRead(REG_STATUS);
+        if ((status & STATUS_DONE) != 0u) {
+            return 1;
+        }
+
+        usleep(1000u);
+        waited_us += 1000u;
+    }
+
+    return 0;
+}
+
+static int64_t CombineSigned64(u32 lo, u32 hi)
+{
+    uint64_t raw = ((uint64_t)hi << 32) | (uint64_t)lo;
+
+    if ((raw & 0x8000000000000000ULL) != 0ULL) {
+        return -(int64_t)((~raw) + 1ULL);
+    }
+
+    return (int64_t)raw;
+}
+
+static int RunMeasurement(double freq_hz, FraResult *result)
+{
+    u32 phase_inc;
+    u32 adc_min_max;
+    u32 i_lo;
+    u32 i_hi;
+    u32 q_lo;
+    u32 q_hi;
+    double mag;
+
+    phase_inc = DdsPhaseIncFromFreq(freq_hz);
+    if (phase_inc == 0u) {
+        return 0;
+    }
+
+    RegWrite(REG_PHASE_INC, phase_inc);
+    RegWrite(REG_PHASE_OFFSET, 0u);
+    RegWrite(REG_AMPLITUDE, Config.amplitude & 0xFFu);
+    RegWrite(REG_SETTLE_CYCLES, Config.settle_cycles);
+    RegWrite(REG_MEASURE_CYCLES, Config.measure_cycles);
+    RegWrite(REG_CONTROL, CTRL_DDS_ENABLE | CTRL_CLEAR_DONE | CTRL_RESET_PHASE | CTRL_START);
+
+    if (!WaitForDone(freq_hz)) {
+        return 0;
+    }
+
+    i_lo = RegRead(REG_I_ACC_LO);
+    i_hi = RegRead(REG_I_ACC_HI);
+    q_lo = RegRead(REG_Q_ACC_LO);
+    q_hi = RegRead(REG_Q_ACC_HI);
+    adc_min_max = RegRead(REG_ADC_MIN_MAX);
+
+    result->freq_hz = freq_hz;
+    result->status = RegRead(REG_STATUS);
+    result->sample_count = RegRead(REG_SAMPLE_COUNT);
+    result->adc_min = adc_min_max & 0xFFu;
+    result->adc_max = (adc_min_max >> 8) & 0xFFu;
+    result->i_acc = CombineSigned64(i_lo, i_hi);
+    result->q_acc = CombineSigned64(q_lo, q_hi);
+
+    if (result->sample_count == 0u) {
+        result->mag_counts = 0.0;
+        result->phase_deg = 0.0;
+        result->status |= STATUS_CONFIG_ERR;
+        return 1;
+    }
+
+    mag = hypot((double)result->i_acc, (double)result->q_acc);
+    result->mag_counts = (2.0 * mag) / ((double)result->sample_count * 127.0);
+    result->phase_deg = atan2((double)result->q_acc, (double)result->i_acc) * 180.0 / M_PI;
+    return 1;
+}
+
+static void PrintCsvHeader(void)
+{
+    xil_printf("idx,freq_hz,mag_counts,phase_deg,norm_db,norm_phase_deg,i_acc,q_acc,samples,adc_min,adc_max,status\r\n");
+}
+
+static void PrintResultRow(u32 index, const FraResult *result, int use_calibration)
+{
+    int has_cal = 0;
+    double norm_db = 0.0;
+    double norm_phase = 0.0;
+
+    if (use_calibration &&
+        (index < MAX_SWEEP_POINTS) &&
+        (Calibration.valid[index] != 0u) &&
+        (Calibration.mag_counts[index] > 0.0)) {
+        has_cal = 1;
+        norm_db = 20.0 * log10(result->mag_counts / Calibration.mag_counts[index]);
+        norm_phase = WrapPhaseDeg(result->phase_deg - Calibration.phase_deg[index]);
+    }
+
+    xil_printf("%lu,", (unsigned long)index);
+    PrintDouble3(result->freq_hz);
+    xil_printf(",");
+    PrintDouble3(result->mag_counts);
+    xil_printf(",");
+    PrintDouble3(result->phase_deg);
+    xil_printf(",");
+    if (has_cal) {
+        PrintDouble3(norm_db);
+    } else {
+        xil_printf("nan");
+    }
+    xil_printf(",");
+    if (has_cal) {
+        PrintDouble3(norm_phase);
+    } else {
+        xil_printf("nan");
+    }
+    xil_printf(",");
+    PrintI64(result->i_acc);
+    xil_printf(",");
+    PrintI64(result->q_acc);
+    xil_printf(",%lu,%lu,%lu,0x%08lx",
+               (unsigned long)result->sample_count,
+               (unsigned long)result->adc_min,
+               (unsigned long)result->adc_max,
+               (unsigned long)result->status);
+    PrintStatusFlags(result->status);
+    xil_printf("\r\n");
+}
+
+static void CmdHelp(void)
+{
+    xil_printf("commands:\r\n");
+    xil_printf("  help\r\n");
+    xil_printf("  id\r\n");
+    xil_printf("  status\r\n");
+    xil_printf("  set start <hz>\r\n");
+    xil_printf("  set stop <hz>\r\n");
+    xil_printf("  set points <1..64>\r\n");
+    xil_printf("  set amp <0..255>\r\n");
+    xil_printf("  set settle <cycles>\r\n");
+    xil_printf("  set measure <cycles>\r\n");
+    xil_printf("  single <hz>\r\n");
+    xil_printf("  sweep\r\n");
+    xil_printf("  cal\r\n");
+}
+
+static void CmdSingle(const char *arg)
+{
+    double freq_hz;
+    FraResult result;
+
+    if (!ParseDouble(arg, &freq_hz) || (freq_hz <= 0.0)) {
+        xil_printf("usage: single <hz>\r\n");
+        return;
+    }
+
+    PrintCsvHeader();
+    if (RunMeasurement(freq_hz, &result)) {
+        PrintResultRow(0u, &result, 0);
+    } else {
+        xil_printf("ERROR: measurement timeout or invalid frequency\r\n");
+    }
+}
+
+static void CmdSweep(void)
+{
+    u32 i;
+    FraResult result;
+    double freq_hz;
+
+    PrintCsvHeader();
+    for (i = 0u; i < Config.points; i++) {
+        freq_hz = SweepFreq(i);
+        if (RunMeasurement(freq_hz, &result)) {
+            PrintResultRow(i, &result, 1);
+        } else {
+            xil_printf("%lu,", (unsigned long)i);
+            PrintDouble3(freq_hz);
+            xil_printf(",ERROR\r\n");
+        }
+    }
+}
+
+static void CmdCal(void)
+{
+    u32 i;
+    FraResult result;
+    double freq_hz;
+
+    ClearCalibration();
+    xil_printf("calibrating loopback baseline\r\n");
+    PrintCsvHeader();
+
+    for (i = 0u; i < Config.points; i++) {
+        freq_hz = SweepFreq(i);
+        if (RunMeasurement(freq_hz, &result)) {
+            Calibration.mag_counts[i] = result.mag_counts;
+            Calibration.phase_deg[i] = result.phase_deg;
+            Calibration.valid[i] = 1u;
+            PrintResultRow(i, &result, 0);
+        } else {
+            xil_printf("%lu,", (unsigned long)i);
+            PrintDouble3(freq_hz);
+            xil_printf(",ERROR\r\n");
+        }
+    }
+
+    xil_printf("calibration complete\r\n");
+}
+
+static void CmdSet(char *key, char *value)
+{
+    double parsed_double;
+    u32 parsed_u32;
+
+    if ((key == NULL) || (value == NULL)) {
+        xil_printf("usage: set <start|stop|points|amp|settle|measure> <value>\r\n");
+        return;
+    }
+
+    if (StrEq(key, "start")) {
+        if (!ParseDouble(value, &parsed_double) || (parsed_double <= 0.0)) {
+            xil_printf("invalid start frequency\r\n");
+            return;
+        }
+        Config.start_hz = parsed_double;
+    } else if (StrEq(key, "stop")) {
+        if (!ParseDouble(value, &parsed_double) || (parsed_double <= 0.0)) {
+            xil_printf("invalid stop frequency\r\n");
+            return;
+        }
+        Config.stop_hz = parsed_double;
+    } else if (StrEq(key, "points")) {
+        if (!ParseU32(value, &parsed_u32) || (parsed_u32 < 1u) || (parsed_u32 > MAX_SWEEP_POINTS)) {
+            xil_printf("points must be 1..%lu\r\n", (unsigned long)MAX_SWEEP_POINTS);
+            return;
+        }
+        Config.points = parsed_u32;
+    } else if (StrEq(key, "amp")) {
+        if (!ParseU32(value, &parsed_u32) || (parsed_u32 > 255u)) {
+            xil_printf("amplitude must be 0..255\r\n");
+            return;
+        }
+        Config.amplitude = parsed_u32;
+    } else if (StrEq(key, "settle")) {
+        if (!ParseU32(value, &parsed_u32)) {
+            xil_printf("invalid settle cycle count\r\n");
+            return;
+        }
+        Config.settle_cycles = parsed_u32;
+    } else if (StrEq(key, "measure")) {
+        if (!ParseU32(value, &parsed_u32) || (parsed_u32 == 0u)) {
+            xil_printf("measure cycles must be > 0\r\n");
+            return;
+        }
+        Config.measure_cycles = parsed_u32;
+    } else {
+        xil_printf("unknown setting: %s\r\n", key);
+        return;
+    }
+
+    ClearCalibration();
+    PrintConfig();
+    xil_printf("calibration cleared\r\n");
+}
+
+static int ReadLine(char *buf, u32 max_len)
+{
+    u32 len = 0u;
+    char c;
+
+    while (1) {
+        c = inbyte();
+
+        if ((c == '\r') || (c == '\n')) {
+            xil_printf("\r\n");
+            buf[len] = '\0';
+            return (int)len;
+        }
+
+        if ((c == '\b') || (c == 0x7Fu)) {
+            if (len > 0u) {
+                len--;
+                xil_printf("\b \b");
+            }
+            continue;
+        }
+
+        if (isprint((unsigned char)c) && (len < (max_len - 1u))) {
+            buf[len++] = c;
+            xil_printf("%c", c);
+        }
+    }
+}
+
+static void Dispatch(char *line)
+{
+    char *cmd;
+    char *arg1;
+    char *arg2;
+
+    cmd = strtok(line, " \t");
+    if (cmd == NULL) {
+        return;
+    }
+
+    arg1 = strtok(NULL, " \t");
+    arg2 = strtok(NULL, " \t");
+
+    if (StrEq(cmd, "help")) {
+        CmdHelp();
+    } else if (StrEq(cmd, "id")) {
+        xil_printf("PCIE_FRA functional FRA firmware, core version 0x%08lx, base 0x%08lx\r\n",
+                   (unsigned long)RegRead(REG_VERSION),
+                   (unsigned long)FRA_BASEADDR);
+    } else if (StrEq(cmd, "status")) {
+        PrintCoreStatus();
+    } else if (StrEq(cmd, "set")) {
+        CmdSet(arg1, arg2);
+    } else if (StrEq(cmd, "single")) {
+        CmdSingle(arg1);
+    } else if (StrEq(cmd, "sweep")) {
+        CmdSweep();
+    } else if (StrEq(cmd, "cal")) {
+        CmdCal();
+    } else {
+        xil_printf("unknown command: %s\r\n", cmd);
+    }
+}
 
 int main(void)
 {
-    int Status;
-    XGpio GpioAdc;
-    XGpio GpioAmpEnable;
-    XGpio GpioPhase;
+    char line[LINE_BUF_SIZE];
 
-#if !PRINT_ON_CHANGE
-    u32 min_sample = ADC_MASK;
-    u32 max_sample = 0u;
-    u32 sum_sample = 0u;
-    u32 count = 0u;
-#else
-    u32 last_sample = UINT_MAX;
-#endif
+    ClearCalibration();
+    RegWrite(REG_CONTROL, CTRL_CLEAR_DONE | CTRL_RESET_PHASE);
 
-    xil_printf("\r\n=== FRA GPIO test start ===\r\n");
-
-    xil_printf("Base addresses:\r\n");
-    xil_printf("  ADC_REG        = 0x%08lx\r\n", (unsigned long)XPAR_ADC_REG_BASEADDR);
-    xil_printf("  AMP_ENABLE_REG = 0x%08lx\r\n", (unsigned long)XPAR_AMP_ENABLE_REG_BASEADDR);
-    xil_printf("  PHASE_REG      = 0x%08lx\r\n", (unsigned long)XPAR_PHASE_REG_BASEADDR);
-
-    Status = InitFraGpio(&GpioAdc, &GpioAmpEnable, &GpioPhase);
-    if (Status != XST_SUCCESS) {
-        return XST_FAILURE;
-    }
-
-    ProgramFra(&GpioPhase,
-               &GpioAmpEnable,
-               DdsPhaseIncFromFreq(TEST_FREQ_HZ),
-               TEST_PHASE_OFFSET,
-               TEST_AMPLITUDE,
-               TEST_ENABLE);
-
-    PrintConfig(&GpioPhase, &GpioAmpEnable);
-
-#if RUN_SWEEP
-    xil_printf("Mode: log sweep from %lu Hz to %lu Hz, %lu points, dwell %lu us\r\n",
-               (unsigned long)(SWEEP_FSTART_HZ + 0.5),
-               (unsigned long)(SWEEP_FSTOP_HZ + 0.5),
-               (unsigned long)SWEEP_POINTS,
-               (unsigned long)SWEEP_DWELL_US);
+    xil_printf("\r\n=== PCIE_FRA functional FRA ===\r\n");
+    xil_printf("base=0x%08lx version=0x%08lx\r\n",
+               (unsigned long)FRA_BASEADDR,
+               (unsigned long)RegRead(REG_VERSION));
+    PrintConfig();
+    CmdHelp();
 
     while (1) {
-        SweepLog(&GpioPhase,
-                 SWEEP_FSTART_HZ,
-                 SWEEP_FSTOP_HZ,
-                 SWEEP_POINTS,
-                 SWEEP_DWELL_US);
+        xil_printf("fra> ");
+        ReadLine(line, LINE_BUF_SIZE);
+        Dispatch(line);
     }
-#else
-#if PRINT_ON_CHANGE
-    xil_printf("Mode: print ADC on change\r\n");
-#else
-    xil_printf("Mode: %u us polling, report every %u samples\r\n",
-               (unsigned)POLL_INTERVAL_US,
-               (unsigned)REPORT_EVERY_SAMPLES);
-#endif
-
-    while (1) {
-        u32 sample = XGpio_DiscreteRead(&GpioAdc, ADC_CH) & ADC_MASK;
-
-#if PRINT_ON_CHANGE
-        if (sample != last_sample) {
-            xil_printf("sample_out = %lu\r\n", (unsigned long)sample);
-            last_sample = sample;
-        }
-#else
-        if (sample < min_sample) {
-            min_sample = sample;
-        }
-
-        if (sample > max_sample) {
-            max_sample = sample;
-        }
-
-        sum_sample += sample;
-        count++;
-
-        if (count >= REPORT_EVERY_SAMPLES) {
-            xil_printf("sample_out: last=%lu min=%lu max=%lu avg=%lu\r\n",
-                       (unsigned long)sample,
-                       (unsigned long)min_sample,
-                       (unsigned long)max_sample,
-                       (unsigned long)(sum_sample / REPORT_EVERY_SAMPLES));
-
-            min_sample = ADC_MASK;
-            max_sample = 0u;
-            sum_sample = 0u;
-            count = 0u;
-        }
-#endif
-
-        usleep(POLL_INTERVAL_US);
-    }
-#endif
 }
