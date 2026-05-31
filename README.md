@@ -42,13 +42,15 @@ flowchart LR
 `fra_core` runs from the 50 MHz PS `FCLK_CLK0` clock and uses a 25 MHz
 clock-enable for DAC update, ADC sampling, and I/Q accumulation. The exported
 ADC/DAC clocks are generated from a register for the external converters, but
-they are not used as internal fabric clocks.
+they are not used as internal fabric clocks. The DAC clock is inverted relative
+to the ADC clock so `dac_out` is stable before the AD9708 positive latch edge.
 
 The measurement core:
 
 - Converts ADC offset-binary samples to signed samples around midscale.
 - Generates in-phase and quadrature references from the DDS phase.
 - Accumulates signed 64-bit `I` and `Q` over whole DDS cycles.
+- Primes the synchronous sine LUT for one uncounted sample tick on start.
 - Supports configurable settle cycles and measurement cycles.
 - Reports sample count, ADC min/max, last sample, clipping, low-signal,
   overflow, config-error, busy, and done status.
@@ -104,7 +106,10 @@ idx,freq_hz,mag_counts,phase_deg,norm_db,norm_phase_deg,i_acc,q_acc,samples,adc_
 ```
 
 `norm_db` and `norm_phase_deg` are `nan` until a calibration exists for the
-corresponding sweep point.
+corresponding valid sweep point. Firmware rejects frequencies that do not
+resolve to a nonzero DDS phase increment or are at or above the 12.5 MHz
+Nyquist limit. Hardware validation for this revision remains scoped to the
+default 10 Hz to 20 kHz sweep range.
 
 ## Build
 
@@ -124,7 +129,10 @@ corresponding sweep point.
 Generated Vivado/Vitis runs, bitstreams, XSAs, ELFs, logs, and caches should be
 treated as build or release artifacts, not source. The root `.gitignore` is set
 up for new generated files; older checked-in generated outputs may still exist
-until they are removed from version control in a cleanup commit.
+until they are removed from version control in a cleanup commit. The current
+block-design rebuild script depends on the checked-in Vivado project and
+existing PS block design; it does not recreate the complete Vivado project from
+an empty directory.
 
 ## Validation
 

@@ -27,6 +27,7 @@ architecture sim of tb_fra_core is
     constant STATUS_DONE       : natural := 1;
     constant STATUS_ADC_CLIP   : natural := 3;
     constant STATUS_LOW_SIGNAL : natural := 4;
+    constant STATUS_CONFIG_ERR : natural := 5;
 
     signal clk    : std_logic := '0';
     signal resetn : std_logic := '0';
@@ -69,14 +70,15 @@ architecture sim of tb_fra_core is
         signal bvalid_s  : in  std_logic;
         signal bready_s  : out std_logic;
         constant addr    : in  natural;
-        constant data    : in  std_logic_vector(31 downto 0)
+        constant data    : in  std_logic_vector(31 downto 0);
+        constant strb    : in  std_logic_vector(3 downto 0) := x"F"
     ) is
     begin
         wait until rising_edge(clk_s);
         awaddr_s  <= std_logic_vector(to_unsigned(addr, awaddr_s'length));
         awvalid_s <= '1';
         wdata_s   <= data;
-        wstrb_s   <= (others => '1');
+        wstrb_s   <= strb;
         wvalid_s  <= '1';
 
         loop
@@ -210,6 +212,14 @@ begin
         axi_read(clk, araddr, arvalid, arready, rdata, rvalid, rready, REG_VERSION, rd);
         assert rd = x"00010000" report "unexpected fra_core version" severity failure;
 
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
+                  CTRL_DDS_ENABLE or CTRL_RESET_PHASE_ON_START);
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
+                  x"00000000", x"E");
+        axi_read(clk, araddr, arvalid, arready, rdata, rvalid, rready, REG_CONTROL, rd);
+        assert rd = (CTRL_DDS_ENABLE or CTRL_RESET_PHASE_ON_START)
+            report "CONTROL write ignored WSTRB" severity failure;
+
         axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_PHASE_INC, x"10000000");
         axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_AMPLITUDE, x"000000C0");
         axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_SETTLE_CYCLES, x"00000001");
@@ -227,6 +237,20 @@ begin
 
         axi_read(clk, araddr, arvalid, arready, rdata, rvalid, rready, REG_ADC_MIN_MAX, rd);
         assert unsigned(rd(15 downto 8)) > unsigned(rd(7 downto 0)) report "ADC min/max did not span" severity failure;
+
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_SETTLE_CYCLES, x"00000000");
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
+                  CTRL_DDS_ENABLE or CTRL_START or CTRL_CLEAR_DONE or CTRL_RESET_PHASE_ON_START);
+        wait_done(clk, araddr, arvalid, arready, rdata, rvalid, rready, status);
+        axi_read(clk, araddr, arvalid, arready, rdata, rvalid, rready, REG_SAMPLE_COUNT, rd);
+        assert unsigned(rd) = 64 report "zero-settle measurement did not accumulate four whole DDS cycles" severity failure;
+
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_PHASE_INC, x"00000000");
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
+                  CTRL_DDS_ENABLE or CTRL_START or CTRL_CLEAR_DONE or CTRL_RESET_PHASE_ON_START);
+        wait_done(clk, araddr, arvalid, arready, rdata, rvalid, rready, status);
+        assert status(STATUS_CONFIG_ERR) = '1' report "zero phase increment did not set config error" severity failure;
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_PHASE_INC, x"10000000");
 
         adc_mode <= 1;
         axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,

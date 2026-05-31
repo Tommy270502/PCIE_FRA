@@ -5,6 +5,7 @@
 #include "sleep.h"
 
 #include <ctype.h>
+#include <errno.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -105,12 +106,8 @@ static void RegWrite(u32 offset, u32 value)
 
 static u32 DdsPhaseIncFromFreq(double freq_hz)
 {
-    if (freq_hz <= 0.0) {
+    if (!isfinite(freq_hz) || (freq_hz <= 0.0) || (freq_hz >= (DDS_CLK_HZ / 2.0))) {
         return 0u;
-    }
-
-    if (freq_hz > (DDS_CLK_HZ / 2.0)) {
-        freq_hz = DDS_CLK_HZ / 2.0;
     }
 
     return (u32)((freq_hz * DDS_PHASE_SCALE) / DDS_CLK_HZ + 0.5);
@@ -152,12 +149,13 @@ static int ParseU32(const char *text, u32 *value)
     char *end = NULL;
     unsigned long parsed;
 
-    if (text == NULL) {
+    if ((text == NULL) || (*text == '\0') || (*text == '-')) {
         return 0;
     }
 
+    errno = 0;
     parsed = strtoul(text, &end, 0);
-    if ((end == text) || (*end != '\0')) {
+    if ((end == text) || (*end != '\0') || (errno == ERANGE) || (parsed > UINT32_MAX)) {
         return 0;
     }
 
@@ -199,33 +197,39 @@ static void PrintI64(int64_t value)
     PrintU64(magnitude);
 }
 
-static int32_t RoundMilli(double value)
+static int64_t RoundMilli(double value)
 {
     if (value >= 0.0) {
-        return (int32_t)(value * 1000.0 + 0.5);
+        return (int64_t)(value * 1000.0 + 0.5);
     }
 
-    return (int32_t)(value * 1000.0 - 0.5);
+    return (int64_t)(value * 1000.0 - 0.5);
 }
 
-static void PrintFixedMilli(int32_t milli)
+static void PrintFixedMilli(int64_t milli)
 {
-    int32_t whole;
-    int32_t frac;
+    uint64_t magnitude;
 
     if (milli < 0) {
         xil_printf("-");
-        milli = -milli;
+        magnitude = (uint64_t)(-(milli + 1)) + 1u;
+    } else {
+        magnitude = (uint64_t)milli;
     }
 
-    whole = milli / 1000;
-    frac = milli % 1000;
-
-    xil_printf("%ld.%03ld", (long)whole, (long)frac);
+    PrintU64(magnitude / 1000u);
+    xil_printf(".%03lu", (unsigned long)(magnitude % 1000u));
 }
 
 static void PrintDouble3(double value)
 {
+    if (!isfinite(value) ||
+        (value > ((double)INT64_MAX / 1000.0)) ||
+        (value < ((double)INT64_MIN / 1000.0))) {
+        xil_printf("nan");
+        return;
+    }
+
     PrintFixedMilli(RoundMilli(value));
 }
 
@@ -359,7 +363,7 @@ static int64_t CombineSigned64(u32 lo, u32 hi)
     uint64_t raw = ((uint64_t)hi << 32) | (uint64_t)lo;
 
     if ((raw & 0x8000000000000000ULL) != 0ULL) {
-        return -(int64_t)((~raw) + 1ULL);
+        return -1 - (int64_t)(~raw);
     }
 
     return (int64_t)raw;
@@ -418,6 +422,16 @@ static int RunMeasurement(double freq_hz, FraResult *result)
     return 1;
 }
 
+static int ResultIsValidForCalibration(const FraResult *result)
+{
+    const u32 invalid_flags = STATUS_OVERFLOW | STATUS_ADC_CLIP | STATUS_LOW_SIGNAL | STATUS_CONFIG_ERR;
+
+    return ((result->status & invalid_flags) == 0u) &&
+           (result->sample_count > 0u) &&
+           isfinite(result->mag_counts) &&
+           (result->mag_counts > 0.0);
+}
+
 static void PrintCsvHeader(void)
 {
     xil_printf("idx,freq_hz,mag_counts,phase_deg,norm_db,norm_phase_deg,i_acc,q_acc,samples,adc_min,adc_max,status\r\n");
@@ -430,6 +444,7 @@ static void PrintResultRow(u32 index, const FraResult *result, int use_calibrati
     double norm_phase = 0.0;
 
     if (use_calibration &&
+        ResultIsValidForCalibration(result) &&
         (index < MAX_SWEEP_POINTS) &&
         (Calibration.valid[index] != 0u) &&
         (Calibration.mag_counts[index] > 0.0)) {
@@ -469,6 +484,13 @@ static void PrintResultRow(u32 index, const FraResult *result, int use_calibrati
     xil_printf("\r\n");
 }
 
+static void PrintErrorRow(u32 index, double freq_hz)
+{
+    xil_printf("%lu,", (unsigned long)index);
+    PrintDouble3(freq_hz);
+    xil_printf(",nan,nan,nan,nan,0,0,0,0,0,ERROR\r\n");
+}
+
 static void CmdHelp(void)
 {
     xil_printf("commands:\r\n");
@@ -491,8 +513,8 @@ static void CmdSingle(const char *arg)
     double freq_hz;
     FraResult result;
 
-    if (!ParseDouble(arg, &freq_hz) || (freq_hz <= 0.0)) {
-        xil_printf("usage: single <hz>\r\n");
+    if (!ParseDouble(arg, &freq_hz) || (DdsPhaseIncFromFreq(freq_hz) == 0u)) {
+        xil_printf("usage: single <hz>, where hz resolves below 12500000\r\n");
         return;
     }
 
@@ -516,9 +538,7 @@ static void CmdSweep(void)
         if (RunMeasurement(freq_hz, &result)) {
             PrintResultRow(i, &result, 1);
         } else {
-            xil_printf("%lu,", (unsigned long)i);
-            PrintDouble3(freq_hz);
-            xil_printf(",ERROR\r\n");
+            PrintErrorRow(i, freq_hz);
         }
     }
 }
@@ -536,14 +556,14 @@ static void CmdCal(void)
     for (i = 0u; i < Config.points; i++) {
         freq_hz = SweepFreq(i);
         if (RunMeasurement(freq_hz, &result)) {
-            Calibration.mag_counts[i] = result.mag_counts;
-            Calibration.phase_deg[i] = result.phase_deg;
-            Calibration.valid[i] = 1u;
+            if (ResultIsValidForCalibration(&result)) {
+                Calibration.mag_counts[i] = result.mag_counts;
+                Calibration.phase_deg[i] = result.phase_deg;
+                Calibration.valid[i] = 1u;
+            }
             PrintResultRow(i, &result, 0);
         } else {
-            xil_printf("%lu,", (unsigned long)i);
-            PrintDouble3(freq_hz);
-            xil_printf(",ERROR\r\n");
+            PrintErrorRow(i, freq_hz);
         }
     }
 
@@ -561,13 +581,13 @@ static void CmdSet(char *key, char *value)
     }
 
     if (StrEq(key, "start")) {
-        if (!ParseDouble(value, &parsed_double) || (parsed_double <= 0.0)) {
+        if (!ParseDouble(value, &parsed_double) || (DdsPhaseIncFromFreq(parsed_double) == 0u)) {
             xil_printf("invalid start frequency\r\n");
             return;
         }
         Config.start_hz = parsed_double;
     } else if (StrEq(key, "stop")) {
-        if (!ParseDouble(value, &parsed_double) || (parsed_double <= 0.0)) {
+        if (!ParseDouble(value, &parsed_double) || (DdsPhaseIncFromFreq(parsed_double) == 0u)) {
             xil_printf("invalid stop frequency\r\n");
             return;
         }

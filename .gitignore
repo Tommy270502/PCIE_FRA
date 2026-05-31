@@ -8,6 +8,7 @@
 *.rpx
 *.wdb
 *.wcfg
+dfx_runtime.txt
 *.dcp
 *.bit
 *.bin
@@ -28,6 +29,7 @@ software/**/export/
 software/**/logs/
 software/**/_ide/logs/
 software/**/_ide/.wsdata/
+software/_ide/
 software/**/*.elf
 software/**/*.map
 software/**/*.o
@@ -42,5 +44,7 @@ software/**/.cache/
 .idea/
 *~
 *.swp
+*.bkp
+CLAUDE_HANDOVER.md
 Thumbs.db
 .DS_Store

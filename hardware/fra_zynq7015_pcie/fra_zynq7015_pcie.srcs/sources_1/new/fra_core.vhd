@@ -129,6 +129,7 @@ architecture rtl of fra_core is
     signal adc_clip_i    : std_logic := '0';
     signal low_signal_i  : std_logic := '0';
     signal config_err_i  : std_logic := '0';
+    signal priming_i     : std_logic := '0';
     signal settling_i    : std_logic := '0';
 
     signal settle_cycle_count  : unsigned(31 downto 0) := (others => '0');
@@ -138,6 +139,7 @@ architecture rtl of fra_core is
     signal q_acc_i             : signed(63 downto 0) := (others => '0');
     signal adc_min_i           : unsigned(7 downto 0) := x"FF";
     signal adc_max_i           : unsigned(7 downto 0) := x"00";
+    signal adc_sample_i        : unsigned(7 downto 0) := x"00";
     signal last_sample_i       : unsigned(7 downto 0) := x"00";
 
     function addr_word(addr : std_logic_vector) return unsigned is
@@ -162,12 +164,23 @@ architecture rtl of fra_core is
     end function;
 
     function scale_lut(lut_value : std_logic_vector(7 downto 0); amplitude : unsigned(7 downto 0)) return std_logic_vector is
-        variable lut_center : integer;
-        variable scaled     : integer;
-        variable dac_int    : integer;
+        variable lut_center : integer range -128 to 127;
+        variable product    : integer range -32640 to 32385;
+        variable magnitude  : integer range 0 to 32640;
+        variable scaled     : integer range -128 to 127;
+        variable dac_int    : integer range 0 to 255;
     begin
         lut_center := to_integer(unsigned(lut_value)) - 128;
-        scaled     := (lut_center * to_integer(amplitude)) / 255;
+        product    := lut_center * to_integer(amplitude);
+
+        -- Exact division by 255 using shifts and adds avoids a long divider path.
+        if product < 0 then
+            magnitude := -product;
+            scaled := -((magnitude + 1 + ((magnitude + 1) / 256)) / 256);
+        else
+            scaled := (product + 1 + ((product + 1) / 256)) / 256;
+        end if;
+
         dac_int    := scaled + 128;
 
         if dac_int < 0 then
@@ -191,7 +204,7 @@ begin
     s_axi_rdata   <= axi_rdata_i;
 
     adc_clk_out <= clk_div;
-    dac_clk_out <= clk_div;
+    dac_clk_out <= not clk_div;
     dac_out     <= dac_out_i;
 
     lut_addr_i <= phase_acc(31 downto 24) + phase_offset_reg(31 downto 24);
@@ -267,6 +280,7 @@ begin
                 adc_clip_i           <= '0';
                 low_signal_i         <= '0';
                 config_err_i         <= '0';
+                priming_i            <= '0';
                 settling_i           <= '0';
                 settle_cycle_count   <= (others => '0');
                 measure_cycle_count  <= (others => '0');
@@ -275,6 +289,7 @@ begin
                 q_acc_i              <= (others => '0');
                 adc_min_i            <= x"FF";
                 adc_max_i            <= x"00";
+                adc_sample_i         <= x"00";
                 last_sample_i        <= x"00";
             else
                 axi_awready_i <= '0';
@@ -309,19 +324,21 @@ begin
                     if (v_aw_seen = '1') and (v_w_seen = '1') then
                         case addr_word(v_awaddr) is
                             when REG_CONTROL =>
-                                dds_enable           <= v_wdata(0);
-                                reset_phase_on_start <= v_wdata(3);
+                                if v_wstrb(0) = '1' then
+                                    dds_enable           <= v_wdata(0);
+                                    reset_phase_on_start <= v_wdata(3);
 
-                                if v_wdata(2) = '1' then
-                                    done_i       <= '0';
-                                    overflow_i   <= '0';
-                                    adc_clip_i   <= '0';
-                                    low_signal_i <= '0';
-                                    config_err_i <= '0';
-                                end if;
+                                    if v_wdata(2) = '1' then
+                                        done_i       <= '0';
+                                        overflow_i   <= '0';
+                                        adc_clip_i   <= '0';
+                                        low_signal_i <= '0';
+                                        config_err_i <= '0';
+                                    end if;
 
-                                if v_wdata(1) = '1' then
-                                    v_start := '1';
+                                    if v_wdata(1) = '1' then
+                                        v_start := '1';
+                                    end if;
                                 end if;
 
                             when REG_PHASE_INC =>
@@ -419,6 +436,10 @@ begin
                 sample_tick := (clk_div = '0');
                 clk_div <= not clk_div;
 
+                if clk_div = '1' then
+                    adc_sample_i <= unsigned(adc_in);
+                end if;
+
                 if sample_tick then
                     phase_next := phase_acc + phase_inc_reg;
                     wrapped    := phase_next < phase_acc;
@@ -430,13 +451,15 @@ begin
                         dac_out_i <= x"80";
                     end if;
 
-                    last_sample_i <= unsigned(adc_in);
+                    last_sample_i <= adc_sample_i;
 
                     if v_start = '1' then
                         if (phase_inc_reg = U32_ZERO) or (measure_cycles_reg = U32_ZERO) then
                             busy_i       <= '0';
                             done_i       <= '1';
                             config_err_i <= '1';
+                            priming_i    <= '0';
+                            settling_i   <= '0';
                         else
                             busy_i              <= '1';
                             done_i              <= '0';
@@ -444,7 +467,7 @@ begin
                             adc_clip_i          <= '0';
                             low_signal_i        <= '0';
                             config_err_i        <= '0';
-                            settling_i          <= '1';
+                            priming_i           <= '1';
                             settle_cycle_count  <= (others => '0');
                             measure_cycle_count <= (others => '0');
                             sample_count_i      <= (others => '0');
@@ -453,12 +476,21 @@ begin
                             adc_min_i           <= x"FF";
                             adc_max_i           <= x"00";
 
+                            if settle_cycles_reg = U32_ZERO then
+                                settling_i <= '0';
+                            else
+                                settling_i <= '1';
+                            end if;
+
                             if reset_phase_on_start = '1' then
                                 phase_acc <= (others => '0');
                             end if;
                         end if;
                     elsif busy_i = '1' then
-                        if settling_i = '1' then
+                        if priming_i = '1' then
+                            priming_i <= '0';
+                            phase_acc <= phase_acc;
+                        elsif settling_i = '1' then
                             if settle_cycles_reg = 0 then
                                 settling_i <= '0';
                             elsif wrapped then
@@ -469,7 +501,7 @@ begin
                                 end if;
                             end if;
                         else
-                            sample_int := to_integer(unsigned(adc_in)) - 128;
+                            sample_int := to_integer(adc_sample_i) - 128;
                             ref_i_int  := to_integer(unsigned(lut_data_i)) - 128;
                             ref_q_int  := to_integer(unsigned(lut_data_q)) - 128;
                             prod_i     := sample_int * ref_i_int;
@@ -483,16 +515,16 @@ begin
 
                             min_next := adc_min_i;
                             max_next := adc_max_i;
-                            if unsigned(adc_in) < min_next then
-                                min_next := unsigned(adc_in);
+                            if adc_sample_i < min_next then
+                                min_next := adc_sample_i;
                             end if;
-                            if unsigned(adc_in) > max_next then
-                                max_next := unsigned(adc_in);
+                            if adc_sample_i > max_next then
+                                max_next := adc_sample_i;
                             end if;
                             adc_min_i <= min_next;
                             adc_max_i <= max_next;
 
-                            if (adc_in = x"00") or (adc_in = x"FF") then
+                            if (adc_sample_i = x"00") or (adc_sample_i = x"FF") then
                                 adc_clip_i <= '1';
                             end if;
 
@@ -520,6 +552,8 @@ begin
                         busy_i       <= '0';
                         done_i       <= '1';
                         config_err_i <= '1';
+                        priming_i    <= '0';
+                        settling_i   <= '0';
                     else
                         busy_i              <= '1';
                         done_i              <= '0';
@@ -527,7 +561,7 @@ begin
                         adc_clip_i          <= '0';
                         low_signal_i        <= '0';
                         config_err_i        <= '0';
-                        settling_i          <= '1';
+                        priming_i           <= '1';
                         settle_cycle_count  <= (others => '0');
                         measure_cycle_count <= (others => '0');
                         sample_count_i      <= (others => '0');
@@ -535,6 +569,12 @@ begin
                         q_acc_i             <= (others => '0');
                         adc_min_i           <= x"FF";
                         adc_max_i           <= x"00";
+
+                        if settle_cycles_reg = U32_ZERO then
+                            settling_i <= '0';
+                        else
+                            settling_i <= '1';
+                        end if;
 
                         if reset_phase_on_start = '1' then
                             phase_acc <= (others => '0');

@@ -12,10 +12,18 @@ set project_dir [file normalize [file join $script_dir ".."]]
 set project_file [file join $project_dir "fra_zynq7015_pcie.xpr"]
 set bd_file [file join $project_dir "fra_zynq7015_pcie.srcs/sources_1/bd/system_bd/system_bd.bd"]
 set src_dir [file join $project_dir "fra_zynq7015_pcie.srcs/sources_1/new"]
+set external_timing_xdc [file join $project_dir "fra_zynq7015_pcie.srcs/constrs_1/new/fra_external_timing.xdc"]
 
 if {[llength [get_projects -quiet]] == 0} {
     open_project $project_file
 }
+
+if {[llength [get_files -quiet $external_timing_xdc]] == 0} {
+    add_files -fileset constrs_1 -norecurse $external_timing_xdc
+}
+set external_timing_file [get_files -quiet $external_timing_xdc]
+set_property USED_IN_SYNTHESIS false $external_timing_file
+set_property USED_IN_IMPLEMENTATION true $external_timing_file
 
 foreach src [list \
     [file join $src_dir "sineLUT.vhd"] \
