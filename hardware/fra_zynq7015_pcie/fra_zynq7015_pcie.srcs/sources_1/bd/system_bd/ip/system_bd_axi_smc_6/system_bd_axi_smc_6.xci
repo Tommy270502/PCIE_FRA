@@ -1,14 +1,14 @@
 {
   "schema": "xilinx.com:schema:json_instance:1.0",
   "ip_inst": {
-    "xci_name": "system_bd_axi_smc_3",
+    "xci_name": "system_bd_axi_smc_6",
     "cell_name": "axi_smc",
     "component_reference": "xilinx.com:ip:smartconnect:1.0",
     "ip_revision": "27",
-    "gen_directory": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_3",
+    "gen_directory": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6",
     "parameters": {
       "component_parameters": {
-        "Component_Name": [ { "value": "system_bd_axi_smc_3", "resolve_type": "user", "usage": "all" } ],
+        "Component_Name": [ { "value": "system_bd_axi_smc_6", "resolve_type": "user", "usage": "all" } ],
         "NUM_MI": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "NUM_SI": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "NUM_CLKS": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
@@ -16,7 +16,7 @@
         "ADVANCED_PROPERTIES": [ { "value": "0", "resolve_type": "user", "usage": "all" } ]
       },
       "model_parameters": {
-        "TLM_COMPONENT_NAME": [ { "value": "system_bd_axi_smc_3", "resolve_type": "generated", "usage": "simulation.tlm" } ],
+        "TLM_COMPONENT_NAME": [ { "value": "system_bd_axi_smc_6", "resolve_type": "generated", "usage": "simulation.tlm" } ],
         "HAS_RESET": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "simulation.tlm" } ]
       },
       "project_parameters": {
@@ -36,7 +36,7 @@
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
         "IPREVISION": [ { "value": "27" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_3" } ],
+        "OUTPUTDIR": [ { "value": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "../../ipshared" } ],
         "SWVERSION": [ { "value": "2025.1" } ],

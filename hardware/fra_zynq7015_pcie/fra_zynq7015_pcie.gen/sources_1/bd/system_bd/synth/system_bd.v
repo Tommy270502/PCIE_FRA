@@ -1,9 +1,9 @@
 //Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
-//Tool Version: Vivado v.2025.1 (lin64) Build 6140274 Wed May 21 22:58:25 MDT 2025
-//Date        : Thu May 21 15:12:25 2026
-//Host        : ThinkpadT14s running 64-bit Ubuntu 24.04.4 LTS
+//Tool Version: Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
+//Date        : Sun May 31 22:36:39 2026
+//Host        : DESKTOP-QGTME97 running 64-bit major release  (build 9200)
 //Command     : generate_target system_bd.bd
 //Design      : system_bd
 //Purpose     : IP block netlist
@@ -149,7 +149,7 @@ module system_bd
   wire [3:0]processing_system7_0_M_AXI_GP0_WSTRB;
   wire processing_system7_0_M_AXI_GP0_WVALID;
 
-  system_bd_axi_smc_3 axi_smc
+  system_bd_axi_smc_6 axi_smc
        (.M00_AXI_araddr(axi_smc_M00_AXI_ARADDR),
         .M00_AXI_arprot(axi_smc_M00_AXI_ARPROT),
         .M00_AXI_arready(axi_smc_M00_AXI_ARREADY),
@@ -209,7 +209,7 @@ module system_bd
         .S00_AXI_wvalid(processing_system7_0_M_AXI_GP0_WVALID),
         .aclk(processing_system7_0_FCLK_CLK0),
         .aresetn(proc_sys_reset_0_peripheral_aresetn));
-  system_bd_fra_core_0_2 fra_core_0
+  system_bd_fra_core_0_5 fra_core_0
        (.adc_clk_out(adc_clk_out_0),
         .adc_in(adc_in_0),
         .dac_clk_out(dac_clk_out_0),

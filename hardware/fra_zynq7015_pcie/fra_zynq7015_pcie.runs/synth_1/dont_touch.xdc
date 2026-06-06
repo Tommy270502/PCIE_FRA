@@ -3,6 +3,8 @@
 
 # XDC: new/constraints.xdc
 
+# XDC: new/fra_external_timing.xdc
+
 # Block Designs: bd/system_bd/system_bd.bd
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd || ORIG_REF_NAME==system_bd} -quiet] -quiet
 
@@ -12,19 +14,10 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_p
 # IP: bd/system_bd/ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_proc_sys_reset_0_0 || ORIG_REF_NAME==system_bd_proc_sys_reset_0_0} -quiet] -quiet
 
-# IP: bd/system_bd/ip/system_bd_fra_top_0_0/system_bd_fra_top_0_0.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_fra_top_0_0 || ORIG_REF_NAME==system_bd_fra_top_0_0} -quiet] -quiet
+# IP: bd/system_bd/ip/system_bd_fra_core_0_5/system_bd_fra_core_0_5.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_fra_core_0_5 || ORIG_REF_NAME==system_bd_fra_core_0_5} -quiet] -quiet
 
-# IP: bd/system_bd/ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_gpio_0_0 || ORIG_REF_NAME==system_bd_axi_gpio_0_0} -quiet] -quiet
-
-# IP: bd/system_bd/ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_gpio_1_0 || ORIG_REF_NAME==system_bd_axi_gpio_1_0} -quiet] -quiet
-
-# IP: bd/system_bd/ip/system_bd_axi_smc_0/system_bd_axi_smc_0.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_smc_0 || ORIG_REF_NAME==system_bd_axi_smc_0} -quiet] -quiet
-
-# IP: bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_gpio_1_1 || ORIG_REF_NAME==system_bd_axi_gpio_1_1} -quiet] -quiet
+# IP: bd/system_bd/ip/system_bd_axi_smc_6/system_bd_axi_smc_6.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_smc_6 || ORIG_REF_NAME==system_bd_axi_smc_6} -quiet] -quiet
 
 # XDC: c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/system_bd_ooc.xdc

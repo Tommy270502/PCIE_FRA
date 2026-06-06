@@ -58,7 +58,6 @@ if {$::dispatch::connected} {
 OPTRACE "synth_1" START { ROLLUP_AUTO }
 set_param general.usePosixSpawnForFork 1
 set_param bd.open.in_stealth_mode 1
-set_param xicom.use_bs_reader 1
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7z015clg485-2
 
@@ -75,59 +74,21 @@ set_property ip_output_repo c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-read_verilog -library xil_defaultlib C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/hdl/system_bd_wrapper.v
+read_verilog -library xil_defaultlib C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sources_1/imports/hdl/system_bd_wrapper.v
 add_files C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sources_1/bd/system_bd/system_bd.bd
 set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0_board.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0_board.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_0_0/system_bd_axi_gpio_0_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0_board.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_0/system_bd_axi_gpio_1_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_1/bd_3c1f_psr_aclk_0_board.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_2/bd_3c1f_arinsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_3/bd_3c1f_rinsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_4/bd_3c1f_awinsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_5/bd_3c1f_winsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_6/bd_3c1f_binsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_7/bd_3c1f_aroutsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_8/bd_3c1f_routsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_9/bd_3c1f_awoutsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_10/bd_3c1f_woutsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_11/bd_3c1f_boutsw_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_12/bd_3c1f_arni_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_13/bd_3c1f_rni_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_14/bd_3c1f_awni_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_15/bd_3c1f_wni_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_16/bd_3c1f_bni_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_20/bd_3c1f_s00a2s_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_21/bd_3c1f_sarn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_22/bd_3c1f_srn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_23/bd_3c1f_sawn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_24/bd_3c1f_swn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_25/bd_3c1f_sbn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_26/bd_3c1f_m00s2a_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_27/bd_3c1f_m00arn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_28/bd_3c1f_m00rn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_29/bd_3c1f_m00awn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_30/bd_3c1f_m00wn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_31/bd_3c1f_m00bn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_33/bd_3c1f_m01s2a_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_34/bd_3c1f_m01arn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_35/bd_3c1f_m01rn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_36/bd_3c1f_m01awn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_37/bd_3c1f_m01wn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_38/bd_3c1f_m01bn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_40/bd_3c1f_m02s2a_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_41/bd_3c1f_m02arn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_42/bd_3c1f_m02rn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_43/bd_3c1f_m02awn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_44/bd_3c1f_m02wn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/bd_0/ip/ip_45/bd_3c1f_m02bn_0_ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/ooc.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_0/smartconnect.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_board.xdc]
-set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_gpio_1_1/system_bd_axi_gpio_1_1_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_1/bd_3e9f_psr_aclk_0_board.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_5/bd_3e9f_s00a2s_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_6/bd_3e9f_sarn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_7/bd_3e9f_srn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_8/bd_3e9f_sawn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_9/bd_3e9f_swn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_10/bd_3e9f_sbn_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/bd_0/ip/ip_11/bd_3e9f_m00s2a_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_axi_smc_6/smartconnect.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/system_bd_ooc.xdc]
 
 OPTRACE "Adding files" END { }

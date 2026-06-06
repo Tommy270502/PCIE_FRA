@@ -209,7 +209,7 @@
         "vlnv": "xilinx.com:ip:processing_system7:5.5",
         "ip_revision": "7",
         "xci_name": "system_bd_processing_system7_0_0",
-        "xci_path": "ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0.xci",
+        "xci_path": "ip\\system_bd_processing_system7_0_0\\system_bd_processing_system7_0_0.xci",
         "inst_hier_path": "processing_system7_0",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -562,15 +562,15 @@
         "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
         "ip_revision": "17",
         "xci_name": "system_bd_proc_sys_reset_0_0",
-        "xci_path": "ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0.xci",
+        "xci_path": "ip\\system_bd_proc_sys_reset_0_0\\system_bd_proc_sys_reset_0_0.xci",
         "inst_hier_path": "proc_sys_reset_0",
         "has_run_ip_tcl": "true"
       },
       "fra_core_0": {
         "vlnv": "xilinx.com:module_ref:fra_core:1.0",
         "ip_revision": "1",
-        "xci_name": "system_bd_fra_core_0_2",
-        "xci_path": "ip/system_bd_fra_core_0_2/system_bd_fra_core_0_2.xci",
+        "xci_name": "system_bd_fra_core_0_5",
+        "xci_path": "ip\\system_bd_fra_core_0_5\\system_bd_fra_core_0_5.xci",
         "inst_hier_path": "fra_core_0",
         "has_run_ip_tcl": "true",
         "reference_info": {
@@ -854,8 +854,8 @@
       "axi_smc": {
         "vlnv": "xilinx.com:ip:smartconnect:1.0",
         "ip_revision": "27",
-        "xci_name": "system_bd_axi_smc_3",
-        "xci_path": "ip/system_bd_axi_smc_3/system_bd_axi_smc_3.xci",
+        "xci_name": "system_bd_axi_smc_6",
+        "xci_path": "ip\\system_bd_axi_smc_6\\system_bd_axi_smc_6.xci",
         "inst_hier_path": "axi_smc",
         "has_run_ip_tcl": "true",
         "parameters": {

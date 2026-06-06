@@ -1,16 +1,16 @@
 {
   "schema": "xilinx.com:schema:json_instance:1.0",
   "ip_inst": {
-    "xci_name": "system_bd_fra_core_0_2",
+    "xci_name": "system_bd_fra_core_0_5",
     "cell_name": "fra_core_0",
     "component_reference": "xilinx.com:module_ref:fra_core:1.0",
     "ip_revision": "1",
-    "gen_directory": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_core_0_2",
+    "gen_directory": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_core_0_5",
     "parameters": {
       "component_parameters": {
         "C_S_AXI_DATA_WIDTH": [ { "value": "32", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "C_S_AXI_ADDR_WIDTH": [ { "value": "8", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "Component_Name": [ { "value": "system_bd_fra_core_0_2", "resolve_type": "user", "usage": "all" } ]
+        "Component_Name": [ { "value": "system_bd_fra_core_0_5", "resolve_type": "user", "usage": "all" } ]
       },
       "model_parameters": {
         "C_S_AXI_DATA_WIDTH": [ { "value": "32", "resolve_type": "generated", "format": "long", "usage": "all" } ],
@@ -33,7 +33,7 @@
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
         "IPREVISION": [ { "value": "1" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_core_0_2" } ],
+        "OUTPUTDIR": [ { "value": "../../../../../../fra_zynq7015_pcie.gen/sources_1/bd/system_bd/ip/system_bd_fra_core_0_5" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "../../ipshared" } ],
         "SWVERSION": [ { "value": "2025.1" } ],
