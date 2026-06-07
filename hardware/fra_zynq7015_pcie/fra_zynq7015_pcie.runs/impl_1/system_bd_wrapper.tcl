@@ -106,7 +106,6 @@ set rc [catch {
   create_msg_db init_design.pb
   set_param chipscope.maxJobs 4
   set_param general.usePosixSpawnForFork 1
-  set_param bd.open.in_stealth_mode 1
   set_param runs.launchOptions { -jobs 8  }
 OPTRACE "create in-memory project" START { }
   create_project -in_memory -part xc7z015clg485-2
@@ -129,6 +128,7 @@ OPTRACE "add files" START { }
 OPTRACE "read constraints: implementation" START { }
   read_xdc C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc
   read_xdc C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/fra_external_timing.xdc
+  read_xdc C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/pcie_pins.xdc
 OPTRACE "read constraints: implementation" END { }
 OPTRACE "read constraints: implementation_pre" START { }
 OPTRACE "read constraints: implementation_pre" END { }

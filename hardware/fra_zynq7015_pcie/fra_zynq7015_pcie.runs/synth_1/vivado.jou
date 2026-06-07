@@ -3,8 +3,8 @@
 # SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
 # IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
 # SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-# Start of session at: Sun May 31 22:37:26 2026
-# Process ID         : 29576
+# Start of session at: Sun Jun  7 01:55:04 2026
+# Process ID         : 5064
 # Current directory  : C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1
 # Command line       : vivado.exe -log system_bd_wrapper.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source system_bd_wrapper.tcl
 # Log file           : C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.runs/synth_1/system_bd_wrapper.vds
@@ -19,6 +19,6 @@
 # Host memory        : 66208 MB
 # Swap memory        : 4160 MB
 # Total Virtual      : 70369 MB
-# Available Virtual  : 44010 MB
+# Available Virtual  : 21495 MB
 #-----------------------------------------------------------
 source system_bd_wrapper.tcl -notrace

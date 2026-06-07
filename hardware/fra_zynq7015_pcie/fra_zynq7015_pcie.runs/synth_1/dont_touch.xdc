@@ -5,6 +5,8 @@
 
 # XDC: new/fra_external_timing.xdc
 
+# XDC: new/pcie_pins.xdc
+
 # Block Designs: bd/system_bd/system_bd.bd
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd || ORIG_REF_NAME==system_bd} -quiet] -quiet
 
@@ -19,5 +21,20 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_f
 
 # IP: bd/system_bd/ip/system_bd_axi_smc_6/system_bd_axi_smc_6.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_smc_6 || ORIG_REF_NAME==system_bd_axi_smc_6} -quiet] -quiet
+
+# IP: bd/system_bd/ip/system_bd_axi_pcie_0_0/system_bd_axi_pcie_0_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_axi_pcie_0_0 || ORIG_REF_NAME==system_bd_axi_pcie_0_0} -quiet] -quiet
+
+# IP: bd/system_bd/ip/system_bd_pcie_bar_regs_0_0/system_bd_pcie_bar_regs_0_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_pcie_bar_regs_0_0 || ORIG_REF_NAME==system_bd_pcie_bar_regs_0_0} -quiet] -quiet
+
+# IP: bd/system_bd/ip/system_bd_pcie_smc_0/system_bd_pcie_smc_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_pcie_smc_0 || ORIG_REF_NAME==system_bd_pcie_smc_0} -quiet] -quiet
+
+# IP: bd/system_bd/ip/system_bd_proc_sys_reset_pcie_0/system_bd_proc_sys_reset_pcie_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_proc_sys_reset_pcie_0 || ORIG_REF_NAME==system_bd_proc_sys_reset_pcie_0} -quiet] -quiet
+
+# IP: bd/system_bd/ip/system_bd_pcie_refclk_buf_0/system_bd_pcie_refclk_buf_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==system_bd_pcie_refclk_buf_0 || ORIG_REF_NAME==system_bd_pcie_refclk_buf_0} -quiet] -quiet
 
 # XDC: c:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.gen/sources_1/bd/system_bd/system_bd_ooc.xdc

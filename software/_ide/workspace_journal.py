@@ -7,3 +7,5 @@ client.set_workspace(path="software")
 platform = client.get_component(name="PCIE_FRA")
 status = platform.build()
 
+vitis.dispose()
+

@@ -2,12 +2,15 @@
 #include "xil_types.h"
 #include "xil_io.h"
 #include "xil_printf.h"
+#include "xuartps_hw.h"
 #include "sleep.h"
 
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,6 +30,14 @@
 #define DDS_PHASE_SCALE         4294967296.0
 #define MAX_SWEEP_POINTS        64u
 #define LINE_BUF_SIZE           96u
+
+#define CONSOLE_UART0_BASEADDR  ((UINTPTR)0xE0000000u)
+#define CONSOLE_UART1_BASEADDR  ((UINTPTR)0xE0001000u)
+#define CONSOLE_PRINTF_BUF_SIZE 384u
+#define CONSOLE_TX_TIMEOUT      100000u
+#define CONSOLE_BAUDGEN_115200  124u
+#define CONSOLE_BAUDDIV_115200  6u
+#define CONSOLE_MODE_8N1        0x20u
 
 #define REG_VERSION             0x00u
 #define REG_CONTROL             0x04u
@@ -55,6 +66,13 @@
 #define STATUS_ADC_CLIP         0x00000008u
 #define STATUS_LOW_SIGNAL       0x00000010u
 #define STATUS_CONFIG_ERR       0x00000020u
+
+static void ConsoleInit(void);
+static void ConsolePrintf(const char *fmt, ...);
+static char ConsoleGetChar(void);
+
+#define xil_printf ConsolePrintf
+#define inbyte ConsoleGetChar
 
 typedef struct {
     double start_hz;
@@ -93,6 +111,89 @@ static FraConfig Config = {
 };
 
 static FraCalibration Calibration;
+
+static const UINTPTR ConsoleUarts[] = {
+    CONSOLE_UART0_BASEADDR,
+    CONSOLE_UART1_BASEADDR
+};
+
+static void ConsoleInit(void)
+{
+    u32 i;
+
+    for (i = 0u; i < (u32)(sizeof(ConsoleUarts) / sizeof(ConsoleUarts[0])); i++) {
+        UINTPTR base = ConsoleUarts[i];
+
+        Xil_Out32(base + XUARTPS_BAUDDIV_OFFSET, CONSOLE_BAUDDIV_115200);
+        Xil_Out32(base + XUARTPS_BAUDGEN_OFFSET, CONSOLE_BAUDGEN_115200);
+        Xil_Out32(base + XUARTPS_CR_OFFSET,
+                  XUARTPS_CR_TXRST | XUARTPS_CR_RXRST |
+                  XUARTPS_CR_TX_EN | XUARTPS_CR_RX_EN);
+        Xil_Out32(base + XUARTPS_MR_OFFSET, CONSOLE_MODE_8N1);
+    }
+}
+
+static void ConsolePutCharToUart(UINTPTR base, char c)
+{
+    u32 timeout = CONSOLE_TX_TIMEOUT;
+
+    while ((Xil_In32(base + XUARTPS_SR_OFFSET) & XUARTPS_SR_TXFULL) != 0u) {
+        if (timeout == 0u) {
+            return;
+        }
+        timeout--;
+    }
+
+    Xil_Out32(base + XUARTPS_FIFO_OFFSET, (u32)((u8)c));
+}
+
+static void ConsolePutChar(char c)
+{
+    u32 i;
+
+    for (i = 0u; i < (u32)(sizeof(ConsoleUarts) / sizeof(ConsoleUarts[0])); i++) {
+        ConsolePutCharToUart(ConsoleUarts[i], c);
+    }
+}
+
+static void ConsolePrintf(const char *fmt, ...)
+{
+    char buf[CONSOLE_PRINTF_BUF_SIZE];
+    va_list args;
+    int len;
+    int i;
+
+    va_start(args, fmt);
+    len = vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    if (len < 0) {
+        return;
+    }
+
+    if (len >= (int)sizeof(buf)) {
+        len = (int)sizeof(buf) - 1;
+    }
+
+    for (i = 0; i < len; i++) {
+        ConsolePutChar(buf[i]);
+    }
+}
+
+static char ConsoleGetChar(void)
+{
+    while (1) {
+        u32 i;
+
+        for (i = 0u; i < (u32)(sizeof(ConsoleUarts) / sizeof(ConsoleUarts[0])); i++) {
+            UINTPTR base = ConsoleUarts[i];
+
+            if ((Xil_In32(base + XUARTPS_SR_OFFSET) & XUARTPS_SR_RXEMPTY) == 0u) {
+                return (char)(Xil_In32(base + XUARTPS_FIFO_OFFSET) & 0xFFu);
+            }
+        }
+    }
+}
 
 static u32 RegRead(u32 offset)
 {
@@ -694,6 +795,7 @@ int main(void)
 {
     char line[LINE_BUF_SIZE];
 
+    ConsoleInit();
     ClearCalibration();
     RegWrite(REG_CONTROL, CTRL_CLEAR_DONE | CTRL_RESET_PHASE);
 

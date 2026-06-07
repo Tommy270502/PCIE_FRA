@@ -1,13 +1,16 @@
 # PCIE_FRA
 
-PCIE_FRA is a standalone Frequency Response Analyzer for the Alinx AX7015B
-Zynq-7015 board. The current implementation generates a DDS stimulus in PL,
-captures the 8-bit ADC response, performs synchronous I/Q accumulation in a
-custom AXI4-Lite FRA core, and exposes a bare-metal UART CLI for calibration
-and sweeps.
+PCIE_FRA is a Frequency Response Analyzer for the Alinx AX7015B Zynq-7015
+board. The current implementation generates a DDS stimulus in PL, captures the
+8-bit ADC response, performs synchronous I/Q accumulation in a custom AXI4-Lite
+FRA core, and exposes a bare-metal UART CLI for calibration and sweeps.
 
-PCIe endpoint logic, DMA streaming, host drivers, and a PC GUI are intentionally
-out of scope for this revision.
+A PCIe x1 Gen1 endpoint (`axi_pcie` + a small `pcie_bar_regs` register file
+behind BAR0) is additively integrated alongside the FRA core and signs off
+clean in implementation (see `docs/PCIE_BRINGUP_HANDOVER.md`). PCIe link
+training and host enumeration are not yet validated — the bench has no PCIe
+host slot/refclk. DMA streaming, a host driver, and a PC GUI remain out of
+scope for this revision; see `docs/ROADMAP.md` for what's still open.
 
 ## Repository Layout
 
@@ -15,18 +18,22 @@ out of scope for this revision.
 | --- | --- |
 | `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.xpr` | Vivado 2025.1 project for `xc7z015clg485-2`. |
 | `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sources_1/new/fra_core.vhd` | AXI4-Lite FRA measurement core. |
-| `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sim_1/new/tb_fra_core.vhd` | Self-checking RTL testbench for the core. |
-| `hardware/fra_zynq7015_pcie/scripts/rebuild_functional_fra_bd.tcl` | Vivado script that replaces the GPIO prototype BD wiring with `fra_core`. |
+| `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sources_1/new/pcie_bar_regs.vhd` | BAR0 AXI4-Lite register file behind the PCIe endpoint (board ID/version/scratch/control). |
+| `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sim_1/new/tb_fra_core.vhd` | Self-checking RTL testbench for the FRA core. |
 | `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/constraints.xdc` | ADC/DAC pin and timing constraints. |
-| `software/FRA_Controller/src/main.c` | Bare-metal UART CLI and sweep controller. |
+| `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/constrs_1/new/pcie_pins.xdc` | PCIe refclk/serial-pair/PERST pin constraints. |
+| `hardware/fra_zynq7015_pcie/scripts/rebuild_functional_fra_bd.tcl` | Vivado script that replaces the GPIO prototype BD wiring with `fra_core` (PCIe-free BD). |
+| `hardware/fra_zynq7015_pcie/scripts/run_pcie_impl_signoff.tcl` | Signoff build (impl→bitstream→XSA) for the current PCIe-integrated project; preserves the PCIe endpoint. |
+| `software/FRA_Controller/src/main.c` | Bare-metal UART CLI and sweep controller (mirrors the CLI on both PS UART0/UART1). |
 | `software/PCIE_FRA/` | Vitis platform/BSP/FSBL workspace generated from the exported XSA. |
-| `docs/` | Board manuals, AD/DA module references, and architecture notes. |
+| `software/pcie_host_test/pcie_bar_test.c` | Linux BAR0 smoke test for use once a PCIe host slot is available. |
+| `docs/` | Board manuals, AD/DA module references, architecture notes, PCIe bring-up hand-off docs, and `ROADMAP.md`. |
 
 ## Hardware Architecture
 
 ```mermaid
 flowchart LR
-    console["UART console"] <--> app["FRA_Controller CLI"]
+    console["UART console\n(COM9 UART0 + UART1)"] <--> app["FRA_Controller CLI"]
     app --> gp0["Zynq PS M_AXI_GP0"]
 
     gp0 --> axi["AXI SmartConnect"]
@@ -37,6 +44,8 @@ flowchart LR
     adc["8-bit ADC bus + ADC clock"] --> core
 
     core --> lockin["I/Q lock-in accumulation\nsettle cycles + measure cycles"]
+
+    pcie["PCIe x1 Gen1 endpoint\naxi_pcie (separate clock domain)"] --> bar["pcie_bar_regs\nAXI4-Lite behind BAR0"]
 ```
 
 `fra_core` runs from the 50 MHz PS `FCLK_CLK0` clock and uses a 25 MHz
@@ -44,6 +53,11 @@ clock-enable for DAC update, ADC sampling, and I/Q accumulation. The exported
 ADC/DAC clocks are generated from a register for the external converters, but
 they are not used as internal fabric clocks. The DAC clock is inverted relative
 to the ADC clock so `dac_out` is stable before the AD9708 positive latch edge.
+
+The PCIe endpoint is additive and lives in its own `axi_pcie/axi_aclk_out`
+clock domain — it does not connect to or alter the `fra_core` signal chain
+above. It cannot be exercised on the bench (no host slot/refclk); see
+`docs/PCIE_BRINGUP_HANDOVER.md` and `docs/ROADMAP.md`.
 
 The measurement core:
 
@@ -144,6 +158,8 @@ Minimum final validation for this revision:
 3. Scope DAC output plus ADC/DAC clocks at 10 Hz, 1 kHz, and 20 kHz.
 4. Wire DAC output to ADC input, run `cal`, then `sweep`; valid loopback points
    should normalize close to 0 dB and 0 degrees without ADC clipping.
+   **Done** — `docs/loopback_accuracy_report.md` reports a `sweep → cal → sweep`
+   run with post-calibration residuals of ~0.002 dB / ~0.01°, well inside spec.
 5. Measure a simple RC low-pass and compare against the expected response. The
    acceptance target is within +/-2 dB and +/-15 degrees for valid, unclipped
-   points.
+   points. **Still open** — see `docs/ROADMAP.md`.

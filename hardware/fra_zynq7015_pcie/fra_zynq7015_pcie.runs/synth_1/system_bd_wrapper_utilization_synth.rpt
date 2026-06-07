@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Sun May 31 22:37:51 2026
+| Date         : Sun Jun  7 01:55:30 2026
 | Host         : DESKTOP-QGTME97 running 64-bit major release  (build 9200)
 | Command      : report_utilization -file system_bd_wrapper_utilization_synth.rpt -pb system_bd_wrapper_utilization_synth.pb
 | Design       : system_bd_wrapper
@@ -93,7 +93,7 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +-----------------------------+------+-------+------------+-----------+-------+
 |          Site Type          | Used | Fixed | Prohibited | Available | Util% |
 +-----------------------------+------+-------+------------+-----------+-------+
-| Bonded IOB                  |   18 |     0 |          0 |       150 | 12.00 |
+| Bonded IOB                  |   23 |     0 |          0 |       150 | 15.33 |
 | Bonded IPADs                |    0 |     0 |          0 |        14 |  0.00 |
 | Bonded OPADs                |    0 |     0 |          0 |         8 |  0.00 |
 | Bonded IOPADs               |    0 |     0 |          0 |       130 |  0.00 |
@@ -153,8 +153,8 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+------+---------------------+
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
-| OBUF     |   10 |                  IO |
-| IBUF     |    8 |                  IO |
+| OBUF     |   12 |                  IO |
+| IBUF     |   11 |                  IO |
 +----------+------+---------------------+
 
 
@@ -165,9 +165,14 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 |             Ref Name             | Used |
 +----------------------------------+------+
 | system_bd_processing_system7_0_0 |    1 |
+| system_bd_proc_sys_reset_pcie_0  |    1 |
 | system_bd_proc_sys_reset_0_0     |    1 |
+| system_bd_pcie_smc_0             |    1 |
+| system_bd_pcie_refclk_buf_0      |    1 |
+| system_bd_pcie_bar_regs_0_0      |    1 |
 | system_bd_fra_core_0_5           |    1 |
 | system_bd_axi_smc_6              |    1 |
+| system_bd_axi_pcie_0_0           |    1 |
 +----------------------------------+------+
 
 

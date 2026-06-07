@@ -2,7 +2,7 @@
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-//Date        : Sun May 31 22:36:39 2026
+//Date        : Sun Jun  7 01:38:24 2026
 //Host        : DESKTOP-QGTME97 running 64-bit major release  (build 9200)
 //Command     : generate_target system_bd_wrapper.bd
 //Design      : system_bd_wrapper
@@ -35,7 +35,14 @@ module system_bd_wrapper
     adc_clk_out_0,
     adc_in_0,
     dac_clk_out_0,
-    dac_out_0);
+    dac_out_0,
+    pcie_perst_n,
+    pcie_refclk_n,
+    pcie_refclk_p,
+    pcie_rxn,
+    pcie_rxp,
+    pcie_txn,
+    pcie_txp);
   inout [14:0]DDR_addr;
   inout [2:0]DDR_ba;
   inout DDR_cas_n;
@@ -61,6 +68,13 @@ module system_bd_wrapper
   input [7:0]adc_in_0;
   output dac_clk_out_0;
   output [7:0]dac_out_0;
+  input pcie_perst_n;
+  input pcie_refclk_n;
+  input pcie_refclk_p;
+  input [0:0]pcie_rxn;
+  input [0:0]pcie_rxp;
+  output [0:0]pcie_txn;
+  output [0:0]pcie_txp;
 
   wire [14:0]DDR_addr;
   wire [2:0]DDR_ba;
@@ -87,6 +101,13 @@ module system_bd_wrapper
   wire [7:0]adc_in_0;
   wire dac_clk_out_0;
   wire [7:0]dac_out_0;
+  wire pcie_perst_n;
+  wire pcie_refclk_n;
+  wire pcie_refclk_p;
+  wire [0:0]pcie_rxn;
+  wire [0:0]pcie_rxp;
+  wire [0:0]pcie_txn;
+  wire [0:0]pcie_txp;
 
   system_bd system_bd_i
        (.DDR_addr(DDR_addr),
@@ -113,5 +134,12 @@ module system_bd_wrapper
         .adc_clk_out_0(adc_clk_out_0),
         .adc_in_0(adc_in_0),
         .dac_clk_out_0(dac_clk_out_0),
-        .dac_out_0(dac_out_0));
+        .dac_out_0(dac_out_0),
+        .pcie_perst_n(pcie_perst_n),
+        .pcie_refclk_n(pcie_refclk_n),
+        .pcie_refclk_p(pcie_refclk_p),
+        .pcie_rxn(pcie_rxn),
+        .pcie_rxp(pcie_rxp),
+        .pcie_txn(pcie_txn),
+        .pcie_txp(pcie_txp));
 endmodule

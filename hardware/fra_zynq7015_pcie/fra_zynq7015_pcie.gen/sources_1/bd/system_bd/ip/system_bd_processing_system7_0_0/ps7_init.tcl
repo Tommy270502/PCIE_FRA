@@ -29,11 +29,11 @@ proc ps7_clock_init_data_3_0 {} {
     mwr -force 0XF8000008 0x0000DF0D
     mask_write 0XF8000128 0x03F03F01 0x00700F01
     mask_write 0XF800014C 0x00003F31 0x00000901
-    mask_write 0XF8000154 0x00003F33 0x00001202
+    mask_write 0XF8000154 0x00003F33 0x00001203
     mask_write 0XF8000168 0x00003F31 0x00000901
     mask_write 0XF8000170 0x03F03F30 0x00600600
     mask_write 0XF80001C4 0x00000001 0x00000001
-    mask_write 0XF800012C 0x01FFCCCD 0x01EC000D
+    mask_write 0XF800012C 0x01FFCCCD 0x01FC000D
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_ddr_init_data_3_0 {} {
@@ -145,6 +145,8 @@ proc ps7_mio_init_data_3_0 {} {
     mask_write 0XF8000718 0x00003FFF 0x00000602
     mask_write 0XF8000730 0x00003FFF 0x000016E0
     mask_write 0XF8000734 0x00003FFF 0x000016E1
+    mask_write 0XF8000738 0x00003FFF 0x000016E1
+    mask_write 0XF800073C 0x00003FFF 0x000016E0
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_peripherals_init_data_3_0 {} {
@@ -158,6 +160,10 @@ proc ps7_peripherals_init_data_3_0 {} {
     mask_write 0XE0001018 0x0000FFFF 0x0000007C
     mask_write 0XE0001000 0x000001FF 0x00000017
     mask_write 0XE0001004 0x000003FF 0x00000020
+    mask_write 0XE0000034 0x000000FF 0x00000006
+    mask_write 0XE0000018 0x0000FFFF 0x0000007C
+    mask_write 0XE0000000 0x000001FF 0x00000017
+    mask_write 0XE0000004 0x000003FF 0x00000020
     mask_write 0XE000D000 0x00080000 0x00080000
     mask_write 0XF8007000 0x20000000 0x00000000
 }
@@ -203,11 +209,11 @@ proc ps7_clock_init_data_2_0 {} {
     mwr -force 0XF8000008 0x0000DF0D
     mask_write 0XF8000128 0x03F03F01 0x00700F01
     mask_write 0XF800014C 0x00003F31 0x00000901
-    mask_write 0XF8000154 0x00003F33 0x00001202
+    mask_write 0XF8000154 0x00003F33 0x00001203
     mask_write 0XF8000168 0x00003F31 0x00000901
     mask_write 0XF8000170 0x03F03F30 0x00600600
     mask_write 0XF80001C4 0x00000001 0x00000001
-    mask_write 0XF800012C 0x01FFCCCD 0x01EC000D
+    mask_write 0XF800012C 0x01FFCCCD 0x01FC000D
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_ddr_init_data_2_0 {} {
@@ -320,6 +326,8 @@ proc ps7_mio_init_data_2_0 {} {
     mask_write 0XF8000718 0x00003FFF 0x00000602
     mask_write 0XF8000730 0x00003FFF 0x000016E0
     mask_write 0XF8000734 0x00003FFF 0x000016E1
+    mask_write 0XF8000738 0x00003FFF 0x000016E1
+    mask_write 0XF800073C 0x00003FFF 0x000016E0
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_peripherals_init_data_2_0 {} {
@@ -333,6 +341,10 @@ proc ps7_peripherals_init_data_2_0 {} {
     mask_write 0XE0001018 0x0000FFFF 0x0000007C
     mask_write 0XE0001000 0x000001FF 0x00000017
     mask_write 0XE0001004 0x00000FFF 0x00000020
+    mask_write 0XE0000034 0x000000FF 0x00000006
+    mask_write 0XE0000018 0x0000FFFF 0x0000007C
+    mask_write 0XE0000000 0x000001FF 0x00000017
+    mask_write 0XE0000004 0x00000FFF 0x00000020
     mask_write 0XE000D000 0x00080000 0x00080000
     mask_write 0XF8007000 0x20000000 0x00000000
 }
@@ -378,11 +390,11 @@ proc ps7_clock_init_data_1_0 {} {
     mwr -force 0XF8000008 0x0000DF0D
     mask_write 0XF8000128 0x03F03F01 0x00700F01
     mask_write 0XF800014C 0x00003F31 0x00000901
-    mask_write 0XF8000154 0x00003F33 0x00001202
+    mask_write 0XF8000154 0x00003F33 0x00001203
     mask_write 0XF8000168 0x00003F31 0x00000901
     mask_write 0XF8000170 0x03F03F30 0x00600600
     mask_write 0XF80001C4 0x00000001 0x00000001
-    mask_write 0XF800012C 0x01FFCCCD 0x01EC000D
+    mask_write 0XF800012C 0x01FFCCCD 0x01FC000D
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_ddr_init_data_1_0 {} {
@@ -493,6 +505,8 @@ proc ps7_mio_init_data_1_0 {} {
     mask_write 0XF8000718 0x00003FFF 0x00000602
     mask_write 0XF8000730 0x00003FFF 0x000016E0
     mask_write 0XF8000734 0x00003FFF 0x000016E1
+    mask_write 0XF8000738 0x00003FFF 0x000016E1
+    mask_write 0XF800073C 0x00003FFF 0x000016E0
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_peripherals_init_data_1_0 {} {
@@ -506,6 +520,10 @@ proc ps7_peripherals_init_data_1_0 {} {
     mask_write 0XE0001018 0x0000FFFF 0x0000007C
     mask_write 0XE0001000 0x000001FF 0x00000017
     mask_write 0XE0001004 0x00000FFF 0x00000020
+    mask_write 0XE0000034 0x000000FF 0x00000006
+    mask_write 0XE0000018 0x0000FFFF 0x0000007C
+    mask_write 0XE0000000 0x000001FF 0x00000017
+    mask_write 0XE0000004 0x00000FFF 0x00000020
     mask_write 0XE000D000 0x00080000 0x00080000
     mask_write 0XF8007000 0x20000000 0x00000000
 }

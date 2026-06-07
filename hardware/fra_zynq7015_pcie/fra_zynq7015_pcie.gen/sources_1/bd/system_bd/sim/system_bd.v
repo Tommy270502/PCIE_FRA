@@ -2,7 +2,7 @@
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-//Date        : Sun May 31 22:36:39 2026
+//Date        : Sun Jun  7 01:38:24 2026
 //Host        : DESKTOP-QGTME97 running 64-bit major release  (build 9200)
 //Command     : generate_target system_bd.bd
 //Design      : system_bd
@@ -10,7 +10,7 @@
 //--------------------------------------------------------------------------------
 `timescale 1 ps / 1 ps
 
-(* CORE_GENERATION_INFO = "system_bd,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=system_bd,x_ipVersion=1.00.a,x_ipLanguage=VERILOG,numBlks=4,numReposBlks=4,numNonXlnxBlks=0,numHierBlks=0,maxHierDepth=0,numSysgenBlks=0,numHlsBlks=0,numHdlrefBlks=1,numPkgbdBlks=0,bdsource=USER,da_axi4_cnt=3,da_board_cnt=1,da_clkrst_cnt=2,da_ps7_cnt=1,synth_mode=Hierarchical}" *) (* HW_HANDOFF = "system_bd.hwdef" *) 
+(* CORE_GENERATION_INFO = "system_bd,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=system_bd,x_ipVersion=1.00.a,x_ipLanguage=VERILOG,numBlks=9,numReposBlks=9,numNonXlnxBlks=0,numHierBlks=0,maxHierDepth=0,numSysgenBlks=0,numHlsBlks=0,numHdlrefBlks=2,numPkgbdBlks=0,bdsource=USER,da_axi4_cnt=3,da_board_cnt=1,da_clkrst_cnt=2,da_ps7_cnt=1,synth_mode=Hierarchical}" *) (* HW_HANDOFF = "system_bd.hwdef" *) 
 module system_bd
    (DDR_addr,
     DDR_ba,
@@ -36,7 +36,14 @@ module system_bd
     adc_clk_out_0,
     adc_in_0,
     dac_clk_out_0,
-    dac_out_0);
+    dac_out_0,
+    pcie_perst_n,
+    pcie_refclk_n,
+    pcie_refclk_p,
+    pcie_rxn,
+    pcie_rxp,
+    pcie_txn,
+    pcie_txp);
   (* X_INTERFACE_INFO = "xilinx.com:interface:ddrx:1.0 DDR ADDR" *) (* X_INTERFACE_MODE = "Master" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DDR, AXI_ARBITRATION_SCHEME TDM, BURST_LENGTH 8, CAN_DEBUG false, CAS_LATENCY 11, CAS_WRITE_LATENCY 11, CS_ENABLED true, DATA_MASK_ENABLED true, DATA_WIDTH 8, MEMORY_TYPE COMPONENTS, MEM_ADDR_MAP ROW_COLUMN_BANK, SLOT Single, TIMEPERIOD_PS 1250" *) inout [14:0]DDR_addr;
   (* X_INTERFACE_INFO = "xilinx.com:interface:ddrx:1.0 DDR BA" *) inout [2:0]DDR_ba;
   (* X_INTERFACE_INFO = "xilinx.com:interface:ddrx:1.0 DDR CAS_N" *) inout DDR_cas_n;
@@ -62,6 +69,13 @@ module system_bd
   input [7:0]adc_in_0;
   output dac_clk_out_0;
   output [7:0]dac_out_0;
+  input pcie_perst_n;
+  input pcie_refclk_n;
+  input pcie_refclk_p;
+  input [0:0]pcie_rxn;
+  input [0:0]pcie_rxp;
+  output [0:0]pcie_txn;
+  output [0:0]pcie_txp;
 
   wire [14:0]DDR_addr;
   wire [2:0]DDR_ba;
@@ -86,6 +100,39 @@ module system_bd
   wire FIXED_IO_ps_srstb;
   wire adc_clk_out_0;
   wire [7:0]adc_in_0;
+  wire [31:0]axi_pcie_0_M_AXI_ARADDR;
+  wire [1:0]axi_pcie_0_M_AXI_ARBURST;
+  wire [3:0]axi_pcie_0_M_AXI_ARCACHE;
+  wire [7:0]axi_pcie_0_M_AXI_ARLEN;
+  wire axi_pcie_0_M_AXI_ARLOCK;
+  wire [2:0]axi_pcie_0_M_AXI_ARPROT;
+  wire axi_pcie_0_M_AXI_ARREADY;
+  wire [2:0]axi_pcie_0_M_AXI_ARSIZE;
+  wire axi_pcie_0_M_AXI_ARVALID;
+  wire [31:0]axi_pcie_0_M_AXI_AWADDR;
+  wire [1:0]axi_pcie_0_M_AXI_AWBURST;
+  wire [3:0]axi_pcie_0_M_AXI_AWCACHE;
+  wire [7:0]axi_pcie_0_M_AXI_AWLEN;
+  wire axi_pcie_0_M_AXI_AWLOCK;
+  wire [2:0]axi_pcie_0_M_AXI_AWPROT;
+  wire axi_pcie_0_M_AXI_AWREADY;
+  wire [2:0]axi_pcie_0_M_AXI_AWSIZE;
+  wire axi_pcie_0_M_AXI_AWVALID;
+  wire axi_pcie_0_M_AXI_BREADY;
+  wire [1:0]axi_pcie_0_M_AXI_BRESP;
+  wire axi_pcie_0_M_AXI_BVALID;
+  wire [63:0]axi_pcie_0_M_AXI_RDATA;
+  wire axi_pcie_0_M_AXI_RLAST;
+  wire axi_pcie_0_M_AXI_RREADY;
+  wire [1:0]axi_pcie_0_M_AXI_RRESP;
+  wire axi_pcie_0_M_AXI_RVALID;
+  wire [63:0]axi_pcie_0_M_AXI_WDATA;
+  wire axi_pcie_0_M_AXI_WLAST;
+  wire axi_pcie_0_M_AXI_WREADY;
+  wire [7:0]axi_pcie_0_M_AXI_WSTRB;
+  wire axi_pcie_0_M_AXI_WVALID;
+  wire axi_pcie_0_axi_aclk_out;
+  wire axi_pcie_0_mmcm_lock;
   wire [7:0]axi_smc_M00_AXI_ARADDR;
   wire [2:0]axi_smc_M00_AXI_ARPROT;
   wire axi_smc_M00_AXI_ARREADY;
@@ -107,7 +154,35 @@ module system_bd
   wire axi_smc_M00_AXI_WVALID;
   wire dac_clk_out_0;
   wire [7:0]dac_out_0;
+  wire pcie_perst_n;
+  wire [0:0]pcie_refclk_buf_IBUF_OUT;
+  wire pcie_refclk_n;
+  wire pcie_refclk_p;
+  wire [0:0]pcie_rxn;
+  wire [0:0]pcie_rxp;
+  wire [11:0]pcie_smc_M00_AXI_ARADDR;
+  wire [2:0]pcie_smc_M00_AXI_ARPROT;
+  wire pcie_smc_M00_AXI_ARREADY;
+  wire pcie_smc_M00_AXI_ARVALID;
+  wire [11:0]pcie_smc_M00_AXI_AWADDR;
+  wire [2:0]pcie_smc_M00_AXI_AWPROT;
+  wire pcie_smc_M00_AXI_AWREADY;
+  wire pcie_smc_M00_AXI_AWVALID;
+  wire pcie_smc_M00_AXI_BREADY;
+  wire [1:0]pcie_smc_M00_AXI_BRESP;
+  wire pcie_smc_M00_AXI_BVALID;
+  wire [31:0]pcie_smc_M00_AXI_RDATA;
+  wire pcie_smc_M00_AXI_RREADY;
+  wire [1:0]pcie_smc_M00_AXI_RRESP;
+  wire pcie_smc_M00_AXI_RVALID;
+  wire [31:0]pcie_smc_M00_AXI_WDATA;
+  wire pcie_smc_M00_AXI_WREADY;
+  wire [3:0]pcie_smc_M00_AXI_WSTRB;
+  wire pcie_smc_M00_AXI_WVALID;
+  wire [0:0]pcie_txn;
+  wire [0:0]pcie_txp;
   wire [0:0]proc_sys_reset_0_peripheral_aresetn;
+  wire [0:0]proc_sys_reset_pcie_peripheral_aresetn;
   wire processing_system7_0_FCLK_CLK0;
   wire processing_system7_0_FCLK_RESET0_N;
   wire [31:0]processing_system7_0_M_AXI_GP0_ARADDR;
@@ -149,6 +224,78 @@ module system_bd
   wire [3:0]processing_system7_0_M_AXI_GP0_WSTRB;
   wire processing_system7_0_M_AXI_GP0_WVALID;
 
+  system_bd_axi_pcie_0_0 axi_pcie_0
+       (.INTX_MSI_Request(1'b0),
+        .MSI_Vector_Num({1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .REFCLK(pcie_refclk_buf_IBUF_OUT),
+        .axi_aclk_out(axi_pcie_0_axi_aclk_out),
+        .axi_aresetn(pcie_perst_n),
+        .int_pclk_sel_slave(1'b0),
+        .m_axi_araddr(axi_pcie_0_M_AXI_ARADDR),
+        .m_axi_arburst(axi_pcie_0_M_AXI_ARBURST),
+        .m_axi_arcache(axi_pcie_0_M_AXI_ARCACHE),
+        .m_axi_arlen(axi_pcie_0_M_AXI_ARLEN),
+        .m_axi_arlock(axi_pcie_0_M_AXI_ARLOCK),
+        .m_axi_arprot(axi_pcie_0_M_AXI_ARPROT),
+        .m_axi_arready(axi_pcie_0_M_AXI_ARREADY),
+        .m_axi_arsize(axi_pcie_0_M_AXI_ARSIZE),
+        .m_axi_arvalid(axi_pcie_0_M_AXI_ARVALID),
+        .m_axi_awaddr(axi_pcie_0_M_AXI_AWADDR),
+        .m_axi_awburst(axi_pcie_0_M_AXI_AWBURST),
+        .m_axi_awcache(axi_pcie_0_M_AXI_AWCACHE),
+        .m_axi_awlen(axi_pcie_0_M_AXI_AWLEN),
+        .m_axi_awlock(axi_pcie_0_M_AXI_AWLOCK),
+        .m_axi_awprot(axi_pcie_0_M_AXI_AWPROT),
+        .m_axi_awready(axi_pcie_0_M_AXI_AWREADY),
+        .m_axi_awsize(axi_pcie_0_M_AXI_AWSIZE),
+        .m_axi_awvalid(axi_pcie_0_M_AXI_AWVALID),
+        .m_axi_bready(axi_pcie_0_M_AXI_BREADY),
+        .m_axi_bresp(axi_pcie_0_M_AXI_BRESP),
+        .m_axi_bvalid(axi_pcie_0_M_AXI_BVALID),
+        .m_axi_rdata(axi_pcie_0_M_AXI_RDATA),
+        .m_axi_rlast(axi_pcie_0_M_AXI_RLAST),
+        .m_axi_rready(axi_pcie_0_M_AXI_RREADY),
+        .m_axi_rresp(axi_pcie_0_M_AXI_RRESP),
+        .m_axi_rvalid(axi_pcie_0_M_AXI_RVALID),
+        .m_axi_wdata(axi_pcie_0_M_AXI_WDATA),
+        .m_axi_wlast(axi_pcie_0_M_AXI_WLAST),
+        .m_axi_wready(axi_pcie_0_M_AXI_WREADY),
+        .m_axi_wstrb(axi_pcie_0_M_AXI_WSTRB),
+        .m_axi_wvalid(axi_pcie_0_M_AXI_WVALID),
+        .mmcm_lock(axi_pcie_0_mmcm_lock),
+        .pci_exp_rxn(pcie_rxn),
+        .pci_exp_rxp(pcie_rxp),
+        .pci_exp_txn(pcie_txn),
+        .pci_exp_txp(pcie_txp),
+        .s_axi_araddr({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_arburst({1'b0,1'b1}),
+        .s_axi_arid({1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_arlen({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_arregion({1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_arsize({1'b0,1'b1,1'b1}),
+        .s_axi_arvalid(1'b0),
+        .s_axi_awaddr({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_awburst({1'b0,1'b1}),
+        .s_axi_awid({1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_awlen({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_awregion({1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_awsize({1'b0,1'b1,1'b1}),
+        .s_axi_awvalid(1'b0),
+        .s_axi_bready(1'b0),
+        .s_axi_ctl_araddr({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_ctl_arvalid(1'b0),
+        .s_axi_ctl_awaddr({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_ctl_awvalid(1'b0),
+        .s_axi_ctl_bready(1'b0),
+        .s_axi_ctl_rready(1'b0),
+        .s_axi_ctl_wdata({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_ctl_wstrb({1'b1,1'b1,1'b1,1'b1}),
+        .s_axi_ctl_wvalid(1'b0),
+        .s_axi_rready(1'b0),
+        .s_axi_wdata({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .s_axi_wlast(1'b0),
+        .s_axi_wstrb({1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1}),
+        .s_axi_wvalid(1'b0));
   system_bd_axi_smc_6 axi_smc
        (.M00_AXI_araddr(axi_smc_M00_AXI_ARADDR),
         .M00_AXI_arprot(axi_smc_M00_AXI_ARPROT),
@@ -235,6 +382,87 @@ module system_bd
         .s_axi_wready(axi_smc_M00_AXI_WREADY),
         .s_axi_wstrb(axi_smc_M00_AXI_WSTRB),
         .s_axi_wvalid(axi_smc_M00_AXI_WVALID));
+  system_bd_pcie_bar_regs_0_0 pcie_bar_regs_0
+       (.S_AXI_ACLK(axi_pcie_0_axi_aclk_out),
+        .S_AXI_ARADDR(pcie_smc_M00_AXI_ARADDR),
+        .S_AXI_ARESETN(proc_sys_reset_pcie_peripheral_aresetn),
+        .S_AXI_ARPROT(pcie_smc_M00_AXI_ARPROT),
+        .S_AXI_ARREADY(pcie_smc_M00_AXI_ARREADY),
+        .S_AXI_ARVALID(pcie_smc_M00_AXI_ARVALID),
+        .S_AXI_AWADDR(pcie_smc_M00_AXI_AWADDR),
+        .S_AXI_AWPROT(pcie_smc_M00_AXI_AWPROT),
+        .S_AXI_AWREADY(pcie_smc_M00_AXI_AWREADY),
+        .S_AXI_AWVALID(pcie_smc_M00_AXI_AWVALID),
+        .S_AXI_BREADY(pcie_smc_M00_AXI_BREADY),
+        .S_AXI_BRESP(pcie_smc_M00_AXI_BRESP),
+        .S_AXI_BVALID(pcie_smc_M00_AXI_BVALID),
+        .S_AXI_RDATA(pcie_smc_M00_AXI_RDATA),
+        .S_AXI_RREADY(pcie_smc_M00_AXI_RREADY),
+        .S_AXI_RRESP(pcie_smc_M00_AXI_RRESP),
+        .S_AXI_RVALID(pcie_smc_M00_AXI_RVALID),
+        .S_AXI_WDATA(pcie_smc_M00_AXI_WDATA),
+        .S_AXI_WREADY(pcie_smc_M00_AXI_WREADY),
+        .S_AXI_WSTRB(pcie_smc_M00_AXI_WSTRB),
+        .S_AXI_WVALID(pcie_smc_M00_AXI_WVALID));
+  system_bd_pcie_refclk_buf_0 pcie_refclk_buf
+       (.IBUF_DS_N(pcie_refclk_n),
+        .IBUF_DS_P(pcie_refclk_p),
+        .IBUF_OUT(pcie_refclk_buf_IBUF_OUT));
+  system_bd_pcie_smc_0 pcie_smc
+       (.M00_AXI_araddr(pcie_smc_M00_AXI_ARADDR),
+        .M00_AXI_arprot(pcie_smc_M00_AXI_ARPROT),
+        .M00_AXI_arready(pcie_smc_M00_AXI_ARREADY),
+        .M00_AXI_arvalid(pcie_smc_M00_AXI_ARVALID),
+        .M00_AXI_awaddr(pcie_smc_M00_AXI_AWADDR),
+        .M00_AXI_awprot(pcie_smc_M00_AXI_AWPROT),
+        .M00_AXI_awready(pcie_smc_M00_AXI_AWREADY),
+        .M00_AXI_awvalid(pcie_smc_M00_AXI_AWVALID),
+        .M00_AXI_bready(pcie_smc_M00_AXI_BREADY),
+        .M00_AXI_bresp(pcie_smc_M00_AXI_BRESP),
+        .M00_AXI_bvalid(pcie_smc_M00_AXI_BVALID),
+        .M00_AXI_rdata(pcie_smc_M00_AXI_RDATA),
+        .M00_AXI_rready(pcie_smc_M00_AXI_RREADY),
+        .M00_AXI_rresp(pcie_smc_M00_AXI_RRESP),
+        .M00_AXI_rvalid(pcie_smc_M00_AXI_RVALID),
+        .M00_AXI_wdata(pcie_smc_M00_AXI_WDATA),
+        .M00_AXI_wready(pcie_smc_M00_AXI_WREADY),
+        .M00_AXI_wstrb(pcie_smc_M00_AXI_WSTRB),
+        .M00_AXI_wvalid(pcie_smc_M00_AXI_WVALID),
+        .S00_AXI_araddr(axi_pcie_0_M_AXI_ARADDR),
+        .S00_AXI_arburst(axi_pcie_0_M_AXI_ARBURST),
+        .S00_AXI_arcache(axi_pcie_0_M_AXI_ARCACHE),
+        .S00_AXI_arlen(axi_pcie_0_M_AXI_ARLEN),
+        .S00_AXI_arlock(axi_pcie_0_M_AXI_ARLOCK),
+        .S00_AXI_arprot(axi_pcie_0_M_AXI_ARPROT),
+        .S00_AXI_arqos({1'b0,1'b0,1'b0,1'b0}),
+        .S00_AXI_arready(axi_pcie_0_M_AXI_ARREADY),
+        .S00_AXI_arsize(axi_pcie_0_M_AXI_ARSIZE),
+        .S00_AXI_arvalid(axi_pcie_0_M_AXI_ARVALID),
+        .S00_AXI_awaddr(axi_pcie_0_M_AXI_AWADDR),
+        .S00_AXI_awburst(axi_pcie_0_M_AXI_AWBURST),
+        .S00_AXI_awcache(axi_pcie_0_M_AXI_AWCACHE),
+        .S00_AXI_awlen(axi_pcie_0_M_AXI_AWLEN),
+        .S00_AXI_awlock(axi_pcie_0_M_AXI_AWLOCK),
+        .S00_AXI_awprot(axi_pcie_0_M_AXI_AWPROT),
+        .S00_AXI_awqos({1'b0,1'b0,1'b0,1'b0}),
+        .S00_AXI_awready(axi_pcie_0_M_AXI_AWREADY),
+        .S00_AXI_awsize(axi_pcie_0_M_AXI_AWSIZE),
+        .S00_AXI_awvalid(axi_pcie_0_M_AXI_AWVALID),
+        .S00_AXI_bready(axi_pcie_0_M_AXI_BREADY),
+        .S00_AXI_bresp(axi_pcie_0_M_AXI_BRESP),
+        .S00_AXI_bvalid(axi_pcie_0_M_AXI_BVALID),
+        .S00_AXI_rdata(axi_pcie_0_M_AXI_RDATA),
+        .S00_AXI_rlast(axi_pcie_0_M_AXI_RLAST),
+        .S00_AXI_rready(axi_pcie_0_M_AXI_RREADY),
+        .S00_AXI_rresp(axi_pcie_0_M_AXI_RRESP),
+        .S00_AXI_rvalid(axi_pcie_0_M_AXI_RVALID),
+        .S00_AXI_wdata(axi_pcie_0_M_AXI_WDATA),
+        .S00_AXI_wlast(axi_pcie_0_M_AXI_WLAST),
+        .S00_AXI_wready(axi_pcie_0_M_AXI_WREADY),
+        .S00_AXI_wstrb(axi_pcie_0_M_AXI_WSTRB),
+        .S00_AXI_wvalid(axi_pcie_0_M_AXI_WVALID),
+        .aclk(axi_pcie_0_axi_aclk_out),
+        .aresetn(proc_sys_reset_pcie_peripheral_aresetn));
   system_bd_proc_sys_reset_0_0 proc_sys_reset_0
        (.aux_reset_in(1'b1),
         .dcm_locked(1'b1),
@@ -242,6 +470,13 @@ module system_bd
         .mb_debug_sys_rst(1'b0),
         .peripheral_aresetn(proc_sys_reset_0_peripheral_aresetn),
         .slowest_sync_clk(processing_system7_0_FCLK_CLK0));
+  system_bd_proc_sys_reset_pcie_0 proc_sys_reset_pcie
+       (.aux_reset_in(1'b1),
+        .dcm_locked(axi_pcie_0_mmcm_lock),
+        .ext_reset_in(pcie_perst_n),
+        .mb_debug_sys_rst(1'b0),
+        .peripheral_aresetn(proc_sys_reset_pcie_peripheral_aresetn),
+        .slowest_sync_clk(axi_pcie_0_axi_aclk_out));
   system_bd_processing_system7_0_0 processing_system7_0
        (.DDR_Addr(DDR_addr),
         .DDR_BankAddr(DDR_ba),

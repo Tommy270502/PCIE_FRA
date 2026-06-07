@@ -1,0 +1,17 @@
+metric,value
+Post-cal magnitude residual: peak-to-peak,0.003157 dB
+Post-cal magnitude residual: max absolute,0.002210 dB
+Post-cal magnitude residual: RMS,0.000642 dB
+Post-cal phase residual: peak-to-peak,0.019000 deg
+Post-cal phase residual: max absolute,0.011000 deg
+Post-cal phase residual: RMS,0.003564 deg
+Post-cal raw magnitude repeatability: max absolute,0.014000 counts
+Post-cal raw magnitude repeatability: RMS,0.004068 counts
+Initial sweep vs cal magnitude delta: max absolute,0.010000 counts
+Initial sweep vs cal phase delta: max absolute,0.007000 deg
+Initial sweep vs cal magnitude residual: max absolute,0.001578 dB
+"Calibration absolute phase change, 10 Hz to 20 kHz",-2.118000 deg
+"Post-cal absolute phase change, 10 Hz to 20 kHz",-2.107000 deg
+Post-cal ADC min range,69 to 72 counts
+Post-cal ADC max range,182 to 184 counts
+Post-cal sample count range,5000 to 9999924 samples
