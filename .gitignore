@@ -45,6 +45,19 @@ software/**/.cache/
 *~
 *.swp
 *.bkp
+
+# AI assistant local config and prompts
+.claude/
+.codex/
+.agents/
+CLAUDE*.md
+CODEX*.md
+AGENTS.md
+AI_INSTRUCTIONS.md
 CLAUDE_HANDOVER.md
+docs/*AGENT_SUMMARY*.md
+docs/*BRINGUP_PROMPT*.md
+docs/*HANDOVER*.md
+docs/ROADMAP.md
 Thumbs.db
 .DS_Store
