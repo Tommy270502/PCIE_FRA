@@ -1,0 +1,6 @@
+the_ROM_image:
+{
+  [bootloader]C:\Users\Thomas\Documents\git\PCIE_FRA\software\PCIE_FRA\zynq_fsbl\build\fsbl.elf
+  C:\Users\Thomas\Documents\git\PCIE_FRA\hardware\fra_zynq7015_pcie\export\system_bd_wrapper_pcie.bit
+  C:\Users\Thomas\Documents\git\PCIE_FRA\software\FRA_Controller\build\FRA_Controller.elf
+}
