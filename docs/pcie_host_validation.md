@@ -120,8 +120,29 @@ Writing `SLCR.PSS_RST_CTRL` to reboot the PS in place does not work here: the PS
 resets but the BootROM does not reconfigure the PL (`DEVCFG_STATUS` bit 12
 `PCFG_INIT` goes from 1 to 0, and reads of `0x43C0_0000` time out), and the
 debug port is left wedged reporting `APB AP transaction error, DAP status
-0x30000021`. `rst -system` and `rst -cores` cannot clear that, and the chain has
-no SRST pin. Only a power-on reset recovers it.
+0x30000021`.
+
+What was tried, and did not clear it:
+
+| Attempt | Result |
+| --- | --- |
+| `rst -srst` | `srst not supported for target` — this chain has no SRST pin |
+| `rst -system`, `rst -cores` | `Invalid target` — no core target to select once the DAP is down |
+| Reprogramming the PL over JTAG | Succeeds (`DONE_status = 1`), but does not touch the PS |
+| Killing `hw_server`/`cs_server` and reconnecting fresh | DAP still reports the same error, so it is not stale tooling state |
+
+The scan chain itself stays healthy throughout — a fresh `jtag targets` reads
+both IDCODEs correctly:
+
+```
+1  Digilent JTAG-HS1 210512180081
+   2  arm_dap  (idcode 4ba00477 irlen 4)
+   3  xc7z015  (idcode 0373b093 irlen 6 fpga)
+```
+
+So the cable, TAP and FPGA are fine; it is specifically the APB access port to
+the PS debug bus that is wedged. That is on-chip state, and only a power-on
+reset clears it.
 
 Note that the PCIe link stays up through all of this, because `axi_pcie` and
 `pcie_bar_regs` live in the PCIe reference-clock domain rather than the PS
@@ -135,6 +156,17 @@ A warm reboot does not.
 
 ## Still open
 
-Measuring a real RC low-pass against its expected response, to the +/-2 dB and
-+/-15 degrees acceptance target, needs the AN108 module connected. Nothing in
-the software or gateware blocks it.
+1. **Observing a clean QSPI boot** (`README.md` Validation check 8). The image was written and verified
+   byte-for-byte, and its three components were each exercised over JTAG before
+   flashing (bitstream: `DONE_status = 1` plus a working PCIe endpoint and
+   `fra_core`; application: the CLI responding on UART with the correct core
+   version; FSBL: unchanged, and its `ps7_init.c`/`.h` are byte-identical to the
+   XSA exported from this build). What has not been observed is the
+   BootROM -> FSBL -> bitstream -> application sequence running for real, which
+   needs a power-on reset.
+
+2. **The analog front end** (`README.md` Validation check 9). Measuring an RC low-pass against its expected
+   response, to the +/-2 dB and +/-15 degrees acceptance target, needs the AN108
+   module connected. Nothing in the software or gateware blocks it — the
+   loopback exists precisely so the rest of the chain could be proven without
+   it.

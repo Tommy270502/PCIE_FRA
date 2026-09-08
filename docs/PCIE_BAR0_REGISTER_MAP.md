@@ -38,7 +38,7 @@ Both the PS (`M_AXI_GP0`) and the host (BAR0) reach `fra_core` through
 `axi_smc`, which arbitrates between them. Nothing serialises a *sequence* of
 register writes, so drive the core from one side at a time.
 
-### Address map (from `add_pcie_endpoint.tcl`)
+### Address map (from `hardware/fra_zynq7015_pcie/scripts/add_pcie_endpoint.tcl`)
 
 ```
 axi_pcie_0/M_AXI space:
@@ -92,7 +92,7 @@ gateware only and says nothing about the analog front end.
 | **R4 — Vivado IP availability/license** | `create_ip`/synth errors that the block is not licensed or not for this part. | Already disproved: all three IPs instantiate for `xc7z015`. `axi_pcie` is license-free. If synth flags a feature license, fall back to a smaller config. |
 | **R5 — Host enumeration** | `lspci -d 10ee:7021` shows nothing, or device with all-FF config space. | PERST polarity (active-low) and refclk must be right first. Confirm BAR0 size/type in config space; check `dmesg` for "BAR ... failed to assign". Reseat / boot host with card already configured (7-series PCIe needs link up before host enumeration window closes — program bitstream before host POST, or use a host that re-scans). |
 | **R6 — PERST polarity** | Endpoint held in reset (no link) or never resets. | Defaulted to **active-low** per PCIe spec; `PULLUP` keeps it defined. If the schematic shows an inverter, drop the inversion in the BD reset path. |
-| **R7 — BD integration vs fra_core** | fra_core address/clock changes; FRA build regresses. | PCIe added by `scripts/add_pcie_endpoint.tcl` as a separate clock domain (axi_pcie `axi_aclk_out`); fra_core's PS `M_AXI_GP0`→SmartConnect→`0x43C0_0000` path is untouched. Re-run `run_fra_build_validation.tcl` signoff after integration. |
+| **R7 — BD integration vs fra_core** | fra_core address/clock changes; FRA build regresses; PS and host contend for the core. | As of gateware 1.1.0 the PCIe master *does* reach fra_core, by design. `hardware/fra_zynq7015_pcie/scripts/add_pcie_endpoint.tcl` widens `axi_smc` to two slave ports so the PS and the host arbitrate onto it. The PS path keeps its address and clock (`M_AXI_GP0` → `axi_smc` → `0x43C0_0000` @ `FCLK_CLK0`), so firmware is unaffected — confirmed on hardware, where a UART `single 1000` and a host PCIe `single 1000` return identical results. AXI arbitration makes individual transactions safe but does not serialise a *sequence* of register writes, so drive the core from one side at a time. Re-run `run_pcie_impl_signoff.tcl` after any BD change. |
 
 ## What is verified
 
