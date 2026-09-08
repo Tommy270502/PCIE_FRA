@@ -26,11 +26,37 @@ for f in "$BOOTBIN" "$FSBL"; do
 done
 [ -x "$PROG" ] || { echo "error: program_flash not found at $PROG" >&2; exit 1; }
 
-# Discover the cable rather than hard-coding a serial number.
+# program_flash needs a running hw_server; Vivado/xsdb each start their own and
+# take it down again on exit, so start one here if nothing is listening.
+HW_SERVER=${HW_SERVER:-$(dirname "$PROG")/../../Vivado/bin/hw_server}
+[ -x "$HW_SERVER" ] || HW_SERVER=$HOME/Xilinx/2026.1/Vivado/bin/hw_server
+STARTED_HW_SERVER=0
+if ! "$PROG" -jtagtargets -url "$URL" 2>&1 | grep -q 'jsn-'; then
+    if [ -x "$HW_SERVER" ]; then
+        echo "Starting hw_server"
+        "$HW_SERVER" -d >/dev/null 2>&1 || nohup "$HW_SERVER" >/dev/null 2>&1 &
+        STARTED_HW_SERVER=1
+        i=0
+        while [ $i -lt 20 ]; do
+            "$PROG" -jtagtargets -url "$URL" 2>&1 | grep -q 'jsn-' && break
+            i=$((i + 1))
+            sleep 1
+        done
+    fi
+fi
+cleanup() { [ "$STARTED_HW_SERVER" -eq 1 ] && pkill -f 'hw_server' 2>/dev/null || true; }
+trap cleanup EXIT
+
+# Discover the cable rather than hard-coding a serial number. The chain lists
+# both the ARM DAP and the FPGA:
+#   2  jsn-JTAG-HS1-210512180081-4ba00477-0  (name arm_dap  idcode 4ba00477)
+#   3  jsn-JTAG-HS1-210512180081-0373b093-0  (name xc7z015  idcode 0373b093)
+# program_flash must target the FPGA, so match on the device name, not position.
 TARGET=${JTAG_TARGET:-}
 if [ -z "$TARGET" ]; then
-    TARGET=$("$PROG" -jtagtargets -url "$URL" 2>/dev/null \
-             | awk '/jsn-/ {for(i=1;i<=NF;i++) if($i ~ /^jsn-/) {print $i; exit}}')
+    TARGET=$("$PROG" -jtagtargets -url "$URL" 2>&1 \
+             | grep 'name xc7z' \
+             | tr ' \t' '\n\n' | grep -m1 '^jsn-')
 fi
 if [ -z "$TARGET" ]; then
     echo "error: no JTAG target found. Is the cable connected and hw_server reachable at $URL?" >&2

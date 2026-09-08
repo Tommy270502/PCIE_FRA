@@ -21,6 +21,26 @@ fitted**. That is the current bench configuration.
 
 DMA streaming and a PC GUI remain out of scope for this revision.
 
+## Quick start (host side)
+
+```bash
+make -C software/host
+sudo software/host/scripts/fra-pcie-setup.sh    # one-time: binds vfio-pci
+
+software/host/fra_bar_test                      # BAR0 bring-up check
+software/host/fra_cli id                        # identity + link state
+software/host/fra_cli selftest                  # end-to-end, needs no AD/DA module
+software/host/fra_cli --loopback cal
+software/host/fra_cli --loopback sweep --csv sweep.csv
+```
+
+On a machine with Secure Boot enabled the kernel runs in lockdown mode, where
+`mmap()` of a PCI BAR through sysfs fails for every process including root. The
+setup script binds the endpoint to `vfio-pci`, which is the supported route; the
+tools fall back to sysfs where lockdown is off. See `software/host/README.md`.
+
+Measured results are in `docs/pcie_host_validation.md`.
+
 ## Repository Layout
 
 | Path | Purpose |
@@ -40,7 +60,9 @@ DMA streaming and a PC GUI remain out of scope for this revision.
 | `scripts/build_boot_image.sh` | Packs FSBL + bitstream + app into `BOOT.BIN`. |
 | `scripts/flash_qspi.sh` | Writes `BOOT.BIN` to QSPI over JTAG. |
 | `scripts/program_fpga_jtag.sh` | Volatile bitstream load over JTAG, for trying gateware before flashing. |
-| `docs/` | Board manuals, AD/DA module references, architecture notes, and the BAR0 register map. |
+| `docs/PCIE_BAR0_REGISTER_MAP.md` | BAR0 window layout, address map and register tables. |
+| `docs/pcie_host_validation.md` | On-hardware PCIe + loopback validation results. |
+| `docs/` | Board manuals, AD/DA module references, architecture notes. |
 
 ## Hardware Architecture
 
