@@ -222,10 +222,17 @@ static void cal_clear(fra_cal_t *c)
     memset(c, 0, sizeof(*c));
 }
 
+/*
+ * The baseline is stored per sweep index, not per frequency, so it is only
+ * meaningful for the sweep it was taken with. Normalising a 20-point 10 Hz-20
+ * kHz sweep against a baseline taken over a different range would silently
+ * produce wrong numbers, so the config is recorded and checked on load.
+ */
 static int cal_load(fra_cal_t *c)
 {
     FILE *f = fopen(cal_path, "r");
     char  line[256];
+    int   config_seen = 0;
 
     cal_clear(c);
     if (f == NULL) {
@@ -235,8 +242,45 @@ static int cal_load(fra_cal_t *c)
         unsigned idx;
         double   mag, ph;
 
-        if (line[0] == '#' || line[0] == 'i') {
+        if (line[0] == '#') {
+            double   c_start, c_stop;
+            unsigned c_points, c_amp, c_settle, c_measure;
+            int      c_loopback;
+
+            if (sscanf(line,
+                       "# start=%lf stop=%lf points=%u amp=%u settle=%u "
+                       "measure=%u loopback=%d",
+                       &c_start, &c_stop, &c_points, &c_amp, &c_settle,
+                       &c_measure, &c_loopback) == 7) {
+                config_seen = 1;
+                if (c_points != cfg.points ||
+                    fabs(c_start - cfg.start_hz) > 1e-6 ||
+                    fabs(c_stop - cfg.stop_hz) > 1e-6 ||
+                    c_amp != cfg.amplitude ||
+                    c_settle != cfg.settle_cycles ||
+                    c_measure != cfg.measure_cycles ||
+                    c_loopback != cfg.loopback) {
+                    fprintf(stderr,
+                            "warning: %s was taken with a different setup\n"
+                            "  baseline: start=%.3f stop=%.3f points=%u amp=%u "
+                            "settle=%u measure=%u loopback=%d\n"
+                            "  current : start=%.3f stop=%.3f points=%u amp=%u "
+                            "settle=%u measure=%u loopback=%d\n"
+                            "  ignoring it; re-run 'cal' for these settings.\n",
+                            cal_path, c_start, c_stop, c_points, c_amp,
+                            c_settle, c_measure, c_loopback,
+                            cfg.start_hz, cfg.stop_hz, cfg.points,
+                            cfg.amplitude, cfg.settle_cycles,
+                            cfg.measure_cycles, cfg.loopback);
+                    fclose(f);
+                    cal_clear(c);
+                    return 0;
+                }
+            }
             continue;
+        }
+        if (line[0] == 'i') {
+            continue; /* header row */
         }
         if (sscanf(line, "%u,%lf,%lf", &idx, &mag, &ph) == 3 &&
             idx < FRA_MAX_POINTS) {
@@ -246,6 +290,11 @@ static int cal_load(fra_cal_t *c)
         }
     }
     fclose(f);
+
+    if (!config_seen) {
+        fprintf(stderr, "warning: %s has no config header; assuming it matches\n",
+                cal_path);
+    }
     return 1;
 }
 
@@ -259,6 +308,7 @@ static int cal_save(const fra_cal_t *c)
         return 0;
     }
     fprintf(f, "# fra_cli calibration baseline\n");
+    /* Parsed back by cal_load; keep the format in step with it. */
     fprintf(f, "# start=%.6f stop=%.6f points=%u amp=%u settle=%u measure=%u loopback=%d\n",
             cfg.start_hz, cfg.stop_hz, cfg.points, cfg.amplitude,
             cfg.settle_cycles, cfg.measure_cycles, cfg.loopback);

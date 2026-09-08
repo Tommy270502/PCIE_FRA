@@ -44,6 +44,36 @@ driver binding, BAR0 access, the host loopback self-test and the board UART —
 and prints a pass/fail summary. Measured results are in
 `docs/pcie_host_validation.md`.
 
+## Current state
+
+Working and validated on hardware:
+
+- PCIe link trains at 2.5 GT/s x1; the host enumerates `10ee:7021` with an
+  8 KB BAR0 and reads/writes both windows.
+- A host-driven sweep runs end to end over PCIe and agrees with the board's
+  UART firmware to the printed precision.
+- The gateware loopback closes the measurement loop with no AD/DA module
+  fitted, so the whole digital chain is self-testable.
+- QSPI is flashed and verified with the current bitstream + firmware.
+
+**Next step: a full power-off and power-on** (the board is slot-powered, so a
+warm reboot will not do it), then:
+
+```bash
+scripts/verify_system.sh
+```
+
+That is the outstanding validation of the flashed image. It has not yet been
+observed booting from QSPI, because validating it in place with a soft reset
+does not work — see "Recovering the board after flashing" in
+`docs/pcie_host_validation.md`. The QSPI write itself verified byte-for-byte,
+the bitstream and firmware were each tested over JTAG before flashing, and the
+FSBL and its `ps7_init` are byte-identical to the previously booting image.
+
+After that, the only remaining item is check 8 in Validation: measuring a real
+RC low-pass, which needs the AN108 AD/DA module connected. Nothing in software
+or gateware blocks it.
+
 ## Repository Layout
 
 | Path | Purpose |
