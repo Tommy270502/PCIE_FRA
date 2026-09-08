@@ -1,0 +1,10 @@
+PCIe FRA self-test (gateware loopback, no analog front end needed)
+amplitude 128 -> expected magnitude 63.7490 counts
+
+  freq_hz    mag_counts   expected     phase_deg    samples  status
+  100.0      63.6855      63.7490      0.0001       999992   PASS DONE
+  1000.0     63.6853      63.7490      -0.0129      100000   PASS DONE
+  10000.0    63.6827      63.7490      -0.1427      10000    PASS DONE
+  20000.0    63.6774      63.7490      -0.2839      5000     PASS DONE
+
+SELFTEST PASS

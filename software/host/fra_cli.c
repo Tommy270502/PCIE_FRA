@@ -471,12 +471,16 @@ static int cmd_selftest(const fra_dev_t *dev)
     unsigned i;
     int      fails = 0;
     int      saved_loopback = cfg.loopback;
+    double   exp_mag;
+    double   exp_phase;
 
     cfg.loopback = 1;
 
-    printf("PCIe FRA self-test (gateware loopback, no analog front end needed)\n\n");
-    printf("  %-10s %-14s %-12s %-8s %s\n",
-           "freq_hz", "mag_counts", "phase_deg", "samples", "status");
+    printf("PCIe FRA self-test (gateware loopback, no analog front end needed)\n");
+    printf("amplitude %u -> expected magnitude %.4f counts\n\n",
+           cfg.amplitude, 127.0 * (double)cfg.amplitude / 255.0);
+    printf("  %-10s %-12s %-12s %-12s %-8s %s\n",
+           "freq_hz", "mag_counts", "expected", "phase_deg", "samples", "status");
 
     for (i = 0; i < sizeof(test_hz) / sizeof(test_hz[0]); i++) {
         fra_result_t r;
@@ -492,16 +496,21 @@ static int cmd_selftest(const fra_dev_t *dev)
         status_flags(r.status, flags, sizeof(flags));
 
         /*
-         * In loopback the ADC path sees the DAC word directly, so magnitude
-         * should land near amplitude/255 of full scale and phase near zero
-         * (one sample of pipeline delay, i.e. -360*f/25e6 degrees).
+         * In loopback the ADC path sees the DAC word directly. mag_counts is a
+         * peak ADC deviation in counts, so it lands at 127*amp/255 (~63.7 at
+         * the default amplitude of 128), not at unity. Phase is one sample tick
+         * of delay: -360*f/25e6 degrees. Measured on hardware at 1 kHz:
+         * 63.685 counts and -0.0129 deg, against 63.749 and -0.0144 predicted.
          */
-        ok = result_valid_for_cal(&r) &&
-             r.mag_counts > 0.5 && r.mag_counts < 1.5 &&
-             fabs(wrap_phase_deg(r.phase_deg)) < 5.0;
+        exp_mag   = 127.0 * (double)cfg.amplitude / 255.0;
+        exp_phase = -360.0 * r.freq_hz / FRA_DDS_CLK_HZ;
 
-        printf("  %-10.1f %-14.6f %-12.3f %-8u %s%s\n",
-               r.freq_hz, r.mag_counts, r.phase_deg, r.sample_count,
+        ok = result_valid_for_cal(&r) &&
+             fabs(r.mag_counts - exp_mag) <= 0.05 * exp_mag &&
+             fabs(wrap_phase_deg(r.phase_deg) - exp_phase) <= 1.0;
+
+        printf("  %-10.1f %-12.4f %-12.4f %-12.4f %-8u %s%s\n",
+               r.freq_hz, r.mag_counts, exp_mag, r.phase_deg, r.sample_count,
                ok ? "PASS" : "FAIL", flags);
         if (!ok) {
             fails++;
