@@ -74,5 +74,13 @@ echo
 
 echo
 echo "QSPI programmed and verified."
-echo "Power-cycle the board AND reboot the host: the PCIe endpoint must be"
-echo "configured before the host enumerates the bus."
+echo
+echo "Validate with a real power cycle, not a soft reset. Writing"
+echo "SLCR.PSS_RST_CTRL after program_flash leaves devcfg dirty: the PS resets"
+echo "but the BootROM does not reconfigure the PL (DEVCFG_STATUS PCFG_INIT stays"
+echo "0), and the debug port ends up wedged with an APB AP transaction error"
+echo "that only a power-on reset clears."
+echo
+echo "The board is slot-powered, so: shut the host down fully (not a warm"
+echo "reboot), then power on. That reconfigures the FPGA from flash before the"
+echo "host POSTs, which is what makes the endpoint enumerable."

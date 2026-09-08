@@ -1,20 +1,28 @@
 # AX7015B PCIe FRA endpoint (Xilinx vendor 0x10ee, device 0x7021).
 #
-# Two things are needed for the host tools in software/host/ to reach BAR0
-# without root:
+# Gives the host tools in software/host/ unprivileged access to BAR0, and makes
+# that survive a reboot.
 #
-#  1. VFIO character devices readable by the FRA_GROUP group. This is the route
-#     that works when Secure Boot has put the kernel into lockdown, which
-#     blocks mmap() of /sys/bus/pci/.../resource0 for every process, root
-#     included.
-#  2. As a fallback on machines with lockdown off, memory decode enabled and
+#  1. Bind the endpoint to vfio-pci. This is the route that works when Secure
+#     Boot has put the kernel into lockdown, which blocks mmap() of
+#     /sys/bus/pci/.../resource0 for every process, root included. driver_override
+#     is runtime-only state, so it has to be re-applied on every enumeration --
+#     which is exactly what this rule does.
+#  2. Hand the VFIO character devices to the FRA_GROUP group.
+#  3. As a fallback where lockdown is off, enable memory decode and make
 #     resource0 group-accessible.
 #
 # Install with: sudo software/host/scripts/fra-pcie-setup.sh
 
+# VFIO nodes readable by the group.
 SUBSYSTEM=="vfio", GROUP="plugdev", MODE="0660"
 KERNEL=="vfio", GROUP="plugdev", MODE="0666"
 
+# Bind the endpoint to vfio-pci as soon as the kernel enumerates it.
+ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10ee", ATTR{device}=="0x7021", \
+    RUN+="/bin/sh -c 'modprobe vfio-pci; test -L /sys/bus/pci/devices/$kernel/driver || { echo vfio-pci > /sys/bus/pci/devices/$kernel/driver_override; echo $kernel > /sys/bus/pci/drivers_probe; }'"
+
+# Memory decode plus sysfs-fallback permissions.
 ACTION=="add|change", SUBSYSTEM=="pci", ATTR{vendor}=="0x10ee", ATTR{device}=="0x7021", \
     ATTR{enable}="1", \
     RUN+="/bin/sh -c 'chgrp plugdev /sys/bus/pci/devices/$kernel/resource0 2>/dev/null; chmod 0660 /sys/bus/pci/devices/$kernel/resource0 2>/dev/null'"

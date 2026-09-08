@@ -110,6 +110,29 @@ That figure measures repeatability of the digital chain, not analog accuracy.
 For the analog result with the module fitted, see
 `docs/loopback_accuracy_report.md` (~0.002 dB / ~0.01 degrees post-calibration).
 
+## Recovering the board after flashing
+
+`program_flash` leaves the FPGA holding its flash-writer design and devcfg in a
+dirty state. Validate the flashed image with a **real power cycle**, not a soft
+reset.
+
+Writing `SLCR.PSS_RST_CTRL` to reboot the PS in place does not work here: the PS
+resets but the BootROM does not reconfigure the PL (`DEVCFG_STATUS` bit 12
+`PCFG_INIT` goes from 1 to 0, and reads of `0x43C0_0000` time out), and the
+debug port is left wedged reporting `APB AP transaction error, DAP status
+0x30000021`. `rst -system` and `rst -cores` cannot clear that, and the chain has
+no SRST pin. Only a power-on reset recovers it.
+
+Note that the PCIe link stays up through all of this, because `axi_pcie` and
+`pcie_bar_regs` live in the PCIe reference-clock domain rather than the PS
+fabric clock — which is the reason `pcie_bar_regs` was deliberately kept out of
+the PS clock/reset domain. `fra_core` at `BAR0+0x1000` does depend on the PS, so
+do not read that window while the PS is in an unknown state: with `FCLK_CLK0`
+stopped the AXI read never completes and the host sees a completion timeout.
+
+The board is slot-powered, so a full host shutdown (S5) is what power-cycles it.
+A warm reboot does not.
+
 ## Still open
 
 Measuring a real RC low-pass against its expected response, to the +/-2 dB and

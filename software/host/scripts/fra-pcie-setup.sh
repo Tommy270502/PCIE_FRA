@@ -73,6 +73,8 @@ if ! getent group "$GROUP" >/dev/null 2>&1; then
 fi
 
 echo "Installing $RULE_DST (group: $GROUP)"
+# The rule also re-binds vfio-pci on every enumeration, so this setup survives
+# a reboot -- driver_override itself is runtime-only state.
 sed "s/GROUP=\"plugdev\"/GROUP=\"$GROUP\"/g; s/chgrp plugdev/chgrp $GROUP/g" \
     "$RULE_SRC" > "$RULE_DST"
 chmod 0644 "$RULE_DST"
@@ -126,6 +128,7 @@ echo "link      : $(cat "$DEVPATH/current_link_speed" 2>/dev/null) x$(cat "$DEVP
 echo "lockdown  : $(cat /sys/kernel/security/lockdown 2>/dev/null || echo 'n/a')"
 echo
 echo "Done. Members of '$GROUP' can now run software/host/fra_bar_test and fra_cli."
+echo "The udev rule re-applies this on every boot, so this is a one-time step."
 if [ -n "${SUDO_USER:-}" ] && ! id -nG "$SUDO_USER" | tr ' ' '\n' | grep -qx "$GROUP"; then
     echo "NOTE: user '$SUDO_USER' is not in '$GROUP'. Add with:"
     echo "  sudo usermod -aG $GROUP $SUDO_USER   (then log out and back in)"
