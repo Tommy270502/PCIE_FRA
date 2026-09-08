@@ -1,3 +1,5 @@
+# NOTE: run with "xsdb", not "xsct" -- Vitis 2026.1 removed xsct.
+#
 # Probe the Zynq PS UART0/UART1 controller registers over JTAG to determine which
 # UART the firmware is driving and at what baud. PS register space (0xE000_xxxx) is
 # in the default memory map, so no loadhw is needed.

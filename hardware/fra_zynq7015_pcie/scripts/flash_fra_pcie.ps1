@@ -1,3 +1,7 @@
+# SUPERSEDED on Linux -- use scripts/flash_qspi.sh from the repo root, which
+# discovers the JTAG cable instead of hardcoding a serial number and starts
+# hw_server itself. Kept for Windows use; hardcodes C:\Xilinx\2025.1 paths.
+#
 # Flash the AX7015B with the current PCIe-integrated bitstream + FRA_Controller ELF over JTAG.
 #
 # Wraps program_fra_pcie_jtag.tcl (which always points at the latest exported

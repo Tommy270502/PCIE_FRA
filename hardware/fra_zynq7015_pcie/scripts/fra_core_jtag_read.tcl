@@ -1,3 +1,8 @@
+# NOTE: run with "xsdb", not "xsct" -- Vitis 2026.1 removed xsct. The $xsa path
+# below is a Windows absolute path from the original bring-up and needs editing
+# before use. For a quick check that fra_core answers on AXI, the shorter route
+# is: software/host/fra_cli status (over PCIe) or the board's UART "status".
+#
 # Read/exercise fra_core directly over JTAG (APU AXI), independent of UART.
 # Proves fra_core responds on AXI at 0x43C0_0000 in the PCIe-integrated bitstream.
 # Assumes the board is already programmed + PS initialised (program_fra_pcie_jtag.tcl).

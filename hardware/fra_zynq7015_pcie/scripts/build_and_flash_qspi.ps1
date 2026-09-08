@@ -1,3 +1,12 @@
+# SUPERSEDED on Linux -- use the portable equivalents from the repo root:
+#     scripts/build_boot_image.sh     (bootgen: FSBL + bitstream + app -> BOOT.BIN)
+#     scripts/flash_qspi.sh           (program_flash: BOOT.BIN -> QSPI over JTAG)
+#     make -C software/FRA_Controller (application ELF)
+#
+# Kept for Windows use, but note it hardcodes C:\Xilinx\2025.1 paths and drives
+# ninja through the Vitis IDE build tree. Vitis 2026.1 removed xsct, so parts of
+# the surrounding flow no longer apply.
+#
 # Build everything needed for a persistent (QSPI flash) boot of the AX7015B
 # and write it to the onboard flash over the existing JTAG link.
 #

@@ -1,3 +1,10 @@
+# SUPERSEDED -- use scripts/program_fpga_jtag.sh --app from the repo root, which
+# does the same thing (program PL, reset the core, download the ELF, run) with
+# no hardcoded paths.
+#
+# This script also documents "xsct", which Vitis 2026.1 removed; the Tcl xsdb
+# front end is still present and is what the shell script drives.
+#
 # Program the PCIe-integrated bitstream and boot the bare-metal FRA CLI over JTAG.
 # Bare-metal Zynq-7000 sequence: reset, program PL, ps7_init/post_config, download
 # the FRA_Controller ELF, run. Leaves the app free-running on the PS.
