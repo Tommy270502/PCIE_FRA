@@ -39,7 +39,10 @@ On a machine with Secure Boot enabled the kernel runs in lockdown mode, where
 setup script binds the endpoint to `vfio-pci`, which is the supported route; the
 tools fall back to sysfs where lockdown is off. See `software/host/README.md`.
 
-Measured results are in `docs/pcie_host_validation.md`.
+`scripts/verify_system.sh` runs the whole chain — enumeration, link state,
+driver binding, BAR0 access, the host loopback self-test and the board UART —
+and prints a pass/fail summary. Measured results are in
+`docs/pcie_host_validation.md`.
 
 ## Repository Layout
 
@@ -60,6 +63,7 @@ Measured results are in `docs/pcie_host_validation.md`.
 | `scripts/build_boot_image.sh` | Packs FSBL + bitstream + app into `BOOT.BIN`. |
 | `scripts/flash_qspi.sh` | Writes `BOOT.BIN` to QSPI over JTAG. |
 | `scripts/program_fpga_jtag.sh` | Volatile bitstream load over JTAG, for trying gateware before flashing. |
+| `scripts/verify_system.sh` | End-to-end pass/fail check of the whole system. |
 | `docs/PCIE_BAR0_REGISTER_MAP.md` | BAR0 window layout, address map and register tables. |
 | `docs/pcie_host_validation.md` | On-hardware PCIe + loopback validation results. |
 | `docs/` | Board manuals, AD/DA module references, architecture notes. |
