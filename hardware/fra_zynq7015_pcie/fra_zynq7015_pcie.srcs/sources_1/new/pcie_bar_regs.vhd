@@ -10,7 +10,7 @@
 --
 -- Register map (32-bit, word-addressed; see docs/PCIE_BAR0_REGISTER_MAP.md):
 --   0x00 BOARD_ID  RO  0xA7015B00  -- "AX7015B" board magic
---   0x04 VERSION   RO  0x00010000  -- gateware version 1.0.0
+--   0x04 VERSION   RO  0x00010100  -- gateware version 1.1.0
 --   0x08 SCRATCH   RW  0x00000000  -- host read/write smoke test
 --   0x0C CONTROL   RW  0x00000000  -- bit0 host->PS attention (informational)
 --   0x10 SCRATCH2  RW  0x00000000  -- spare RW
@@ -63,7 +63,8 @@ architecture rtl of pcie_bar_regs is
 
   -- Identity / version constants
   constant BOARD_ID_C : std_logic_vector(31 downto 0) := x"A7015B00";
-  constant VERSION_C  : std_logic_vector(31 downto 0) := x"00010000";
+  -- 1.1.0: BAR0 also decodes fra_core at +0x1000 (see add_pcie_endpoint.tcl).
+  constant VERSION_C  : std_logic_vector(31 downto 0) := x"00010100";
 
   -- Number of address bits that select a 32-bit word (low 2 bits are byte lanes)
   constant ADDR_LSB   : integer := 2;

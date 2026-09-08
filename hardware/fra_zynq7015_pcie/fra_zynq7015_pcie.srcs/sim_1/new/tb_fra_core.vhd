@@ -23,6 +23,7 @@ architecture sim of tb_fra_core is
     constant CTRL_START                : std_logic_vector(31 downto 0) := x"00000002";
     constant CTRL_CLEAR_DONE           : std_logic_vector(31 downto 0) := x"00000004";
     constant CTRL_RESET_PHASE_ON_START : std_logic_vector(31 downto 0) := x"00000008";
+    constant CTRL_LOOPBACK_EN          : std_logic_vector(31 downto 0) := x"00000010";
 
     constant STATUS_DONE       : natural := 1;
     constant STATUS_ADC_CLIP   : natural := 3;
@@ -210,7 +211,7 @@ begin
         wait for 200 ns;
 
         axi_read(clk, araddr, arvalid, arready, rdata, rvalid, rready, REG_VERSION, rd);
-        assert rd = x"00010000" report "unexpected fra_core version" severity failure;
+        assert rd = x"00010100" report "unexpected fra_core version" severity failure;
 
         axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
                   CTRL_DDS_ENABLE or CTRL_RESET_PHASE_ON_START);
@@ -263,6 +264,32 @@ begin
                   CTRL_DDS_ENABLE or CTRL_START or CTRL_CLEAR_DONE or CTRL_RESET_PHASE_ON_START);
         wait_done(clk, araddr, arvalid, arready, rdata, rvalid, rready, status);
         assert status(STATUS_ADC_CLIP) = '1' report "clipped ADC input was not flagged" severity failure;
+
+        -- Internal loopback must take over from the pins entirely: leave the
+        -- ADC pins pegged at full scale (adc_mode 2, which just clipped) and
+        -- enable CONTROL.LOOPBACK_EN. The measurement should now see the DAC
+        -- word instead, so no clip, no low-signal, and a real min/max span.
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
+                  CTRL_DDS_ENABLE or CTRL_LOOPBACK_EN or CTRL_CLEAR_DONE or CTRL_RESET_PHASE_ON_START);
+        axi_read(clk, araddr, arvalid, arready, rdata, rvalid, rready, REG_CONTROL, rd);
+        assert rd(4) = '1' report "CONTROL.LOOPBACK_EN did not read back" severity failure;
+
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
+                  CTRL_DDS_ENABLE or CTRL_LOOPBACK_EN or CTRL_START or CTRL_CLEAR_DONE or CTRL_RESET_PHASE_ON_START);
+        wait_done(clk, araddr, arvalid, arready, rdata, rvalid, rready, status);
+        assert status(STATUS_DONE) = '1' report "loopback-mode measurement not done" severity failure;
+        assert status(STATUS_ADC_CLIP) = '0' report "loopback mode still saw the clipped pins" severity failure;
+        assert status(STATUS_LOW_SIGNAL) = '0' report "loopback mode reported low signal" severity failure;
+
+        axi_read(clk, araddr, arvalid, arready, rdata, rvalid, rready, REG_ADC_MIN_MAX, rd);
+        assert unsigned(rd(15 downto 8)) > unsigned(rd(7 downto 0))
+            report "loopback mode produced no ADC min/max span" severity failure;
+
+        -- Clearing the bit must hand control straight back to the pins.
+        axi_write(clk, awaddr, awvalid, awready, wdata, wstrb, wvalid, wready, bvalid, bready, REG_CONTROL,
+                  CTRL_DDS_ENABLE or CTRL_START or CTRL_CLEAR_DONE or CTRL_RESET_PHASE_ON_START);
+        wait_done(clk, araddr, arvalid, arready, rdata, rvalid, rready, status);
+        assert status(STATUS_ADC_CLIP) = '1' report "clearing LOOPBACK_EN did not restore the ADC pins" severity failure;
 
         assert false report "tb_fra_core completed" severity note;
         wait;

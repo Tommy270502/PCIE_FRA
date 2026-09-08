@@ -59,6 +59,7 @@
 #define CTRL_START              0x00000002u
 #define CTRL_CLEAR_DONE         0x00000004u
 #define CTRL_RESET_PHASE        0x00000008u
+#define CTRL_LOOPBACK_EN        0x00000010u
 
 #define STATUS_BUSY             0x00000001u
 #define STATUS_DONE             0x00000002u
@@ -81,6 +82,9 @@ typedef struct {
     u32 amplitude;
     u32 settle_cycles;
     u32 measure_cycles;
+    /* Gateware DAC->ADC loopback: lets the whole chain be exercised with no
+       AD/DA module fitted. Requires core version >= 0x00010100. */
+    u32 loopback;
 } FraConfig;
 
 typedef struct {
@@ -107,7 +111,8 @@ static FraConfig Config = {
     20u,
     128u,
     2u,
-    4u
+    4u,
+    0u
 };
 
 static FraCalibration Calibration;
@@ -398,11 +403,12 @@ static void PrintConfig(void)
     PrintDouble3(Config.start_hz);
     xil_printf("Hz stop=");
     PrintDouble3(Config.stop_hz);
-    xil_printf("Hz points=%lu amp=%lu settle=%lu measure=%lu\r\n",
+    xil_printf("Hz points=%lu amp=%lu settle=%lu measure=%lu loopback=%s\r\n",
                (unsigned long)Config.points,
                (unsigned long)Config.amplitude,
                (unsigned long)Config.settle_cycles,
-               (unsigned long)Config.measure_cycles);
+               (unsigned long)Config.measure_cycles,
+               (Config.loopback != 0u) ? "on" : "off");
 }
 
 static void PrintCoreStatus(void)
@@ -490,7 +496,9 @@ static int RunMeasurement(double freq_hz, FraResult *result)
     RegWrite(REG_AMPLITUDE, Config.amplitude & 0xFFu);
     RegWrite(REG_SETTLE_CYCLES, Config.settle_cycles);
     RegWrite(REG_MEASURE_CYCLES, Config.measure_cycles);
-    RegWrite(REG_CONTROL, CTRL_DDS_ENABLE | CTRL_CLEAR_DONE | CTRL_RESET_PHASE | CTRL_START);
+    RegWrite(REG_CONTROL,
+             CTRL_DDS_ENABLE | CTRL_CLEAR_DONE | CTRL_RESET_PHASE | CTRL_START |
+             ((Config.loopback != 0u) ? CTRL_LOOPBACK_EN : 0u));
 
     if (!WaitForDone(freq_hz)) {
         return 0;
@@ -607,6 +615,38 @@ static void CmdHelp(void)
     xil_printf("  single <hz>\r\n");
     xil_printf("  sweep\r\n");
     xil_printf("  cal\r\n");
+    xil_printf("  loopback <on|off>\r\n");
+}
+
+/*
+ * Internal DAC->ADC loopback in fra_core. Useful for self-test when the AN108
+ * AD/DA module is not fitted; the measured path is then gateware-only.
+ */
+static void CmdLoopback(const char *arg)
+{
+    if (arg == NULL) {
+        xil_printf("loopback is %s\r\n", (Config.loopback != 0u) ? "on" : "off");
+        return;
+    }
+
+    if (StrEq(arg, "on") || StrEq(arg, "1")) {
+        Config.loopback = 1u;
+    } else if (StrEq(arg, "off") || StrEq(arg, "0")) {
+        Config.loopback = 0u;
+    } else {
+        xil_printf("usage: loopback <on|off>\r\n");
+        return;
+    }
+
+    if ((Config.loopback != 0u) && (RegRead(REG_VERSION) < 0x00010100u)) {
+        xil_printf("WARNING: core version 0x%08lx predates loopback support\r\n",
+                   (unsigned long)RegRead(REG_VERSION));
+    }
+
+    /* The measured path just changed, so any stored baseline is meaningless. */
+    ClearCalibration();
+    xil_printf("loopback %s, calibration cleared\r\n",
+               (Config.loopback != 0u) ? "on" : "off");
 }
 
 static void CmdSingle(const char *arg)
@@ -786,6 +826,8 @@ static void Dispatch(char *line)
         CmdSweep();
     } else if (StrEq(cmd, "cal")) {
         CmdCal();
+    } else if (StrEq(cmd, "loopback")) {
+        CmdLoopback(arg1);
     } else {
         xil_printf("unknown command: %s\r\n", cmd);
     }

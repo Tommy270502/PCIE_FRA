@@ -1,22 +1,31 @@
 # PCIE_FRA
 
 PCIE_FRA is a Frequency Response Analyzer for the Alinx AX7015B Zynq-7015
-board. The current implementation generates a DDS stimulus in PL, captures the
-8-bit ADC response, performs synchronous I/Q accumulation in a custom AXI4-Lite
-FRA core, and exposes a bare-metal UART CLI for calibration and sweeps.
+board. It generates a DDS stimulus in PL, captures the 8-bit ADC response,
+performs synchronous I/Q accumulation in a custom AXI4-Lite FRA core, and can
+be driven from two places at once:
 
-A PCIe x1 Gen1 endpoint (`axi_pcie` + a small `pcie_bar_regs` register file
-behind BAR0) is additively integrated alongside the FRA core and signs off
-clean in implementation (see `docs/PCIE_BRINGUP_HANDOVER.md`). PCIe link
-training and host enumeration are not yet validated — the bench has no PCIe
-host slot/refclk. DMA streaming, a host driver, and a PC GUI remain out of
-scope for this revision; see `docs/ROADMAP.md` for what's still open.
+- a bare-metal **UART CLI** on the board (`software/FRA_Controller`), and
+- a **host PCIe application** over the board's x1 Gen1 endpoint
+  (`software/host`).
+
+The PCIe endpoint is validated on hardware: the link trains at 2.5 GT/s x1, the
+device enumerates as `10ee:7021`, and the host reads and writes both BAR0
+windows. The 8 KB BAR0 decodes `pcie_bar_regs` (identity/scratch) at `+0x0000`
+and `fra_core` itself at `+0x1000`, so a host can run a complete sweep without
+touching the UART.
+
+`fra_core` also has a gateware DAC→ADC loopback (`CONTROL.LOOPBACK_EN`), which
+makes the whole digital chain self-testable with **no AN108 AD/DA module
+fitted**. That is the current bench configuration.
+
+DMA streaming and a PC GUI remain out of scope for this revision.
 
 ## Repository Layout
 
 | Path | Purpose |
 | --- | --- |
-| `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.xpr` | Vivado 2025.1 project for `xc7z015clg485-2`. |
+| `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.xpr` | Vivado project for `xc7z015clg485-2` (created in 2025.1, builds under 2026.1). |
 | `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sources_1/new/fra_core.vhd` | AXI4-Lite FRA measurement core. |
 | `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sources_1/new/pcie_bar_regs.vhd` | BAR0 AXI4-Lite register file behind the PCIe endpoint (board ID/version/scratch/control). |
 | `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs/sim_1/new/tb_fra_core.vhd` | Self-checking RTL testbench for the FRA core. |
@@ -25,27 +34,35 @@ scope for this revision; see `docs/ROADMAP.md` for what's still open.
 | `hardware/fra_zynq7015_pcie/scripts/rebuild_functional_fra_bd.tcl` | Vivado script that replaces the GPIO prototype BD wiring with `fra_core` (PCIe-free BD). |
 | `hardware/fra_zynq7015_pcie/scripts/run_pcie_impl_signoff.tcl` | Signoff build (impl→bitstream→XSA) for the current PCIe-integrated project; preserves the PCIe endpoint. |
 | `software/FRA_Controller/src/main.c` | Bare-metal UART CLI and sweep controller (mirrors the CLI on both PS UART0/UART1). |
+| `software/FRA_Controller/Makefile` | Command-line firmware build against the checked-in BSP (Vitis 2026.1 removed XSCT). |
 | `software/PCIE_FRA/` | Vitis platform/BSP/FSBL workspace generated from the exported XSA. |
-| `software/pcie_host_test/pcie_bar_test.c` | Linux BAR0 smoke test for use once a PCIe host slot is available. |
-| `docs/` | Board manuals, AD/DA module references, architecture notes, PCIe bring-up hand-off docs, and `ROADMAP.md`. |
+| `software/host/` | Linux host tools: `fra_cli` (sweeps over PCIe), `fra_bar_test`, VFIO setup scripts. See its `README.md`. |
+| `scripts/build_boot_image.sh` | Packs FSBL + bitstream + app into `BOOT.BIN`. |
+| `scripts/flash_qspi.sh` | Writes `BOOT.BIN` to QSPI over JTAG. |
+| `scripts/program_fpga_jtag.sh` | Volatile bitstream load over JTAG, for trying gateware before flashing. |
+| `docs/` | Board manuals, AD/DA module references, architecture notes, and the BAR0 register map. |
 
 ## Hardware Architecture
 
 ```mermaid
 flowchart LR
-    console["UART console\n(COM9 UART0 + UART1)"] <--> app["FRA_Controller CLI"]
-    app --> gp0["Zynq PS M_AXI_GP0"]
+    console["UART console\n(ttyUSB, CP2102N)"] <--> app["FRA_Controller CLI"]
+    app --> gp0["Zynq PS M_AXI_GP0\n50 MHz"]
 
-    gp0 --> axi["AXI SmartConnect"]
-    axi --> core["fra_core\nAXI4-Lite @ 0x43C0_0000"]
+    hostpc["Host PC\nsoftware/host/fra_cli"] --> ep["PCIe x1 Gen1 endpoint\naxi_pcie, 62.5 MHz"]
+    ep --> psmc["pcie_smc\nclock crossing"]
+    psmc --> bar["pcie_bar_regs\nBAR0 + 0x0000"]
+    psmc --> axi
+
+    gp0 --> axi["axi_smc\n2 masters"]
+    axi --> core["fra_core\nPS 0x43C0_0000\nBAR0 + 0x1000"]
 
     core --> dds["DDS / sine LUT\n25 MHz sample enable"]
     dds --> dac["8-bit DAC bus + DAC clock"]
     adc["8-bit ADC bus + ADC clock"] --> core
+    dds -. "CONTROL.LOOPBACK_EN" .-> core
 
     core --> lockin["I/Q lock-in accumulation\nsettle cycles + measure cycles"]
-
-    pcie["PCIe x1 Gen1 endpoint\naxi_pcie (separate clock domain)"] --> bar["pcie_bar_regs\nAXI4-Lite behind BAR0"]
 ```
 
 `fra_core` runs from the 50 MHz PS `FCLK_CLK0` clock and uses a 25 MHz
@@ -54,10 +71,16 @@ ADC/DAC clocks are generated from a register for the external converters, but
 they are not used as internal fabric clocks. The DAC clock is inverted relative
 to the ADC clock so `dac_out` is stable before the AD9708 positive latch edge.
 
-The PCIe endpoint is additive and lives in its own `axi_pcie/axi_aclk_out`
-clock domain — it does not connect to or alter the `fra_core` signal chain
-above. It cannot be exercised on the bench (no host slot/refclk); see
-`docs/PCIE_BRINGUP_HANDOVER.md` and `docs/ROADMAP.md`.
+The PCIe endpoint runs in its own `axi_pcie/axi_aclk_out` domain (62.5 MHz).
+`pcie_smc` does the crossing into the PS fabric clock, so BAR0 reaches both
+`pcie_bar_regs` (which stays in the PCIe domain, and therefore answers even
+when the PS is in reset) and `fra_core` (which does not — it needs `FCLK_CLK0`
+running). Both the PS and the host arbitrate onto `fra_core` through `axi_smc`;
+drive the core from one side at a time. See `docs/PCIE_BAR0_REGISTER_MAP.md`.
+
+With `CONTROL.LOOPBACK_EN` set, `fra_core` substitutes the DAC word for the ADC
+pins internally. That closes the measurement loop in gateware, which is how the
+system is exercised end to end while the AN108 AD/DA module is unfitted.
 
 The measurement core:
 
@@ -71,12 +94,14 @@ The measurement core:
 
 ## AXI Register Map
 
-The Vivado rebuild script assigns `fra_core` to `0x43C0_0000`.
+`fra_core` is mapped at `0x43C0_0000` in the PS address space and at
+`BAR0 + 0x1000` in the PCIe master's space. The registers below are the same
+block seen from either side.
 
 | Offset | Name | Access | Description |
 | ---: | --- | --- | --- |
-| `0x00` | `VERSION` | RO | Core version, currently `0x00010000`. |
-| `0x04` | `CONTROL` | RW/W1P | Bit 0 `DDS_ENABLE`, bit 1 `START`, bit 2 `CLEAR_DONE`, bit 3 `RESET_PHASE_ON_START`. |
+| `0x00` | `VERSION` | RO | Core version, currently `0x00010100` (1.1.0). |
+| `0x04` | `CONTROL` | RW/W1P | Bit 0 `DDS_ENABLE`, bit 1 `START`, bit 2 `CLEAR_DONE`, bit 3 `RESET_PHASE_ON_START`, bit 4 `LOOPBACK_EN`. |
 | `0x08` | `STATUS` | RO | Bit 0 `BUSY`, bit 1 `DONE`, bit 2 `OVERFLOW`, bit 3 `ADC_CLIP`, bit 4 `LOW_SIGNAL`, bit 5 `CONFIG_ERR`. |
 | `0x0C` | `PHASE_INC` | RW | DDS phase increment. |
 | `0x10` | `PHASE_OFFSET` | RW | DDS phase offset. |
@@ -109,11 +134,14 @@ set measure <cycles>
 single <hz>
 cal
 sweep
+loopback <on|off>
 ```
 
 Defaults are 10 Hz to 20 kHz, 20 log-spaced points, amplitude 128, 2 settle
-cycles, and 4 measure cycles. `cal` stores a RAM-only loopback baseline for the
-active sweep setup. `sweep` prints CSV rows:
+cycles, and 4 measure cycles. `cal` stores a RAM-only baseline for the active
+sweep setup; `loopback on` switches to the internal gateware loopback and
+clears that baseline, since the measured path just changed. `sweep` prints CSV
+rows:
 
 ```text
 idx,freq_hz,mag_counts,phase_deg,norm_db,norm_phase_deg,i_acc,q_acc,samples,adc_min,adc_max,status
@@ -127,18 +155,43 @@ default 10 Hz to 20 kHz sweep range.
 
 ## Build
 
-1. Open or run Vivado 2025.1 from the repo root.
-2. Rebuild the block design PL side:
+The project was created with Vivado 2025.1 and builds under 2026.1; the BD
+script upgrades the locked IP in place on first run. Vitis 2026.1 removed
+`xsct`, so the firmware and boot-image steps are plain shell/Make rather than
+the old IDE flow.
 
-   ```bash
-   vivado -mode batch -source hardware/fra_zynq7015_pcie/scripts/rebuild_functional_fra_bd.tcl
-   ```
+```bash
+# 1. Gateware: BD wiring (PCIe endpoint + BAR0 -> fra_core), then signoff build.
+vivado -mode batch -source hardware/fra_zynq7015_pcie/scripts/add_pcie_endpoint.tcl
+vivado -mode batch -source hardware/fra_zynq7015_pcie/scripts/run_pcie_impl_signoff.tcl
 
-3. In Vivado, run synthesis, implementation, timing, DRC, methodology, and
-   bitstream generation for `hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.xpr`.
-4. Export the hardware platform with the bitstream to a new XSA.
-5. Regenerate the Vitis platform/BSP from that XSA, then build
-   `software/FRA_Controller`.
+# 2. Firmware ELF (uses the checked-in standalone BSP).
+make -C software/FRA_Controller
+
+# 3. Boot image, then QSPI.
+scripts/build_boot_image.sh
+scripts/flash_qspi.sh
+
+# 4. Host tools.
+make -C software/host
+sudo software/host/scripts/fra-pcie-setup.sh   # one-time
+```
+
+`run_pcie_impl_signoff.tcl` only writes the BIT and XSA on a clean pass: zero
+setup/hold violations, ADC/DAC/PCIe reference clocks constrained, and no DRC or
+methodology Errors or Critical Warnings.
+
+To try gateware without committing it to flash, `scripts/program_fpga_jtag.sh`
+loads a bitstream over JTAG — but note it drops the live PCIe link, so follow it
+with `sudo software/host/scripts/fra-pcie-rescan.sh`.
+
+### Boot ordering matters
+
+The board's boot mode strap is QSPI (`SLCR.BOOT_MODE` @ `0xF800025C` reads
+`0x1`). That is required, not incidental: the FPGA must be configured — and the
+PCIe endpoint linked — before the host POSTs and enumerates the bus. After
+reflashing QSPI, do a **full power-off and power-on**, not a warm reboot, so the
+board actually reconfigures from flash.
 
 Generated Vivado/Vitis runs, bitstreams, XSAs, ELFs, logs, and caches should be
 treated as build or release artifacts, not source. The root `.gitignore` is set
@@ -150,16 +203,19 @@ an empty directory.
 
 ## Validation
 
-Minimum final validation for this revision:
+| # | Check | Status |
+| --- | --- | --- |
+| 1 | RTL testbench `tb_fra_core` (now also covers `LOOPBACK_EN`) | **Pass** |
+| 2 | Timing met, ADC/DAC/PCIe clocks constrained, no critical DRC/methodology | **Pass** — WNS +2.016 ns, WHS +0.060 ns |
+| 3 | Scope DAC output plus ADC/DAC clocks at 10 Hz, 1 kHz, 20 kHz | Done in an earlier revision |
+| 4 | Wire DAC to ADC, `cal` then `sweep`, normalise to ~0 dB / ~0° | **Pass** — `docs/loopback_accuracy_report.md`: residuals ~0.002 dB / ~0.01° |
+| 5 | PCIe link training and host enumeration | **Pass** — 2.5 GT/s x1, `10ee:7021`, 8 KB BAR0 |
+| 6 | Host BAR0 read/write, including per-byte `WSTRB` | **Pass** — `software/host/fra_bar_test` |
+| 7 | Host-driven sweep over PCIe via the gateware loopback | **Pass** — `fra_cli selftest` |
+| 8 | Measure an RC low-pass, within +/-2 dB and +/-15° | **Open** — needs the AN108 module fitted |
 
-1. Run the RTL testbench `tb_fra_core`.
-2. Confirm Vivado timing is met and methodology has no critical warnings from
-   unconstrained FRA clocks.
-3. Scope DAC output plus ADC/DAC clocks at 10 Hz, 1 kHz, and 20 kHz.
-4. Wire DAC output to ADC input, run `cal`, then `sweep`; valid loopback points
-   should normalize close to 0 dB and 0 degrees without ADC clipping.
-   **Done** — `docs/loopback_accuracy_report.md` reports a `sweep → cal → sweep`
-   run with post-calibration residuals of ~0.002 dB / ~0.01°, well inside spec.
-5. Measure a simple RC low-pass and compare against the expected response. The
-   acceptance target is within +/-2 dB and +/-15 degrees for valid, unclipped
-   points. **Still open** — see `docs/ROADMAP.md`.
+Check 8 is the only remaining gap, and it is a hardware-availability gap rather
+than a software one: the AD/DA module is not currently connected, so nothing
+downstream of `dac_out` or upstream of `adc_in` can be exercised. Everything
+either side of that boundary — DDS, sampling, I/Q accumulation, both register
+interfaces, the PCIe path and the host tooling — is covered by checks 1-7.

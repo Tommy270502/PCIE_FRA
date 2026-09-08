@@ -25,8 +25,18 @@ file mkdir $report_dir
 open_project $project_file
 update_compile_order -fileset sources_1
 
-# Synthesis: reuse if current, else (re)run.
-if {[get_property STATUS [get_runs synth_1]] ne "synth_design Complete!" || \
+# Incremental synthesis needs a licence above BASIC, and the reference the
+# project carries (fra_top.dcp) is from a superseded top level anyway. Clearing
+# both the automatic and the explicit checkpoint keeps the plain flow.
+foreach run {synth_1 impl_1} {
+    catch { set_property AUTO_INCREMENTAL_CHECKPOINT 0 [get_runs $run] }
+    catch { set_property INCREMENTAL_CHECKPOINT "" [get_runs $run] }
+}
+
+# Synthesis: reuse only if it is both complete AND up to date with the sources.
+# NEEDS_REFRESH is what catches an edited BD or VHDL file.
+if {[get_property NEEDS_REFRESH [get_runs synth_1]] || \
+    [get_property STATUS [get_runs synth_1]] ne "synth_design Complete!" || \
     [get_property PROGRESS [get_runs synth_1]] ne "100%"} {
     reset_run synth_1
     launch_runs synth_1 -jobs 8
@@ -36,6 +46,10 @@ if {[get_property STATUS [get_runs synth_1]] ne "synth_design Complete!" || \
     }
 }
 
+if {[get_property NEEDS_REFRESH [get_runs impl_1]] || \
+    [get_property PROGRESS [get_runs impl_1]] ne "100%"} {
+    reset_run impl_1
+}
 launch_runs impl_1 -to_step write_bitstream -jobs 8
 wait_on_run impl_1
 if {[get_property STATUS [get_runs impl_1]] ne "write_bitstream Complete!"} {

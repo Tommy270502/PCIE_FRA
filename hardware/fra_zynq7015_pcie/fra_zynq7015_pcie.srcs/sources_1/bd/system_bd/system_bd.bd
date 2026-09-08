@@ -7,7 +7,7 @@
       "name": "system_bd",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2025.1",
+      "tool_version": "2026.1",
       "validated": "true"
     },
     "design_tree": {
@@ -241,9 +241,9 @@
     "components": {
       "processing_system7_0": {
         "vlnv": "xilinx.com:ip:processing_system7:5.5",
-        "ip_revision": "7",
+        "ip_revision": "9",
         "xci_name": "system_bd_processing_system7_0_0",
-        "xci_path": "ip\\system_bd_processing_system7_0_0\\system_bd_processing_system7_0_0.xci",
+        "xci_path": "ip/system_bd_processing_system7_0_0/system_bd_processing_system7_0_0.xci",
         "inst_hier_path": "processing_system7_0",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -629,7 +629,7 @@
         "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
         "ip_revision": "17",
         "xci_name": "system_bd_proc_sys_reset_0_0",
-        "xci_path": "ip\\system_bd_proc_sys_reset_0_0\\system_bd_proc_sys_reset_0_0.xci",
+        "xci_path": "ip/system_bd_proc_sys_reset_0_0/system_bd_proc_sys_reset_0_0.xci",
         "inst_hier_path": "proc_sys_reset_0",
         "has_run_ip_tcl": "true"
       },
@@ -637,7 +637,7 @@
         "vlnv": "xilinx.com:module_ref:fra_core:1.0",
         "ip_revision": "1",
         "xci_name": "system_bd_fra_core_0_5",
-        "xci_path": "ip\\system_bd_fra_core_0_5\\system_bd_fra_core_0_5.xci",
+        "xci_path": "ip/system_bd_fra_core_0_5/system_bd_fra_core_0_5.xci",
         "inst_hier_path": "fra_core_0",
         "has_run_ip_tcl": "true",
         "reference_info": {
@@ -920,9 +920,9 @@
       },
       "axi_smc": {
         "vlnv": "xilinx.com:ip:smartconnect:1.0",
-        "ip_revision": "27",
+        "ip_revision": "29",
         "xci_name": "system_bd_axi_smc_6",
-        "xci_path": "ip\\system_bd_axi_smc_6\\system_bd_axi_smc_6.xci",
+        "xci_path": "ip/system_bd_axi_smc_6/system_bd_axi_smc_6.xci",
         "inst_hier_path": "axi_smc",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -930,7 +930,7 @@
             "value": "1"
           },
           "NUM_SI": {
-            "value": "1"
+            "value": "2"
           }
         },
         "interface_ports": {
@@ -944,6 +944,32 @@
               },
               "NUM_WRITE_OUTSTANDING": {
                 "value": "8"
+              }
+            },
+            "bridges": [
+              "M00_AXI"
+            ],
+            "bd_attributes": {
+              "BRIDGES": {
+                "value": "M00_AXI",
+                "value_src": "auto"
+              },
+              "TYPE": {
+                "value": "interior",
+                "value_src": "default"
+              }
+            }
+          },
+          "S01_AXI": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "NUM_READ_OUTSTANDING": {
+                "value": "4"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "4"
               }
             },
             "bridges": [
@@ -995,9 +1021,9 @@
       },
       "axi_pcie_0": {
         "vlnv": "xilinx.com:ip:axi_pcie:2.9",
-        "ip_revision": "14",
-        "xci_name": "system_bd_axi_pcie_0_0",
-        "xci_path": "ip\\system_bd_axi_pcie_0_0\\system_bd_axi_pcie_0_0.xci",
+        "ip_revision": "16",
+        "xci_name": "system_bd_axi_pcie_0_1",
+        "xci_path": "ip/system_bd_axi_pcie_0_1/system_bd_axi_pcie_0_1.xci",
         "inst_hier_path": "axi_pcie_0",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -1107,8 +1133,8 @@
       "pcie_bar_regs_0": {
         "vlnv": "xilinx.com:module_ref:pcie_bar_regs:1.0",
         "ip_revision": "1",
-        "xci_name": "system_bd_pcie_bar_regs_0_0",
-        "xci_path": "ip\\system_bd_pcie_bar_regs_0_0\\system_bd_pcie_bar_regs_0_0.xci",
+        "xci_name": "system_bd_pcie_bar_regs_0_1",
+        "xci_path": "ip/system_bd_pcie_bar_regs_0_1/system_bd_pcie_bar_regs_0_1.xci",
         "inst_hier_path": "pcie_bar_regs_0",
         "has_run_ip_tcl": "true",
         "reference_info": {
@@ -1219,7 +1245,7 @@
                 "value_src": "auto"
               },
               "CLK_DOMAIN": {
-                "value": "system_bd_axi_pcie_0_0_axi_aclk_out",
+                "value": "system_bd_axi_pcie_0_1_axi_aclk_out",
                 "value_src": "default_prop"
               },
               "NUM_READ_THREADS": {
@@ -1356,7 +1382,7 @@
                 "value_src": "user_prop"
               },
               "CLK_DOMAIN": {
-                "value": "system_bd_axi_pcie_0_0_axi_aclk_out",
+                "value": "system_bd_axi_pcie_0_1_axi_aclk_out",
                 "value_src": "default_prop"
               }
             }
@@ -1375,14 +1401,17 @@
       },
       "pcie_smc": {
         "vlnv": "xilinx.com:ip:smartconnect:1.0",
-        "ip_revision": "27",
-        "xci_name": "system_bd_pcie_smc_0",
-        "xci_path": "ip\\system_bd_pcie_smc_0\\system_bd_pcie_smc_0.xci",
+        "ip_revision": "29",
+        "xci_name": "system_bd_pcie_smc_1",
+        "xci_path": "ip/system_bd_pcie_smc_1/system_bd_pcie_smc_1.xci",
         "inst_hier_path": "pcie_smc",
         "has_run_ip_tcl": "true",
         "parameters": {
+          "NUM_CLKS": {
+            "value": "2"
+          },
           "NUM_MI": {
-            "value": "1"
+            "value": "2"
           },
           "NUM_SI": {
             "value": "1"
@@ -1402,11 +1431,12 @@
               }
             },
             "bridges": [
-              "M00_AXI"
+              "M00_AXI",
+              "M01_AXI"
             ],
             "bd_attributes": {
               "BRIDGES": {
-                "value": "M00_AXI",
+                "value": "M00_AXI:M01_AXI",
                 "value_src": "auto"
               },
               "TYPE": {
@@ -1445,22 +1475,59 @@
                 "value_src": "default"
               }
             }
+          },
+          "M01_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "MAX_BURST_LENGTH": {
+                "value": "256"
+              },
+              "NUM_READ_OUTSTANDING": {
+                "value": "4"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "4"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0"
+              },
+              "SUPPORTS_NARROW_BURST": {
+                "value": "0"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0"
+              }
+            },
+            "bd_attributes": {
+              "TYPE": {
+                "value": "interior",
+                "value_src": "default"
+              }
+            }
           }
         }
       },
       "proc_sys_reset_pcie": {
         "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
         "ip_revision": "17",
-        "xci_name": "system_bd_proc_sys_reset_pcie_0",
-        "xci_path": "ip\\system_bd_proc_sys_reset_pcie_0\\system_bd_proc_sys_reset_pcie_0.xci",
+        "xci_name": "system_bd_proc_sys_reset_pcie_1",
+        "xci_path": "ip/system_bd_proc_sys_reset_pcie_1/system_bd_proc_sys_reset_pcie_1.xci",
         "inst_hier_path": "proc_sys_reset_pcie",
         "has_run_ip_tcl": "true"
       },
       "pcie_refclk_buf": {
         "vlnv": "xilinx.com:ip:util_ds_buf:2.2",
-        "ip_revision": "8",
-        "xci_name": "system_bd_pcie_refclk_buf_0",
-        "xci_path": "ip\\system_bd_pcie_refclk_buf_0\\system_bd_pcie_refclk_buf_0.xci",
+        "ip_revision": "10",
+        "xci_name": "system_bd_pcie_refclk_buf_1",
+        "xci_path": "ip/system_bd_pcie_refclk_buf_1/system_bd_pcie_refclk_buf_1.xci",
         "inst_hier_path": "pcie_refclk_buf",
         "has_run_ip_tcl": "true",
         "parameters": {
@@ -1474,7 +1541,7 @@
       }
     },
     "interface_nets": {
-      "axi_pcie_0_M_AXI": {
+      "axi_pcie_0_M_AXI1": {
         "interface_ports": [
           "axi_pcie_0/M_AXI",
           "pcie_smc/S00_AXI"
@@ -1490,6 +1557,12 @@
         "interface_ports": [
           "pcie_smc/M00_AXI",
           "pcie_bar_regs_0/S_AXI"
+        ]
+      },
+      "pcie_smc_M01_AXI": {
+        "interface_ports": [
+          "pcie_smc/M01_AXI",
+          "axi_smc/S01_AXI"
         ]
       },
       "processing_system7_0_DDR": {
@@ -1518,7 +1591,7 @@
           "fra_core_0/adc_in"
         ]
       },
-      "axi_pcie_0_axi_aclk_out": {
+      "axi_pcie_0_axi_aclk_out1": {
         "ports": [
           "axi_pcie_0/axi_aclk_out",
           "proc_sys_reset_pcie/slowest_sync_clk",
@@ -1526,19 +1599,19 @@
           "pcie_bar_regs_0/S_AXI_ACLK"
         ]
       },
-      "axi_pcie_0_mmcm_lock": {
+      "axi_pcie_0_mmcm_lock1": {
         "ports": [
           "axi_pcie_0/mmcm_lock",
           "proc_sys_reset_pcie/dcm_locked"
         ]
       },
-      "axi_pcie_0_pci_exp_txn": {
+      "axi_pcie_0_pci_exp_txn1": {
         "ports": [
           "axi_pcie_0/pci_exp_txn",
           "pcie_txn"
         ]
       },
-      "axi_pcie_0_pci_exp_txp": {
+      "axi_pcie_0_pci_exp_txp1": {
         "ports": [
           "axi_pcie_0/pci_exp_txp",
           "pcie_txp"
@@ -1562,38 +1635,38 @@
           "dac_out_0"
         ]
       },
-      "pcie_perst_n_1": {
+      "pcie_perst_n_2": {
         "ports": [
           "pcie_perst_n",
           "axi_pcie_0/axi_aresetn",
           "proc_sys_reset_pcie/ext_reset_in"
         ]
       },
-      "pcie_refclk_buf_IBUF_OUT": {
+      "pcie_refclk_buf_IBUF_OUT1": {
         "ports": [
           "pcie_refclk_buf/IBUF_OUT",
           "axi_pcie_0/REFCLK"
         ]
       },
-      "pcie_refclk_n_1": {
+      "pcie_refclk_n_2": {
         "ports": [
           "pcie_refclk_n",
           "pcie_refclk_buf/IBUF_DS_N"
         ]
       },
-      "pcie_refclk_p_1": {
+      "pcie_refclk_p_2": {
         "ports": [
           "pcie_refclk_p",
           "pcie_refclk_buf/IBUF_DS_P"
         ]
       },
-      "pcie_rxn_1": {
+      "pcie_rxn_2": {
         "ports": [
           "pcie_rxn",
           "axi_pcie_0/pci_exp_rxn"
         ]
       },
-      "pcie_rxp_1": {
+      "pcie_rxp_2": {
         "ports": [
           "pcie_rxp",
           "axi_pcie_0/pci_exp_rxp"
@@ -1602,11 +1675,11 @@
       "proc_sys_reset_0_peripheral_aresetn": {
         "ports": [
           "proc_sys_reset_0/peripheral_aresetn",
-          "axi_smc/aresetn",
-          "fra_core_0/s_axi_aresetn"
+          "fra_core_0/s_axi_aresetn",
+          "axi_smc/aresetn"
         ]
       },
-      "proc_sys_reset_pcie_peripheral_aresetn": {
+      "proc_sys_reset_pcie_peripheral_aresetn1": {
         "ports": [
           "proc_sys_reset_pcie/peripheral_aresetn",
           "pcie_smc/aresetn",
@@ -1617,9 +1690,10 @@
         "ports": [
           "processing_system7_0/FCLK_CLK0",
           "proc_sys_reset_0/slowest_sync_clk",
-          "processing_system7_0/M_AXI_GP0_ACLK",
+          "fra_core_0/s_axi_aclk",
           "axi_smc/aclk",
-          "fra_core_0/s_axi_aclk"
+          "processing_system7_0/M_AXI_GP0_ACLK",
+          "pcie_smc/aclk1"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -1647,6 +1721,11 @@
         "address_spaces": {
           "M_AXI": {
             "segments": {
+              "SEG_fra_core_0_reg0": {
+                "address_block": "/fra_core_0/s_axi/reg0",
+                "offset": "0x00001000",
+                "range": "4K"
+              },
               "SEG_pcie_bar_regs_0_reg0": {
                 "address_block": "/pcie_bar_regs_0/S_AXI/reg0",
                 "offset": "0x00000000",

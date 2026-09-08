@@ -74,7 +74,7 @@ end fra_core;
 
 architecture rtl of fra_core is
 
-    constant REG_VERSION        : integer := 16#00010000#;
+    constant REG_VERSION        : integer := 16#00010100#;
     constant REG_VERSION_ADDR   : unsigned(5 downto 0) := "000000";
     constant REG_CONTROL        : unsigned(5 downto 0) := "000001";
     constant REG_STATUS         : unsigned(5 downto 0) := "000010";
@@ -117,6 +117,9 @@ architecture rtl of fra_core is
 
     signal dds_enable           : std_logic := '0';
     signal reset_phase_on_start : std_logic := '1';
+    -- CONTROL bit 4: substitute the DAC word for the ADC pins, so the whole
+    -- DDS -> sample -> I/Q chain can be exercised with no AD/DA module fitted.
+    signal loopback_en          : std_logic := '0';
     signal phase_inc_reg        : unsigned(31 downto 0) := (others => '0');
     signal phase_offset_reg     : unsigned(31 downto 0) := (others => '0');
     signal amplitude_reg        : unsigned(7 downto 0)  := x"80";
@@ -269,6 +272,7 @@ begin
                 dac_out_i            <= x"80";
                 dds_enable           <= '0';
                 reset_phase_on_start <= '1';
+                loopback_en          <= '0';
                 phase_inc_reg        <= (others => '0');
                 phase_offset_reg     <= (others => '0');
                 amplitude_reg        <= x"80";
@@ -327,6 +331,7 @@ begin
                                 if v_wstrb(0) = '1' then
                                     dds_enable           <= v_wdata(0);
                                     reset_phase_on_start <= v_wdata(3);
+                                    loopback_en          <= v_wdata(4);
 
                                     if v_wdata(2) = '1' then
                                         done_i       <= '0';
@@ -392,6 +397,7 @@ begin
                         when REG_CONTROL =>
                             read_data(0) := dds_enable;
                             read_data(3) := reset_phase_on_start;
+                            read_data(4) := loopback_en;
                         when REG_STATUS =>
                             read_data(0) := busy_i;
                             read_data(1) := done_i;
@@ -437,7 +443,15 @@ begin
                 clk_div <= not clk_div;
 
                 if clk_div = '1' then
-                    adc_sample_i <= unsigned(adc_in);
+                    -- dac_out_i is written on the sample tick and held stable
+                    -- across this capture edge, so loopback presents the DAC
+                    -- word from the previous tick: one sample of delay, i.e.
+                    -- -360*f/25e6 degrees of phase.
+                    if loopback_en = '1' then
+                        adc_sample_i <= unsigned(dac_out_i);
+                    else
+                        adc_sample_i <= unsigned(adc_in);
+                    end if;
                 end if;
 
                 if sample_tick then
