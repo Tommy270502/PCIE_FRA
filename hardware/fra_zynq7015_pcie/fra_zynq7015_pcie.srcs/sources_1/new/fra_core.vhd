@@ -252,6 +252,11 @@ begin
         variable phase_offset_value   : std_logic_vector(31 downto 0);
         variable settle_cycles_value  : std_logic_vector(31 downto 0);
         variable measure_cycles_value : std_logic_vector(31 downto 0);
+        -- VHDL-93 requires a case expression to have a locally static
+        -- subtype, which a function call does not. Landing addr_word() in a
+        -- variable first keeps the two case statements below portable;
+        -- Vivado accepts the direct form, stricter analysers do not.
+        variable v_reg_sel            : unsigned(5 downto 0);
         variable amplitude_value      : std_logic_vector(31 downto 0);
 
         -- A measurement start is requested by writing CONTROL.START, which can
@@ -367,7 +372,8 @@ begin
                     end if;
 
                     if (v_aw_seen = '1') and (v_w_seen = '1') then
-                        case addr_word(v_awaddr) is
+                        v_reg_sel := addr_word(v_awaddr);
+                        case v_reg_sel is
                             when REG_CONTROL =>
                                 if v_wstrb(0) = '1' then
                                     dds_enable           <= v_wdata(0);
@@ -431,8 +437,9 @@ begin
                     end if;
                 elsif s_axi_arvalid = '1' then
                     read_data := (others => '0');
+                    v_reg_sel := addr_word(s_axi_araddr);
 
-                    case addr_word(s_axi_araddr) is
+                    case v_reg_sel is
                         when REG_VERSION_ADDR =>
                             read_data := std_logic_vector(to_unsigned(REG_VERSION, 32));
                         when REG_CONTROL =>

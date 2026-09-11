@@ -83,7 +83,6 @@ tb_sources() {
 # The Vivado project flow sets file_type {VHDL 2008} on it for the same reason;
 # without this the analyser resolves to_hstring to the std.textio bit_vector
 # overload and the testbench does not compile.
-# shellcheck disable=SC2329  # reached only from the simulate_* dispatch
 tb_needs_2008() {
     case $1 in
         pcie_bar_regs) return 0 ;;
@@ -100,14 +99,12 @@ tb_success_marker() {
 
 # 20 ms of simulated time covers the slowest stimulus in tb_fra_core; the
 # bar_regs testbench finishes in microseconds and stops itself.
-# shellcheck disable=SC2329  # reached only from the simulate_* dispatch
 tb_runtime_xsim() {
     case $1 in
         fra_core)      echo "20 ms" ;;
         pcie_bar_regs) echo "20 us" ;;
     esac
 }
-# shellcheck disable=SC2329  # reached only from the simulate_* dispatch
 tb_runtime_ghdl() {
     case $1 in
         fra_core)      echo "20ms" ;;
@@ -117,9 +114,6 @@ tb_runtime_ghdl() {
 
 # --- backends -------------------------------------------------------------
 
-# Dispatched by name as "simulate_$BACKEND"; shellcheck cannot see that,
-# and flags this and everything only reachable from it as unused.
-# shellcheck disable=SC2329
 simulate_xsim() {
     tb=$1; sources=$2; std=
     tb_needs_2008 "$tb" && std=-2008
@@ -130,9 +124,6 @@ simulate_xsim() {
     xsim tb_run -t run.tcl
 }
 
-# Dispatched by name as "simulate_$BACKEND"; shellcheck cannot see that,
-# and flags this and everything only reachable from it as unused.
-# shellcheck disable=SC2329
 simulate_ghdl() {
     tb=$1; sources=$2; std=--std=93
     tb_needs_2008 "$tb" && std=--std=08
@@ -146,6 +137,13 @@ simulate_ghdl() {
     # shellcheck disable=SC2086
     ghdl -r $std --workdir=. "tb_$tb" \
          --stop-time="$(tb_runtime_ghdl "$tb")" --assert-level=failure
+}
+
+run_backend() {
+    case $BACKEND in
+        xsim) simulate_xsim "$1" "$2" ;;
+        ghdl) simulate_ghdl "$1" "$2" ;;
+    esac
 }
 
 # --- driver ---------------------------------------------------------------
@@ -164,7 +162,7 @@ run_one() {
     rc=0
 
     echo "== $tb ($BACKEND) =="
-    ( cd "$work" && "simulate_$BACKEND" "$tb" "$sources" ) > "$log" 2>&1 || rc=$?
+    ( cd "$work" && run_backend "$tb" "$sources" ) > "$log" 2>&1 || rc=$?
 
     if [ "$rc" -ne 0 ]; then
         echo "  FAIL  simulator exited $rc"
