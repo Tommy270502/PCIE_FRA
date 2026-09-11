@@ -253,6 +253,47 @@ begin
         variable settle_cycles_value  : std_logic_vector(31 downto 0);
         variable measure_cycles_value : std_logic_vector(31 downto 0);
         variable amplitude_value      : std_logic_vector(31 downto 0);
+
+        -- A measurement start is requested by writing CONTROL.START, which can
+        -- land on either phase of clk_div. Both arms of the sample_tick test
+        -- below therefore have to honour it, and did so with two identical
+        -- copies of this block.
+        procedure start_measurement is
+        begin
+            if (phase_inc_reg = U32_ZERO) or (measure_cycles_reg = U32_ZERO) then
+                busy_i       <= '0';
+                done_i       <= '1';
+                config_err_i <= '1';
+                priming_i    <= '0';
+                settling_i   <= '0';
+            else
+                busy_i              <= '1';
+                done_i              <= '0';
+                overflow_i          <= '0';
+                adc_clip_i          <= '0';
+                low_signal_i        <= '0';
+                config_err_i        <= '0';
+                priming_i           <= '1';
+                settle_cycle_count  <= (others => '0');
+                measure_cycle_count <= (others => '0');
+                sample_count_i      <= (others => '0');
+                i_acc_i             <= (others => '0');
+                q_acc_i             <= (others => '0');
+                adc_min_i           <= x"FF";
+                adc_max_i           <= x"00";
+
+                if settle_cycles_reg = U32_ZERO then
+                    settling_i <= '0';
+                else
+                    settling_i <= '1';
+                end if;
+
+                if reset_phase_on_start = '1' then
+                    phase_acc <= (others => '0');
+                end if;
+            end if;
+        end procedure;
+
     begin
         if rising_edge(s_axi_aclk) then
             if s_axi_aresetn = '0' then
@@ -468,38 +509,7 @@ begin
                     last_sample_i <= adc_sample_i;
 
                     if v_start = '1' then
-                        if (phase_inc_reg = U32_ZERO) or (measure_cycles_reg = U32_ZERO) then
-                            busy_i       <= '0';
-                            done_i       <= '1';
-                            config_err_i <= '1';
-                            priming_i    <= '0';
-                            settling_i   <= '0';
-                        else
-                            busy_i              <= '1';
-                            done_i              <= '0';
-                            overflow_i          <= '0';
-                            adc_clip_i          <= '0';
-                            low_signal_i        <= '0';
-                            config_err_i        <= '0';
-                            priming_i           <= '1';
-                            settle_cycle_count  <= (others => '0');
-                            measure_cycle_count <= (others => '0');
-                            sample_count_i      <= (others => '0');
-                            i_acc_i             <= (others => '0');
-                            q_acc_i             <= (others => '0');
-                            adc_min_i           <= x"FF";
-                            adc_max_i           <= x"00";
-
-                            if settle_cycles_reg = U32_ZERO then
-                                settling_i <= '0';
-                            else
-                                settling_i <= '1';
-                            end if;
-
-                            if reset_phase_on_start = '1' then
-                                phase_acc <= (others => '0');
-                            end if;
-                        end if;
+                        start_measurement;
                     elsif busy_i = '1' then
                         if priming_i = '1' then
                             priming_i <= '0';
@@ -562,38 +572,7 @@ begin
                         end if;
                     end if;
                 elsif v_start = '1' then
-                    if (phase_inc_reg = U32_ZERO) or (measure_cycles_reg = U32_ZERO) then
-                        busy_i       <= '0';
-                        done_i       <= '1';
-                        config_err_i <= '1';
-                        priming_i    <= '0';
-                        settling_i   <= '0';
-                    else
-                        busy_i              <= '1';
-                        done_i              <= '0';
-                        overflow_i          <= '0';
-                        adc_clip_i          <= '0';
-                        low_signal_i        <= '0';
-                        config_err_i        <= '0';
-                        priming_i           <= '1';
-                        settle_cycle_count  <= (others => '0');
-                        measure_cycle_count <= (others => '0');
-                        sample_count_i      <= (others => '0');
-                        i_acc_i             <= (others => '0');
-                        q_acc_i             <= (others => '0');
-                        adc_min_i           <= x"FF";
-                        adc_max_i           <= x"00";
-
-                        if settle_cycles_reg = U32_ZERO then
-                            settling_i <= '0';
-                        else
-                            settling_i <= '1';
-                        end if;
-
-                        if reset_phase_on_start = '1' then
-                            phase_acc <= (others => '0');
-                        end if;
-                    end if;
+                    start_measurement;
                 end if;
             end if;
         end if;
