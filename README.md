@@ -56,33 +56,17 @@ Working and validated on hardware:
   fitted, so the whole digital chain is self-testable.
 - QSPI is flashed and verified with the current bitstream + firmware.
 
-**Next step: a full power-off and power-on** (the board is slot-powered, so a
-warm reboot will not do it), then:
+- **QSPI boot confirmed.** After a cold power cycle the board configures the
+  FPGA from flash before the host POSTs — the endpoint enumerates at 2.5 GT/s
+  x1 — and the FSBL then starts the application, which answers on the console
+  reporting core version `0x00010100`.
 
-```bash
-scripts/verify_system.sh
-```
+Run `scripts/verify_system.sh` for a pass/fail check of the whole chain.
 
-Two things depend on that power cycle:
-
-1. **The flashed image has not yet been seen booting.** The QSPI write verified
-   byte-for-byte, and the bitstream, application and FSBL were each exercised
-   individually before flashing, but the BootROM → FSBL → bitstream →
-   application sequence has not run for real.
-2. **The PS is currently wedged**, from an attempt to validate the flash in
-   place with a soft reset. Reconfiguring the PL over JTAG still works, but the
-   PS debug bus reports `APB AP transaction error` and no reset available over
-   JTAG clears it. See "Recovering the board after flashing" in
-   `docs/pcie_host_validation.md` for what was tried.
-
-The power cycle resolves both at once, and was required to validate the flash
-regardless. If verification then fails, `scripts/program_fpga_jtag.sh --app`
-loads a known-good bitstream and firmware over JTAG without touching flash.
-
-After that, the only remaining item is check 9 in Validation: measuring a real
-RC low-pass, which needs the AN108 AD/DA module connected. Nothing in software
-or gateware blocks it — the gateware loopback exists so that everything else
-could be proven without it.
+The one remaining item is check 9 in Validation: measuring a real RC low-pass,
+which needs the AN108 AD/DA module connected. Nothing in software or gateware
+blocks it — the gateware loopback exists so that everything else could be
+proven without it.
 
 ## Repository Layout
 
@@ -104,6 +88,7 @@ could be proven without it.
 | `scripts/flash_qspi.sh` | Writes `BOOT.BIN` to QSPI over JTAG. |
 | `scripts/program_fpga_jtag.sh` | Volatile bitstream load over JTAG, for trying gateware before flashing. |
 | `scripts/verify_system.sh` | End-to-end pass/fail check of the whole system. |
+| `scripts/find_fra_uart.sh` | Resolve the board's console by USB VID:PID, since `ttyUSB` numbers move. |
 | `docs/PCIE_BAR0_REGISTER_MAP.md` | BAR0 window layout, address map and register tables. |
 | `docs/pcie_host_validation.md` | On-hardware PCIe + loopback validation results. |
 | `docs/` | Board manuals, AD/DA module references, architecture notes. |
@@ -278,15 +263,14 @@ an empty directory.
 | 5 | PCIe link training and host enumeration | **Pass** — 2.5 GT/s x1, `10ee:7021`, 8 KB BAR0 |
 | 6 | Host BAR0 read/write, including per-byte `WSTRB` | **Pass** — `software/host/fra_bar_test` |
 | 7 | Host-driven sweep over PCIe via the gateware loopback | **Pass** — `fra_cli selftest` |
-| 8 | Board boots the flashed image from QSPI | **Open** — needs a power cycle; run `scripts/verify_system.sh` |
+| 8 | Board boots the flashed image from QSPI | **Pass** — cold boot: endpoint enumerates at POST, firmware answers on the console |
 | 9 | Measure an RC low-pass, within +/-2 dB and +/-15° | **Open** — needs the AN108 module fitted |
 
 Checks 1-7 cover everything on either side of the analog boundary: DDS,
 sampling, I/Q accumulation, both register interfaces, the PCIe path and the host
 tooling.
 
-The two open checks are not software gaps. Check 8 needs a power-on reset, which
-is also what recovers the wedged PS — see "Current state" above. Check 9 needs
-the AD/DA module physically connected, so nothing downstream of `dac_out` or
-upstream of `adc_in` can be exercised until then; the gateware loopback exists
-so that the rest of the chain could be proven in its absence.
+Check 9 is the only one left, and it is not a software gap: it needs the AD/DA
+module physically connected, so nothing downstream of `dac_out` or upstream of
+`adc_in` can be exercised until then. The gateware loopback exists so that the
+rest of the chain could be proven in its absence.

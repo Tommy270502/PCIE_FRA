@@ -10,7 +10,9 @@ set -eu
 
 REPO=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 HOST=$REPO/software/host
-UART=${FRA_UART:-/dev/ttyUSB1}
+# ttyUSB numbering is assignment order, not identity -- plugging in another
+# board renumbers everything -- so resolve the console by USB VID:PID.
+UART=$("$REPO/scripts/find_fra_uart.sh" 2>/dev/null || echo "")
 BDF_GLOB=/sys/bus/pci/devices/*
 
 pass=0
@@ -63,8 +65,11 @@ fi
 rm -f /tmp/fra_selftest.$$
 
 echo "== 5. Board UART console =="
-if [ -c "$UART" ] && command -v python3 >/dev/null 2>&1 && \
+if [ -z "$UART" ]; then
+    bad "no CP210x console found (set FRA_UART=/dev/ttyUSBn to override)"
+elif [ -c "$UART" ] && command -v python3 >/dev/null 2>&1 && \
    python3 -c 'import serial' >/dev/null 2>&1; then
+    echo "  ....  console at $UART"
     out=$(python3 - "$UART" <<'PY' 2>/dev/null || true
 import serial, sys, time
 s = serial.Serial(sys.argv[1], 115200, timeout=0.5)
@@ -80,7 +85,7 @@ PY
         *) bad "no response on $UART -- board may not have booted from QSPI" ;;
     esac
 else
-    echo "  SKIP  $UART not available or pyserial missing"
+    echo "  SKIP  $UART not usable, or pyserial missing"
 fi
 
 echo

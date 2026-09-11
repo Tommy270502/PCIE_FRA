@@ -1,28 +1,19 @@
 # AX7015B PCIe FRA endpoint (Xilinx vendor 0x10ee, device 0x7021).
 #
-# Gives the host tools in software/host/ unprivileged access to BAR0, and makes
-# that survive a reboot.
-#
-#  1. Bind the endpoint to vfio-pci. This is the route that works when Secure
-#     Boot has put the kernel into lockdown, which blocks mmap() of
-#     /sys/bus/pci/.../resource0 for every process, root included. driver_override
-#     is runtime-only state, so it has to be re-applied on every enumeration --
-#     which is exactly what this rule does.
-#  2. Hand the VFIO character devices to the FRA_GROUP group.
-#  3. As a fallback where lockdown is off, enable memory decode and make
-#     resource0 group-accessible.
+# Permissions only. Driver binding is handled by modprobe.d/fra-pcie.conf
+# (vfio-pci ids=), not from here: binding a driver inside a udev RUN rule is
+# unreliable, because udev holds a lock on the device while RUN executes and the
+# bind generates further uevents.
 #
 # Install with: sudo software/host/scripts/fra-pcie-setup.sh
 
-# VFIO nodes readable by the group.
+# VFIO nodes readable by the group. The per-group node (/dev/vfio/<iommu group>)
+# is created when vfio-pci claims the device, so this must cover new nodes.
 SUBSYSTEM=="vfio", GROUP="plugdev", MODE="0660"
 KERNEL=="vfio", GROUP="plugdev", MODE="0666"
 
-# Bind the endpoint to vfio-pci as soon as the kernel enumerates it.
-ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10ee", ATTR{device}=="0x7021", \
-    RUN+="/bin/sh -c 'modprobe vfio-pci; test -L /sys/bus/pci/devices/$kernel/driver || { echo vfio-pci > /sys/bus/pci/devices/$kernel/driver_override; echo $kernel > /sys/bus/pci/drivers_probe; }'"
-
-# Memory decode plus sysfs-fallback permissions.
+# Memory decode on, plus sysfs-fallback permissions for hosts where kernel
+# lockdown is off and the plain resource0 mmap still works.
 ACTION=="add|change", SUBSYSTEM=="pci", ATTR{vendor}=="0x10ee", ATTR{device}=="0x7021", \
     ATTR{enable}="1", \
     RUN+="/bin/sh -c 'chgrp plugdev /sys/bus/pci/devices/$kernel/resource0 2>/dev/null; chmod 0660 /sys/bus/pci/devices/$kernel/resource0 2>/dev/null'"

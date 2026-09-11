@@ -154,18 +154,54 @@ stopped the AXI read never completes and the host sees a completion timeout.
 The board is slot-powered, so a full host shutdown (S5) is what power-cycles it.
 A warm reboot does not.
 
+## QSPI boot, confirmed
+
+After a cold power cycle (host shutdown to S5, which drops slot power):
+
+```
+== 1. PCIe enumeration ==
+  PASS  endpoint present at 0000:08:00.0
+  PASS  link 2.5 GT/s PCIe x1
+```
+
+The FPGA holds no configuration through a power cycle, so the endpoint being
+enumerable at host POST proves the BootROM read the QSPI strap, loaded the FSBL,
+and the FSBL configured the PL from the flashed bitstream — all before the host
+BIOS scanned the bus.
+
+The FSBL then loaded the application, which answers on the console:
+
+```
+fra> id
+PCIE_FRA functional FRA firmware, core version 0x00010100, base 0x43c00000
+fra> status
+base=0x43c00000 version=0x00010100 status=0x00000000
+config: start=10.000Hz stop=20000.000Hz points=20 amp=128 settle=2 measure=4 loopback=off
+```
+
+`loopback=off` in the config line is the tell that this is the new firmware, not
+a stale image: that field did not exist in the previous build.
+
+The wedged debug port described above cleared with the same power cycle, as
+expected for on-chip state needing a POR.
+
+### Serial port identity
+
+The console moved from `/dev/ttyUSB1` to `/dev/ttyUSB3` across this reboot,
+because another development board was plugged in and `ttyUSB` numbers are
+assignment order rather than identity. Resolve it by USB VID:PID:
+
+| Device | VID:PID | Role |
+| --- | --- | --- |
+| Silicon Labs CP2102N | `10c4:ea60` | AX7015B console |
+| Digilent FT232H | `0403:6014` | JTAG cable, not a console |
+| Terasic DE25-Nano | `09fb:6026` | unrelated board that was also attached |
+
+`scripts/find_fra_uart.sh` does this, and `scripts/verify_system.sh` uses it.
+
 ## Still open
 
-1. **Observing a clean QSPI boot** (`README.md` Validation check 8). The image was written and verified
-   byte-for-byte, and its three components were each exercised over JTAG before
-   flashing (bitstream: `DONE_status = 1` plus a working PCIe endpoint and
-   `fra_core`; application: the CLI responding on UART with the correct core
-   version; FSBL: unchanged, and its `ps7_init.c`/`.h` are byte-identical to the
-   XSA exported from this build). What has not been observed is the
-   BootROM -> FSBL -> bitstream -> application sequence running for real, which
-   needs a power-on reset.
-
-2. **The analog front end** (`README.md` Validation check 9). Measuring an RC low-pass against its expected
+1. **The analog front end** (`README.md` Validation check 9). Measuring an RC low-pass against its expected
    response, to the +/-2 dB and +/-15 degrees acceptance target, needs the AN108
    module connected. Nothing in the software or gateware blocks it — the
    loopback exists precisely so the rest of the chain could be proven without

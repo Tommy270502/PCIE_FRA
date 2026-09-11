@@ -54,6 +54,22 @@ access via   : vfio-pci
 The setup script needs the IOMMU enabled (it is, on this host: AMD-Vi). It is
 idempotent, and `--unbind` releases the device again.
 
+### How the binding survives a reboot
+
+`driver_override` is runtime-only state, and binding a driver from inside a udev
+`RUN` rule is unreliable — udev holds a lock on the device while `RUN` executes,
+and the bind generates further uevents. So persistence comes from the module's
+own parameter instead:
+
+| File | Purpose |
+| --- | --- |
+| `/etc/modprobe.d/fra-pcie.conf` | `options vfio-pci ids=10ee:7021` — claim the endpoint at module load |
+| `/etc/modules-load.d/fra-pcie.conf` | load `vfio-pci` at boot, after PCI enumeration |
+| `/etc/udev/rules.d/99-fra-pcie.rules` | group permissions on the VFIO nodes; no binding |
+
+`vfio-pci` only claims devices with no driver already bound, which is the case
+here — nothing else wants a Xilinx "memory controller".
+
 ## Commands
 
 ```
@@ -94,6 +110,22 @@ of 128.
 
 Loopback measures the gateware only. It says nothing about the analog front end;
 that still needs the module fitted and a real `cal` against a wire loopback.
+
+## Finding the board's serial console
+
+`ttyUSB` numbers are assignment order, not identity: plugging in another
+development board renumbers everything, and the Digilent JTAG cable shows up as
+a `ttyUSB` too. Resolve the console by USB VID:PID instead:
+
+```bash
+scripts/find_fra_uart.sh          # prints e.g. /dev/ttyUSB3
+FRA_UART=/dev/ttyUSB3 ...         # explicit override always wins
+```
+
+| Device | VID:PID | Role |
+| --- | --- | --- |
+| Silicon Labs CP2102N | `10c4:ea60` | AX7015B console, 115200 8N1 |
+| Digilent FT232H | `0403:6014` | JTAG cable — *not* the console |
 
 ## After reprogramming the FPGA
 

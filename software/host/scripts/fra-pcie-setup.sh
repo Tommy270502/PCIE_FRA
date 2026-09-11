@@ -20,8 +20,13 @@ UNBIND=0
 
 [ "${1:-}" = "--unbind" ] && UNBIND=1
 
-RULE_SRC=$(CDPATH= cd -- "$(dirname -- "$0")/../udev" && pwd)/99-fra-pcie.rules
+HOSTDIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+RULE_SRC=$HOSTDIR/udev/99-fra-pcie.rules
 RULE_DST=/etc/udev/rules.d/99-fra-pcie.rules
+MODPROBE_SRC=$HOSTDIR/modprobe.d/fra-pcie.conf
+MODPROBE_DST=/etc/modprobe.d/fra-pcie.conf
+MODLOAD_SRC=$HOSTDIR/modules-load.d/fra-pcie.conf
+MODLOAD_DST=/etc/modules-load.d/fra-pcie.conf
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "error: must run as root (use sudo)" >&2
@@ -73,14 +78,21 @@ if ! getent group "$GROUP" >/dev/null 2>&1; then
 fi
 
 echo "Installing $RULE_DST (group: $GROUP)"
-# The rule also re-binds vfio-pci on every enumeration, so this setup survives
-# a reboot -- driver_override itself is runtime-only state.
 sed "s/GROUP=\"plugdev\"/GROUP=\"$GROUP\"/g; s/chgrp plugdev/chgrp $GROUP/g" \
     "$RULE_SRC" > "$RULE_DST"
 chmod 0644 "$RULE_DST"
 udevadm control --reload-rules
 
+# Persistence across reboots comes from vfio-pci's own ids= parameter rather
+# than from udev: binding a driver inside a udev RUN rule is unreliable.
+echo "Installing $MODPROBE_DST and $MODLOAD_DST"
+install -m 0644 "$MODPROBE_SRC" "$MODPROBE_DST"
+install -m 0644 "$MODLOAD_SRC" "$MODLOAD_DST"
+
 # --- bind to vfio-pci -----------------------------------------------------
+# Reload so the freshly written ids= option takes effect in this boot too,
+# rather than only after the next reboot.
+modprobe -r vfio-pci 2>/dev/null || true
 if ! modprobe vfio-pci; then
     echo "error: cannot load vfio-pci" >&2
     exit 1
@@ -128,7 +140,8 @@ echo "link      : $(cat "$DEVPATH/current_link_speed" 2>/dev/null) x$(cat "$DEVP
 echo "lockdown  : $(cat /sys/kernel/security/lockdown 2>/dev/null || echo 'n/a')"
 echo
 echo "Done. Members of '$GROUP' can now run software/host/fra_bar_test and fra_cli."
-echo "The udev rule re-applies this on every boot, so this is a one-time step."
+echo "vfio-pci claims the endpoint at every boot via $MODPROBE_DST,"
+echo "so this is a one-time step."
 if [ -n "${SUDO_USER:-}" ] && ! id -nG "$SUDO_USER" | tr ' ' '\n' | grep -qx "$GROUP"; then
     echo "NOTE: user '$SUDO_USER' is not in '$GROUP'. Add with:"
     echo "  sudo usermod -aG $GROUP $SUDO_USER   (then log out and back in)"
