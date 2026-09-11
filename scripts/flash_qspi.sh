@@ -44,7 +44,14 @@ if ! "$PROG" -jtagtargets -url "$URL" 2>&1 | grep -q 'jsn-'; then
         done
     fi
 fi
-cleanup() { [ "$STARTED_HW_SERVER" -eq 1 ] && pkill -f 'hw_server' 2>/dev/null || true; }
+# Only tear down an hw_server this script started; one that was already running
+# belongs to whoever started it. pkill returning non-zero just means it is
+# already gone, which is not an error worth failing the trap over.
+cleanup() {
+    if [ "$STARTED_HW_SERVER" -eq 1 ]; then
+        pkill -f 'hw_server' 2>/dev/null || true
+    fi
+}
 trap cleanup EXIT
 
 # Discover the cable rather than hard-coding a serial number. The chain lists

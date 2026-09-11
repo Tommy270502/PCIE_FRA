@@ -29,8 +29,13 @@ jobs:
       - name: Install shellcheck
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends shellcheck
 
-      - name: Shellcheck and warnings-as-errors host build
-        run: make lint
+      # Run as two steps rather than `make lint` so a failure says which half
+      # broke without anyone opening the log. Developers run `make lint`.
+      - name: Shellcheck
+        run: scripts/lint.sh shell
+
+      - name: Host tools, warnings as errors
+        run: scripts/lint.sh c
 
   rtl:
     name: RTL testbenches
