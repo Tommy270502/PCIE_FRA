@@ -3,8 +3,8 @@
 #
 #   scripts/build_boot_image.sh [--out PATH]
 #
-# Replaces the Windows-only build_and_flash_qspi.ps1 packing stage. The .bif is
-# generated here rather than checked in, so it carries no absolute paths.
+# The .bif is generated here rather than checked in: bootgen needs absolute
+# paths in it, so a checked-in copy would only ever be right on one machine.
 #
 # Inputs (all must already be built):
 #   hardware/fra_zynq7015_pcie/export/system_bd_wrapper_pcie.bit

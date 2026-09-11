@@ -104,11 +104,11 @@ precision.
 `fra_cli --loopback cal` followed by `fra_cli --loopback sweep`, 20 log-spaced
 points from 10 Hz to 20 kHz: all 20 points valid, every point normalising to
 `0.000000` dB and `0.000` degrees. Raw CSVs are in
-`docs/assets/pcie_loopback_validation/`.
+`docs/validation/data/pcie-loopback/`.
 
 That figure measures repeatability of the digital chain, not analog accuracy.
 For the analog result with the module fitted, see
-`docs/loopback_accuracy_report.md` (~0.002 dB / ~0.01 degrees post-calibration).
+`docs/validation/loopback-accuracy.md` (~0.002 dB / ~0.01 degrees post-calibration).
 
 ## Recovering the board after flashing
 
@@ -157,7 +157,7 @@ A warm reboot does not.
 ## End-to-end result
 
 `scripts/verify_system.sh`, run on a cold-booted board, passes every check —
-full output in `docs/assets/pcie_loopback_validation/verify_system_after_qspi_boot.txt`.
+full output in `docs/validation/data/pcie-loopback/verify_system_after_qspi_boot.txt`.
 
 A `cal` followed by a `sweep` over PCIe normalises all 20 points to `0.000000`
 dB and `0.000` degrees. Running a sweep with different settings against that
@@ -217,7 +217,7 @@ assignment order rather than identity. Resolve it by USB VID:PID:
 
 ## Still open
 
-1. **The analog front end** (`README.md` Validation check 9). Measuring an RC low-pass against its expected
+1. **The analog front end** (the open row in the `README.md` Validation table). Measuring an RC low-pass against its expected
    response, to the +/-2 dB and +/-15 degrees acceptance target, needs the AN108
    module connected. Nothing in the software or gateware blocks it — the
    loopback exists precisely so the rest of the chain could be proven without

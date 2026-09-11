@@ -8,7 +8,7 @@
 -- This is a trivial register file (no PCIe / transceiver logic) -- the PCIe and
 -- GTP logic all come from the xilinx.com:ip:axi_pcie IP, per the bring-up brief.
 --
--- Register map (32-bit, word-addressed; see docs/PCIE_BAR0_REGISTER_MAP.md):
+-- Register map (32-bit, word-addressed; see docs/register-map.md):
 --   0x00 BOARD_ID  RO  0xA7015B00  -- "AX7015B" board magic
 --   0x04 VERSION   RO  0x00010100  -- gateware version 1.1.0
 --   0x08 SCRATCH   RW  0x00000000  -- host read/write smoke test

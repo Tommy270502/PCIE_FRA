@@ -69,11 +69,11 @@ idx,freq_hz,mag_counts,phase_deg,norm_db,norm_phase_deg,i_acc,q_acc,samples,adc_
 
 The raw magnitude and absolute phase are highly repeatable between the initial sweep, the calibration baseline, and the post-calibration sweep.
 
-![Raw magnitude sequence comparison](assets/loopback_accuracy_run2/raw_magnitude_sequence_comparison.png)
+![Raw magnitude sequence comparison](data/loopback-accuracy/raw_magnitude_sequence_comparison.png)
 
 The absolute phase contains the expected loopback phase slope. In this run, the calibration baseline phase changes from approximately 179.987 deg at 10 Hz to approximately 177.869 deg at 20 kHz. That is a total absolute phase change of approximately 2.118 deg across the sweep.
 
-![Absolute phase sequence comparison](assets/loopback_accuracy_run2/absolute_phase_sequence_comparison.png)
+![Absolute phase sequence comparison](data/loopback-accuracy/absolute_phase_sequence_comparison.png)
 
 This absolute phase slope is not a problem. It is the loopback path characteristic that calibration is intended to remove. The important property is repeatability, and this dataset shows good repeatability.
 
@@ -83,9 +83,9 @@ Before applying the calibration result, the initial sweep and the calibration pa
 
 The largest initial-sweep-to-calibration raw magnitude difference was 0.010 counts. The largest initial-sweep-to-calibration phase difference was 0.007 deg. Expressed as magnitude ratio, the largest initial-sweep-to-calibration difference was approximately 0.0016 dB.
 
-![Initial sweep vs calibration magnitude difference](assets/loopback_accuracy_run2/initial_sweep_vs_calibration_magnitude_difference.png)
+![Initial sweep vs calibration magnitude difference](data/loopback-accuracy/initial_sweep_vs_calibration_magnitude_difference.png)
 
-![Initial sweep vs calibration phase difference](assets/loopback_accuracy_run2/initial_sweep_vs_calibration_phase_difference.png)
+![Initial sweep vs calibration phase difference](data/loopback-accuracy/initial_sweep_vs_calibration_phase_difference.png)
 
 This shows that the loopback response is stable between consecutive acquisitions.
 
@@ -95,7 +95,7 @@ The post-calibration magnitude residual is small.
 
 The worst observed magnitude residual was approximately 0.0022 dB. The total peak-to-peak residual over the complete 10 Hz to 20 kHz sweep was approximately 0.0032 dB, with an RMS residual of approximately 0.00064 dB.
 
-![Post-calibrated magnitude residual](assets/loopback_accuracy_run2/post_calibrated_magnitude_residual.png)
+![Post-calibrated magnitude residual](data/loopback-accuracy/post_calibrated_magnitude_residual.png)
 
 The printed firmware `norm_db` values are rounded to 0.001 dB. For this report, the residual was also recomputed from the raw `mag_counts` values against the calibration baseline.
 
@@ -107,7 +107,7 @@ The post-calibration phase residual is also small.
 
 The worst observed phase residual was approximately 0.011 deg. The total peak-to-peak residual over the complete 10 Hz to 20 kHz sweep was approximately 0.019 deg, with an RMS residual of approximately 0.00356 deg.
 
-![Post-calibrated phase residual](assets/loopback_accuracy_run2/post_calibrated_phase_residual.png)
+![Post-calibrated phase residual](data/loopback-accuracy/post_calibrated_phase_residual.png)
 
 The largest phase residual occurs at 20 kHz, where the post-calibration phase is about +0.011 deg relative to the calibration baseline. This remains very small and is consistent with the lower averaging count at the highest test frequency.
 
@@ -200,7 +200,7 @@ The `sweep -> cal -> sweep` sequence confirms both repeatability before calibrat
 The data used for this report is available under:
 
 ```text
-docs/assets/loopback_accuracy_run2/
+docs/validation/data/loopback-accuracy/
 ```
 
 Included files:

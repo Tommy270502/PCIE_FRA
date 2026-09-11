@@ -1,9 +1,8 @@
 # PCIe-integrated implementation signoff.
 #
 # Runs impl -> bitstream -> XSA on the CURRENT project state (fra_core + the
-# additive PCIe endpoint already in system_bd). Unlike run_fra_build_validation.tcl
-# this does NOT rebuild the block design, so the PCIe additions from
-# add_pcie_endpoint.tcl are preserved.
+# additive PCIe endpoint already in system_bd). It does NOT rebuild the block
+# design -- run add_pcie_endpoint.tcl first if that is what you want, then this.
 #
 # Signoff gates: setup/hold timing clean, adc/dac/pcie_refclk clocks constrained,
 # no DRC or methodology Errors/Critical Warnings. BIT/XSA only written on a clean

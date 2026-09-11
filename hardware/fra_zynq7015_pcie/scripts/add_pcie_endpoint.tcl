@@ -25,8 +25,9 @@
 # The PS-side path to fra_core (M_AXI_GP0 -> axi_smc -> 0x43C0_0000) keeps its
 # address and behaviour, so the UART firmware is unaffected.
 #
-# Kept as a SEPARATE script (not folded into rebuild_functional_fra_bd.tcl) so
-# the known-good fra_core rebuild flow stays pristine; run it AFTER that flow.
+# This script is the sole definition of the block design's PL side. It used to
+# sit downstream of a separate PCIe-free rebuild script; that script was removed
+# because running it silently tore the endpoint back out.
 #
 # Run:
 #   vivado -mode batch -source hardware/fra_zynq7015_pcie/scripts/add_pcie_endpoint.tcl

@@ -72,7 +72,7 @@ over the UART and the same sweep driven over PCIe produce identical numbers.
 from both sides; they must agree to the printed precision.
 
 Register definitions exist three times: `fra_core.vhd`, `fra_pcie.h`, and the
-firmware's `REG_*` defines. `docs/PCIE_BAR0_REGISTER_MAP.md` is the reference.
+firmware's `REG_*` defines. `docs/register-map.md` is the reference.
 
 ## Hardware, and what it costs to get wrong
 
