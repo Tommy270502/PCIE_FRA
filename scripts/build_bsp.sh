@@ -67,6 +67,13 @@ mkdir -p "$BSP/lib"
 PATH=$TOOLCHAIN_BIN:$PATH
 export PATH
 
+# Run cmake from inside the build tree. The BSP's CFLAGS carry -MMD, so cmake's
+# compiler probe -- which compiles from stdin -- drops a stray "-.d" dependency
+# file into the working directory. In the build tree that is just more build
+# output; in the repository root it is litter.
+mkdir -p "$BUILD"
+cd "$BUILD"
+
 cmake -G Ninja -S "$BSP" -B "$BUILD" \
       -DCMAKE_TOOLCHAIN_FILE="$BSP/cortexa9_toolchain.cmake" \
       -DCMAKE_MODULE_PATH="$BSP" \
