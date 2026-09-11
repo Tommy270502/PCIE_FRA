@@ -1,8 +1,0 @@
-# Built by the Makefile
-fra_bar_test
-fra_cli
-*.o
-*.d
-
-# Runtime state written by fra_cli
-fra_cal.csv

@@ -20,7 +20,7 @@ UNBIND=0
 
 [ "${1:-}" = "--unbind" ] && UNBIND=1
 
-HOSTDIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+HOSTDIR=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 RULE_SRC=$HOSTDIR/udev/99-fra-pcie.rules
 RULE_DST=/etc/udev/rules.d/99-fra-pcie.rules
 MODPROBE_SRC=$HOSTDIR/modprobe.d/fra-pcie.conf

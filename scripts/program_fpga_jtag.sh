@@ -22,7 +22,7 @@ set -eu
 VIVADO=${VIVADO:-$HOME/Xilinx/2026.1/Vivado/bin/vivado}
 VITIS=${VITIS:-$HOME/Xilinx/2026.1/Vitis}
 XSDB=$VITIS/bin/xsdb
-REPO=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+REPO=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 
 BIT=
 APP=

@@ -1,20 +1,38 @@
-# NOTE: run with "xsdb", not "xsct" -- Vitis 2026.1 removed xsct. The $xsa path
-# below is a Windows absolute path from the original bring-up and needs editing
-# before use. For a quick check that fra_core answers on AXI, the shorter route
-# is: software/host/fra_cli status (over PCIe) or the board's UART "status".
+# Read and exercise fra_core directly over JTAG (APU AXI), independent of both
+# the UART console and PCIe. Proves fra_core answers on AXI at 0x43C0_0000 in
+# whatever bitstream is currently loaded.
 #
-# Read/exercise fra_core directly over JTAG (APU AXI), independent of UART.
-# Proves fra_core responds on AXI at 0x43C0_0000 in the PCIe-integrated bitstream.
-# Assumes the board is already programmed + PS initialised (program_fra_pcie_jtag.tcl).
+# Run with xsdb -- Vitis 2026.1 removed xsct:
+#   xsdb hardware/fra_zynq7015_pcie/scripts/fra_core_jtag_read.tcl
+#
+# Assumes the board is programmed and the PS is initialised; load a bitstream
+# first with scripts/program_fpga_jtag.sh if it is not.
+#
+# This is the fallback path. When the endpoint enumerates, "fra_cli status" over
+# PCIe or "status" on the board console answer the same question far faster.
 
 set BASE 0x43C00000
-set xsa  "C:/Users/Thomas/Documents/git/PCIE_FRA/hardware/fra_zynq7015_pcie/export/fra_pcie_zynq7015.xsa"
+
+# The XSA gives the debugger the PL address map, without which memory access to
+# 0x43C0_0000 is refused. It is a build artifact, so resolve it relative to this
+# script rather than hardcoding a path; FRA_XSA overrides.
+set script_dir [file dirname [file normalize [info script]]]
+if {[info exists ::env(FRA_XSA)]} {
+    set xsa $::env(FRA_XSA)
+} else {
+    set xsa [file normalize [file join $script_dir .. export fra_pcie_zynq7015.xsa]]
+}
+if {![file exists $xsa]} {
+    puts stderr "error: XSA not found at $xsa"
+    puts stderr "       build it with run_pcie_impl_signoff.tcl, or set FRA_XSA"
+    exit 1
+}
+
 proc rd {a} { return [lindex [mrd -value $a] 0] }
 
 connect
 targets -set -nocase -filter {name =~ "*Cortex-A9*#0*"}
-# Halt the APU so the JTAG debugger is the sole AXI master, and register the
-# PL address map (0x43C0_0000 fra_core) so debugger memory access is allowed.
+# Halt the APU so the JTAG debugger is the sole AXI master.
 stop
 loadhw -hw $xsa -mem-ranges [list {0x40000000 0xBFFFFFFF}]
 

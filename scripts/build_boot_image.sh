@@ -17,7 +17,7 @@ set -eu
 VITIS=${VITIS:-$HOME/Xilinx/2026.1/Vitis}
 BOOTGEN=$VITIS/bin/bootgen
 
-REPO=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+REPO=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 BIT=$REPO/hardware/fra_zynq7015_pcie/export/system_bd_wrapper_pcie.bit
 FSBL=$REPO/software/PCIE_FRA/zynq_fsbl/build/fsbl.elf
 APP=$REPO/software/FRA_Controller/FRA_Controller.elf

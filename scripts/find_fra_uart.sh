@@ -28,6 +28,9 @@ for dev in /dev/ttyUSB* /dev/ttyACM*; do
     [ "$v" = "$VID" ] && [ "$p" = "$PID" ] && matches="$matches $dev"
 done
 
+# Deliberate word splitting: $matches is the space-separated device list built
+# above, and turning it into positional parameters is how the count is taken.
+# shellcheck disable=SC2086
 set -- $matches
 case $# in
     0) echo "no $VID:$PID USB-UART found. Connected serial devices:" >&2

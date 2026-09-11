@@ -8,7 +8,7 @@
 --
 -- Checks:
 --   * BOARD_ID (0x00) reads 0xA7015B00
---   * VERSION  (0x04) reads 0x00010000
+--   * VERSION  (0x04) reads 0x00010100
 --   * SCRATCH/CONTROL/SCRATCH2 (0x08/0x0C/0x10) write + read-back
 --   * WSTRB byte-lane partial writes are honoured
 --   * RO/reserved offsets ignore writes (stay at reset) and read 0 where reserved
@@ -182,7 +182,10 @@ begin
 
     -- Identity / version (read-only)
     axi_read(16#00#, rd); check("BOARD_ID", rd, x"A7015B00");
-    axi_read(16#04#, rd); check("VERSION",  rd, x"00010000");
+    -- 1.1.0. Version 1.0.0 (0x00010000) was the revision before fra_core was
+    -- mapped into the second BAR0 window, so this doubles as a check that the
+    -- gateware under test is the fra_core-over-BAR0 one.
+    axi_read(16#04#, rd); check("VERSION",  rd, x"00010100");
 
     -- SCRATCH (0x08) full write + read-back
     axi_write(16#08#, x"DEADBEEF", "1111");

@@ -16,7 +16,7 @@ set -eu
 VITIS=${VITIS:-$HOME/Xilinx/2026.1/Vitis}
 PROG=$VITIS/bin/program_flash
 
-REPO=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+REPO=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 BOOTBIN=${BOOTBIN:-$REPO/software/BOOT.BIN}
 FSBL=$REPO/software/PCIE_FRA/zynq_fsbl/build/fsbl.elf
 URL=${JTAG_URL:-tcp:localhost:3121}
@@ -56,7 +56,7 @@ TARGET=${JTAG_TARGET:-}
 if [ -z "$TARGET" ]; then
     TARGET=$("$PROG" -jtagtargets -url "$URL" 2>&1 \
              | grep 'name xc7z' \
-             | tr ' \t' '\n\n' | grep -m1 '^jsn-')
+             | tr ' \t' '\n' | grep -m1 '^jsn-')
 fi
 if [ -z "$TARGET" ]; then
     echo "error: no JTAG target found. Is the cable connected and hw_server reachable at $URL?" >&2

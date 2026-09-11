@@ -8,12 +8,11 @@
 # grants group access on every enumeration.
 set -eu
 
-REPO=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+REPO=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 HOST=$REPO/software/host
 # ttyUSB numbering is assignment order, not identity -- plugging in another
 # board renumbers everything -- so resolve the console by USB VID:PID.
 UART=$("$REPO/scripts/find_fra_uart.sh" 2>/dev/null || echo "")
-BDF_GLOB=/sys/bus/pci/devices/*
 
 pass=0
 fail=0
@@ -22,7 +21,7 @@ bad()  { echo "  FAIL  $1"; fail=$((fail + 1)); }
 
 echo "== 1. PCIe enumeration =="
 DEV=
-for d in $BDF_GLOB; do
+for d in /sys/bus/pci/devices/*; do
     [ -r "$d/vendor" ] || continue
     [ "$(cat "$d/vendor")" = "0x10ee" ] && [ "$(cat "$d/device")" = "0x7021" ] && DEV=$d
 done
@@ -34,9 +33,16 @@ if [ -n "$DEV" ]; then
         "2.5 GT/s PCIe x1") ok "link $speed x$width" ;;
         *)                  bad "link is '$speed x$width', expected 2.5 GT/s PCIe x1" ;;
     esac
-    drv=$([ -L "$DEV/driver" ] && basename "$(readlink -f "$DEV/driver")" || echo none)
-    [ "$drv" = "vfio-pci" ] && ok "bound to vfio-pci" \
-                            || bad "driver is '$drv' (run scripts/fra-pcie-setup.sh)"
+    if [ -L "$DEV/driver" ]; then
+        drv=$(basename "$(readlink -f "$DEV/driver")")
+    else
+        drv=none
+    fi
+    if [ "$drv" = "vfio-pci" ]; then
+        ok "bound to vfio-pci"
+    else
+        bad "driver is '$drv' (run software/host/scripts/fra-pcie-setup.sh)"
+    fi
 else
     bad "no 10ee:7021 endpoint -- did the board configure from QSPI before host POST?"
 fi
