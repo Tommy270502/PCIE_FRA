@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Nothing here needs Vivado, Vitis or the board. Those steps are covered by
+# `make gateware` and `scripts/verify_system.sh`, which only run on a bench with
+# the hardware attached. What CI can check is everything either side of that:
+# the host tools compile clean, the shell tooling is sound, and the RTL still
+# passes its self-checking testbenches.
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint and host tools
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends shellcheck
+
+      - name: Shellcheck and warnings-as-errors host build
+        run: make lint
+
+  rtl:
+    name: RTL testbenches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # fra_core, sineLUT and pcie_bar_regs are plain IEEE VHDL with no UNISIM
+      # primitives, so GHDL runs the same testbenches xsim does on the bench.
+      - name: Install GHDL
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ghdl
+
+      - name: Run testbenches
+        env:
+          FRA_SIM: ghdl
+        run: scripts/run_sim.sh all
+
+  hygiene:
+    name: Repository hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Generated output crept into this repository once already: a Vitis CMake
+      # tree full of absolute paths from a machine that no longer exists. This
+      # fails the build if a tracked file carries a developer's home directory,
+      # which is the cheapest reliable signal that something generated got
+      # committed.
+      - name: No absolute developer paths in tracked files
+        run: |
+          if git grep -I -l -E '/home/[a-z]+/|C:[\\/]Users[\\/]' -- \
+               ':!software/PCIE_FRA/**/bsp.yaml' ':!*.xpr' > /tmp/hits; then
+            echo "Tracked files contain absolute paths from a developer machine:"
+            sed 's/^/  /' /tmp/hits
+            echo
+            echo "These are almost always generated files. Remove them and add"
+            echo "the pattern to .gitignore."
+            exit 1
+          fi
+          echo "None found."

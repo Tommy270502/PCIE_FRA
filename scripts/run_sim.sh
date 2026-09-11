@@ -1,36 +1,74 @@
 #!/bin/sh
 # Run a self-checking RTL testbench and report pass/fail.
 #
-#   scripts/run_sim.sh fra_core
-#   scripts/run_sim.sh pcie_bar_regs
-#   scripts/run_sim.sh all
+#   scripts/run_sim.sh [fra_core | pcie_bar_regs | all]
+#   FRA_SIM=ghdl scripts/run_sim.sh all      # force a backend
 #
-# This drives xsim directly rather than through the Vivado project. The project
-# flow (hardware/fra_zynq7015_pcie/scripts/run_*_sim.tcl) does the same thing,
-# but has to open the .xpr and launch a full simulation set, which takes minutes;
-# this takes seconds and needs nothing but the sources. It is the loop to use
-# while working on the RTL.
+# Two backends, same testbenches and same pass criteria:
 #
-# Both testbenches are self-checking. Failed assertions are "severity failure",
-# so a clean run is the absence of failures plus the testbench's own completion
-# message -- checked below, because xsim's exit status alone does not distinguish
-# an assertion failure from a clean finish.
+#   xsim  the simulator shipped with Vivado. Used when it is installed, because
+#         it is the one that also runs in the project flow, so a pass here means
+#         the same thing a pass there does.
+#   ghdl  open source, no Xilinx install needed. The RTL and both testbenches
+#         are plain IEEE VHDL with no UNISIM primitives, so they run unmodified.
+#         This is what CI uses.
+#
+# This drives the simulator directly rather than through the Vivado project. The
+# project flow (hardware/fra_zynq7015_pcie/scripts/run_*_sim.tcl) does the same
+# thing, but has to open the .xpr and launch a full simulation set, which takes
+# minutes; this takes seconds. It is the loop to use while working on the RTL.
+#
+# Both testbenches are self-checking, and a failed assertion is severity failure.
+# A pass is therefore the absence of a failure *and* the testbench's own
+# completion message -- both are required, because neither simulator's exit
+# status reliably distinguishes an assertion failure from a clean finish.
 set -eu
 
 VIVADO_BIN=${VIVADO_BIN:-$HOME/Xilinx/2026.1/Vivado/bin}
 REPO=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 SRC=$REPO/hardware/fra_zynq7015_pcie/fra_zynq7015_pcie.srcs
 
-for t in xvhdl xelab xsim; do
-    [ -x "$VIVADO_BIN/$t" ] || {
-        echo "error: $t not found in $VIVADO_BIN (set VIVADO_BIN=<path>)" >&2
-        exit 1
-    }
-done
-PATH=$VIVADO_BIN:$PATH
-export PATH
+# --- backend selection ----------------------------------------------------
 
-# Which sources each testbench needs, and the line that proves it got to the end.
+BACKEND=${FRA_SIM:-}
+if [ -z "$BACKEND" ]; then
+    if [ -x "$VIVADO_BIN/xsim" ]; then
+        BACKEND=xsim
+    elif command -v ghdl >/dev/null 2>&1; then
+        BACKEND=ghdl
+    else
+        echo "error: no simulator found." >&2
+        echo "       install ghdl, or set VIVADO_BIN to a Vivado bin directory" >&2
+        echo "       (looked for xsim in $VIVADO_BIN)" >&2
+        exit 1
+    fi
+fi
+
+case $BACKEND in
+    xsim)
+        for t in xvhdl xelab xsim; do
+            [ -x "$VIVADO_BIN/$t" ] || {
+                echo "error: $t not found in $VIVADO_BIN (set VIVADO_BIN=<path>)" >&2
+                exit 1
+            }
+        done
+        PATH=$VIVADO_BIN:$PATH
+        export PATH
+        ;;
+    ghdl)
+        command -v ghdl >/dev/null 2>&1 || {
+            echo "error: ghdl not found on PATH" >&2
+            exit 1
+        }
+        ;;
+    *)
+        echo "error: unknown backend '$BACKEND' (want: xsim, ghdl)" >&2
+        exit 2
+        ;;
+esac
+
+# --- per-testbench facts --------------------------------------------------
+
 tb_sources() {
     case $1 in
         fra_core)
@@ -43,12 +81,13 @@ tb_sources() {
 
 # tb_pcie_bar_regs reports mismatches with to_hstring, which is VHDL-2008 only.
 # The Vivado project flow sets file_type {VHDL 2008} on it for the same reason;
-# without this xvhdl resolves to_hstring to the std.textio bit_vector overload
-# and the testbench fails to analyse.
-tb_vhdl_std() {
+# without this the analyser resolves to_hstring to the std.textio bit_vector
+# overload and the testbench does not compile.
+# shellcheck disable=SC2329  # reached only from the simulate_* dispatch
+tb_needs_2008() {
     case $1 in
-        pcie_bar_regs) echo "-2008" ;;
-        *)             echo "" ;;
+        pcie_bar_regs) return 0 ;;
+        *)             return 1 ;;
     esac
 }
 
@@ -61,12 +100,55 @@ tb_success_marker() {
 
 # 20 ms of simulated time covers the slowest stimulus in tb_fra_core; the
 # bar_regs testbench finishes in microseconds and stops itself.
-tb_runtime() {
+# shellcheck disable=SC2329  # reached only from the simulate_* dispatch
+tb_runtime_xsim() {
     case $1 in
         fra_core)      echo "20 ms" ;;
         pcie_bar_regs) echo "20 us" ;;
     esac
 }
+# shellcheck disable=SC2329  # reached only from the simulate_* dispatch
+tb_runtime_ghdl() {
+    case $1 in
+        fra_core)      echo "20ms" ;;
+        pcie_bar_regs) echo "20us" ;;
+    esac
+}
+
+# --- backends -------------------------------------------------------------
+
+# Dispatched by name as "simulate_$BACKEND"; shellcheck cannot see that,
+# and flags this and everything only reachable from it as unused.
+# shellcheck disable=SC2329
+simulate_xsim() {
+    tb=$1; sources=$2; std=
+    tb_needs_2008 "$tb" && std=-2008
+    # shellcheck disable=SC2086  # both are deliberately split argument lists
+    xvhdl $std $sources
+    xelab -debug off "tb_$tb" -s tb_run
+    printf 'run %s; quit\n' "$(tb_runtime_xsim "$tb")" > run.tcl
+    xsim tb_run -t run.tcl
+}
+
+# Dispatched by name as "simulate_$BACKEND"; shellcheck cannot see that,
+# and flags this and everything only reachable from it as unused.
+# shellcheck disable=SC2329
+simulate_ghdl() {
+    tb=$1; sources=$2; std=--std=93
+    tb_needs_2008 "$tb" && std=--std=08
+    # shellcheck disable=SC2086
+    ghdl -a $std --workdir=. $sources
+    # shellcheck disable=SC2086
+    ghdl -e $std --workdir=. "tb_$tb"
+    # An assertion at severity failure stops the run and exits non-zero, which
+    # the caller already treats as a failure; --assert-level keeps notes and
+    # warnings from doing the same.
+    # shellcheck disable=SC2086
+    ghdl -r $std --workdir=. "tb_$tb" \
+         --stop-time="$(tb_runtime_ghdl "$tb")" --assert-level=failure
+}
+
+# --- driver ---------------------------------------------------------------
 
 run_one() {
     tb=$1
@@ -75,53 +157,39 @@ run_one() {
         exit 2
     }
 
+    # Both simulators scatter working files (xsim.dir/, *.cf, *.o, logs) into the
+    # current directory, so give them one of their own and take it away after.
     work=$(mktemp -d "${TMPDIR:-/tmp}/fra_sim_${tb}_XXXXXX")
-    # xsim scatters xsim.dir/, .log, .jou and .pb files into the working
-    # directory, so give it one of its own and take it away afterwards.
-    trap 'rm -rf "$work"' EXIT
-
-    std=$(tb_vhdl_std "$tb")
-
-    echo "== $tb =="
     log=$work/sim.log
-    (
-        cd "$work"
-        # shellcheck disable=SC2086  # both are deliberately split argument lists
-        xvhdl $std $sources
-        xelab -debug off "tb_$tb" -s tb_run
-        printf 'run %s; quit\n' "$(tb_runtime "$tb")" > run.tcl
-        xsim tb_run -t run.tcl
-    ) > "$log" 2>&1 || {
-        echo "  FAIL  simulator exited non-zero"
-        sed 's/^/        /' "$log" | tail -30
-        rm -rf "$work"; trap - EXIT
-        return 1
-    }
+    rc=0
 
-    marker=$(tb_success_marker "$tb")
-    if grep -q 'Failure:' "$log"; then
-        echo "  FAIL  assertion failure"
-        grep -B2 'Failure:' "$log" | sed 's/^/        /'
-        rm -rf "$work"; trap - EXIT
-        return 1
-    fi
-    if ! grep -qF "$marker" "$log"; then
-        echo "  FAIL  testbench did not reach the end (no '$marker')"
+    echo "== $tb ($BACKEND) =="
+    ( cd "$work" && "simulate_$BACKEND" "$tb" "$sources" ) > "$log" 2>&1 || rc=$?
+
+    if [ "$rc" -ne 0 ]; then
+        echo "  FAIL  simulator exited $rc"
         tail -30 "$log" | sed 's/^/        /'
-        rm -rf "$work"; trap - EXIT
-        return 1
+    elif grep -qE '^(.*:)?[0-9]+ ?[munpf]?s.*:\(assertion failure\)|Failure:' "$log"; then
+        echo "  FAIL  assertion failure"
+        grep -B2 -E ':\(assertion failure\)|Failure:' "$log" | sed 's/^/        /'
+        rc=1
+    elif ! grep -qF "$(tb_success_marker "$tb")" "$log"; then
+        echo "  FAIL  testbench did not reach the end (no '$(tb_success_marker "$tb")')"
+        tail -30 "$log" | sed 's/^/        /'
+        rc=1
+    else
+        echo "  PASS  $(tb_success_marker "$tb")"
     fi
 
-    echo "  PASS  $marker"
-    rm -rf "$work"; trap - EXIT
-    return 0
+    rm -rf "$work"
+    return "$rc"
 }
 
 status=0
 case ${1:-all} in
-    all) run_one fra_core || status=1
+    all) run_one fra_core      || status=1
          run_one pcie_bar_regs || status=1 ;;
-    *)   run_one "$1" || status=1 ;;
+    *)   run_one "$1"          || status=1 ;;
 esac
 
 exit $status

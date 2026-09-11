@@ -1,0 +1,40 @@
+# Normalise line endings in the repository. This project has been edited from
+# both Windows and Linux, so without this the same file lands twice with
+# different endings and every diff is noise.
+* text=auto eol=lf
+
+# Vivado and Vitis rewrite these wholesale; treating them as text is still
+# useful for conflict detection but a diff of one is rarely worth reading.
+*.xpr    text eol=lf -diff
+*.bd     text eol=lf -diff
+*.bda    text eol=lf -diff
+*.xci    text eol=lf -diff
+*.ui     text eol=lf -diff
+
+# Sources that must stay LF regardless of platform.
+*.sh     text eol=lf
+*.tcl    text eol=lf
+*.vhd    text eol=lf
+*.c      text eol=lf
+*.h      text eol=lf
+*.ld     text eol=lf
+*.xdc    text eol=lf
+Makefile text eol=lf
+
+# Binary. Never diff, never munge.
+*.pdf    binary
+*.jpg    binary
+*.png    binary
+*.bit    binary
+*.dcp    binary
+*.xsa    binary
+*.elf    binary
+*.a      binary
+*.dtb    binary
+*.BIN    binary
+
+# Measured evidence, not source: keep it out of language statistics so the
+# repository is reported as VHDL and C rather than CSV.
+docs/assets/**  linguist-documentation
+docs/board_files/**  linguist-documentation
+software/PCIE_FRA/**  linguist-vendored

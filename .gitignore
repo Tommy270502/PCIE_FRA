@@ -51,6 +51,12 @@ software/.rigel_lopper/
 software/**/.cache/
 software/**/compile_commands.json
 software/**/.clangd
+# IDE component descriptors and lopper intermediates: regenerated whenever the
+# workspace is opened, and every path in them is absolute.
+software/**/vitis-comp.json
+software/**/lib_list.yaml
+software/**/*.dts.pp
+software/**/*.dts.dtb
 software/**/*.elf
 software/**/*.map
 software/**/*.o

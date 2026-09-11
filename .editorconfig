@@ -1,0 +1,32 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Tabs are syntax in a Makefile, not style.
+[Makefile]
+indent_style = tab
+
+[*.{md,yml,yaml}]
+indent_size = 2
+
+[*.{vhd,vhdl}]
+indent_size = 4
+
+[*.tcl]
+indent_size = 4
+
+# Vendored AMD embeddedsw sources and Vivado-managed project files. Left exactly
+# as the tool writes them so diffs stay reviewable.
+[software/PCIE_FRA/**]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+[*.{xpr,bd,bda,xci,ui}]
+trim_trailing_whitespace = false
+insert_final_newline = false
