@@ -1,0 +1,22 @@
+== 1. PCIe enumeration ==
+  PASS  endpoint present at 0000:08:00.0
+  PASS  link 2.5 GT/s PCIe x1
+  PASS  bound to vfio-pci
+== 2. Host tools build ==
+  PASS  software/host builds
+== 3. BAR0 access ==
+  PASS  fra_bar_test
+          BOARD_ID     = 0xA7015B00 (expect 0xA7015B00) OK
+          VERSION      = 0x00010100
+          VERSION      = 0x00010100
+== 4. Host loopback self-test over PCIe ==
+  PASS  fra_cli selftest
+        100.0      63.6855      63.7490      0.0001       999992   PASS DONE
+        1000.0     63.6853      63.7490      -0.0129      100000   PASS DONE
+        10000.0    63.6827      63.7490      -0.1427      10000    PASS DONE
+        20000.0    63.6774      63.7490      -0.2839      5000     PASS DONE
+== 5. Board UART console ==
+  ....  console at /dev/ttyUSB3
+  PASS  firmware alive, core version 0x00010100
+
+7 passed, 0 failed

@@ -46,6 +46,19 @@ and prints a pass/fail summary. Measured results are in
 
 ## Current state
 
+`scripts/verify_system.sh` passes 7/7 on a cold-booted board:
+
+```
+== 1. PCIe enumeration ==
+  PASS  endpoint present at 0000:08:00.0
+  PASS  link 2.5 GT/s PCIe x1
+  PASS  bound to vfio-pci
+== 2. Host tools build ==      PASS
+== 3. BAR0 access ==           PASS  BOARD_ID 0xA7015B00, VERSION 0x00010100
+== 4. Host loopback self-test over PCIe ==  PASS  (4 frequencies)
+== 5. Board UART console ==    PASS  firmware alive, core version 0x00010100
+```
+
 Working and validated on hardware:
 
 - PCIe link trains at 2.5 GT/s x1; the host enumerates `10ee:7021` with an

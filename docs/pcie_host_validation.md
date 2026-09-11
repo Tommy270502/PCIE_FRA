@@ -154,6 +154,22 @@ stopped the AXI read never completes and the host sees a completion timeout.
 The board is slot-powered, so a full host shutdown (S5) is what power-cycles it.
 A warm reboot does not.
 
+## End-to-end result
+
+`scripts/verify_system.sh`, run on a cold-booted board, passes every check —
+full output in `docs/assets/pcie_loopback_validation/verify_system_after_qspi_boot.txt`.
+
+A `cal` followed by a `sweep` over PCIe normalises all 20 points to `0.000000`
+dB and `0.000` degrees. Running a sweep with different settings against that
+baseline is refused rather than silently misapplied:
+
+```
+warning: fra_cal.csv was taken with a different setup
+  baseline: start=10.000 stop=20000.000 points=20 amp=128 settle=2 measure=4 loopback=1
+  current : start=10.000 stop=20000.000 points=10 amp=128 settle=2 measure=4 loopback=1
+  ignoring it; re-run 'cal' for these settings.
+```
+
 ## QSPI boot, confirmed
 
 After a cold power cycle (host shutdown to S5, which drops slot power):
